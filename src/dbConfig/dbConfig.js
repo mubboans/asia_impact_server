@@ -14,11 +14,11 @@ const { createSustainGoalModel } = require('../Models/SustainGoal');
 
 const sequelize = new Sequelize(
     {
-        dialect: 'mysql',
-        host: '127.0.0.1',
-        username: 'root',
-        password: 'mubashir@30',
-        database: 'asia_impact',
+        dialect: process.env.DB_DIALECT,
+        host: process.env.DB_HOST,
+        username: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_DBNAME,
         logging: false,
         pool: {
             max: 5, // Adjust as needed number of connection
