@@ -41,6 +41,14 @@ const createDocument = (sequelize, DataTypes) => {
                 remark: {
                     type: DataTypes.STRING,
                     allowNull: true
+                },
+                companyid: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true
+                },
+                uboid: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true
                 }
             }, DataTypes),
         {

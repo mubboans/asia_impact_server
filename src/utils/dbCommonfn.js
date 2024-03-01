@@ -6,9 +6,21 @@ const { ModuleHistory } = require("../Models/TrackModuleHistory");
 
 const fnGet = async (modelname, query = {}, include = []) => {
     try {
-        let options = {
+        let options;
+        if (query.limit && query.offset) {
+            options = {
+                ...options,
+                limit: Number(query.limit),
+                offset: Number(query.offset),
+            }
+            delete query.limit;
+            delete query.offset;
+        }
+        options = {
+            ...options,
             raw: true,
             where: { ...query },
+            order: [["id", "DESC"]],
             include: include.length > 0 ? include : '',
         }
         console.log(options, 'options');
@@ -22,7 +34,7 @@ const fnGet = async (modelname, query = {}, include = []) => {
 
 const fnPost = async (modelname, obj, include = [], req) => {
     try {
-        let d = setUserDetails(req, obj)
+        let d = setUserDetails(req, obj);
         const data = await modelname.create(d, include);
         console.log('post data');
         return data;

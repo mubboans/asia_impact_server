@@ -1,7 +1,7 @@
 const momentjsDate = require('moment');
 const moment = require('moment-timezone');
 const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-
+const crypto = require("crypto");
 function ValidateEmail(email) {
     if (emailRegex.test(email)) {
         return true;
@@ -29,10 +29,14 @@ const setUserDetails = (req, obj) => {
     // Check if the user is authenticated and user data is available in req.user
 
     // Set user id in the object
+    console.log(req?.user, 'users');
+    obj = {
+        ...obj,
+        createdBy: req?.user?.userId,
+        updatedBy: req?.user?.userId,
+        lastUsedIp: req?.socket?.remoteAddress
+    }
 
-    obj.createdBy = req?.user?.userId;
-    obj.updatedBy = req?.user?.userId;
-    obj.lastUsedIp = req?.socket?.remoteAddress
 
 
 
@@ -46,11 +50,26 @@ const setUserDetails = (req, obj) => {
     return obj;
 };
 const setUserDelete = (req, obj) => {
-    obj.deletedBy = req.user.userId;
-    obj.lastUsedIp = req.socket?.remoteAddress
+    obj = {
+        ...obj,
+        deletedBy: req.user.userId,
+        lastUsedIp: req.socket?.remoteAddress
+    }
+    // obj.deletedBy = req.user.userId;
+    // obj.lastUsedIp = req.socket?.remoteAddress
     return obj;
+}
+async function createRandomCode(modelname) {
+    let code = crypto.randomBytes(6).toString('hex');
+    // let code = '56cd1538f871';
+    let checkCode = await modelname.findOne({
+        newcode: code
+    })
+    console.log(checkCode, checkCode?.newcode, 'checkCode?.newcode');
+    let newCode = checkCode?.newcode ? crypto.randomBytes(6).toString('hex') : code;
+    return newCode;
 }
 module.exports = {
     formatDateTime, getCurrentFormatedDate, setUserDetails, setUserDelete, ValidateEmail,
-    StringtoDate
+    StringtoDate, createRandomCode
 }

@@ -44,7 +44,7 @@ const createUser = (sequelize, DataTypes) => {
             email: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                unique: true
+                // unique: true
             },
             countrycode: {
                 type: DataTypes.STRING,
@@ -57,7 +57,7 @@ const createUser = (sequelize, DataTypes) => {
             contact: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                unique: true
+                // unique: true
             },
             role: {
                 type: DataTypes.ENUM,
@@ -67,6 +67,11 @@ const createUser = (sequelize, DataTypes) => {
             gender: {
                 type: DataTypes.STRING,
                 allowNull: true
+            },
+            isActive: {
+                type: DataTypes.BOOLEAN,
+                allowNull: true,
+                defaultValue: true,
             },
             dateofbirth: {
                 type: DataTypes.DATE,
@@ -118,8 +123,18 @@ const createUser = (sequelize, DataTypes) => {
             sequelize,
             modelName: 'User',
             tableName: 'User',
-            freezeTableName: true
-        }
+            freezeTableName: true,
+
+        },
+        // {
+        //     indexes: [
+        //         // Create a unique index on email
+        //         {
+        //             unique: true,
+        //             fields: ['email']
+        //         },
+        //     ]
+        // }
     )
     User.beforeCreate(async (user, options) => {
         user.dataValues.password = bcrypt.hashSync(user.dataValues.email + user.dataValues.password, 10); //encrypt password

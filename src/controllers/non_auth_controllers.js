@@ -29,6 +29,7 @@ const registerJoi = Joi.object({
     countrycode: Joi.string().required(),
     linkDevice: Joi.string().optional(),
     document: Joi.object().optional(),
+    lang_id: Joi.number().optional(),
 })
 const loginJoi = Joi.object({
     email: Joi.string().email().required(),
@@ -76,9 +77,15 @@ const Register = TryCatch(async (req, res, next) => {
         return next(customErrorClass.recordExists('User Detail Already Exists'))
     }
     else {
-        body.lastUsedIp = req.ip;
+        body.lastUsedIp = req.socket?.remoteAddress;
         if (body?.document) {
             body.document.lastUsedIp = req.socket?.remoteAddress;
+        }
+        let checkUserVerification = await checkUserverification(body);
+
+        console.log(checkUserVerification);
+        if (!checkUserVerification) {
+            return next(customErrorClass.NotFound("User Not Verified"))
         }
         let user = await fnPost(User, body, {
             include: [
@@ -104,11 +111,28 @@ const Register = TryCatch(async (req, res, next) => {
             }
         }
         let emailbody = getEmailBody(email);
-        await ShootMail({ html: emailbody, recieveremail: body.email, subject: "Successfully Register" });
+        // await ShootMail({ html: emailbody, recieveremail: body.email, subject: "Successfully Register" });
         return returnResponse(res, 200, 'Register Succesfully');
     }
 
 })
+async function checkUserverification(body) {
+    // return new Promise(async (resolve, reject) => {
+    try {
+        let d = await fnGet(Otp, { email: body.email, contact: body.contact, status: 'verify' })
+        console.log(d, 'otp check user');
+        if (d.length > 0) {
+            return true
+        }
+        else {
+            return false;
+        }
+    } catch (error) {
+        console.log(error, 'error occured');
+        return false;
+    }
+    // })
+}
 function generateOTP() {
 
     // Declare a digits variable
@@ -155,7 +179,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
             }
         }
         let emailbody = getEmailBody(email);
-        await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
+        // await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
         query = {
             email: body.email
         }
@@ -172,7 +196,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
         console.log(result, 'result check');
         if (result.length > 0) {
             console.log('record found');
-            fnUpdate(Otp, modelobj, { email: body.email })
+            fnUpdate(Otp, modelobj, { email: body.email, status: "active" })
             return returnResponse(res, 201, "Successfully send otp")
         }
         else {
@@ -198,7 +222,7 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
         console.log(StringtoDate(data.validto), currentDate, 'date check with format');
         console.log(StringtoDate(data.validto) >= currentDate, 'condition');
         if (StringtoDate(data.validto) >= currentDate && data.status == 'active') {
-            fnUpdate(Otp, { status: 'inactive', verifyon: moment().format("YYYY-MM-DD HH:mm:ss") }, { id: data.id })
+            fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss") }, { id: data.id })
             return returnResponse(res, 200, "Otp Verify")
         }
         else {

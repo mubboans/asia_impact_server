@@ -61,5 +61,5 @@ app.use(errorresponse)
 
 app.listen(port, async () => {
   await dbConnect();
-  console.log(`Example app listening on port ${port}`)
+  console.log(`Your app listening on port ${port}`)
 })

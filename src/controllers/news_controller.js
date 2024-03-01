@@ -1,9 +1,14 @@
+const Joi = require("joi");
 const { News } = require("../Models/News");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
+const { createRandomCode } = require("../utils/functionalHelper");
 
+// let newJoi = Joi.object({
+
+// })
 const getNews = TryCatch(async (req, res, next) => {
     console.log(req.user, 'user token data');
     let GetAllNews = await fnGet(News, req.query || {});
@@ -28,12 +33,30 @@ const deleteNews = TryCatch(async (req, res, next) => {
 )
 
 const postNews = TryCatch(async (req, res, next) => {
+    let newcode = await createRandomCode(News);
     console.log('post news');
-    await fnPost(News, req.body, [], req);
+    let body = req.body;
+    if (body.isNew) {
+        if (body.newcode) {
+            return next(customErrorClass.BadRequest('Code is not allowed on new data'))
+        }
+        body = {
+            ...body,
+            newcode
+        }
+    }
+    else {
+        if (!body.newcode) {
+            return next(customErrorClass.BadRequest('News Code Require'))
+        }
+    }
+    await fnPost(News, body, [], req);
     return returnResponse(res, 201, 'Successfully Added News');
 }
 )
+function createCode() {
 
+}
 module.exports = {
     getNews,
     updateNews,

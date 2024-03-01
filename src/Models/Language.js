@@ -40,6 +40,20 @@ const createLanguageModel = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 comment: 'URL of the flag image representing the language',
             },
+            createdBy: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+                foreignKey: true,
+                onDelete: "cascade",
+                references: {
+                    model: "User",
+                    key: "id",
+                },
+            },
+            lastUsedIp: {
+                type: DataTypes.STRING,
+                comment: 'User ip address ',
+            }
         },
         {
             sequelize,
