@@ -6,7 +6,9 @@ const { createModuleHistoryModel } = require('../Models/TrackModuleHistory');
 const { createOtpModel } = require('../Models/Opt');
 const { createUserRelationModel, UserRelation } = require('../Models/UserRelation');
 const { createLanguageModel } = require('../Models/Language');
-const { createSustainGoalModel } = require('../Models/SustainGoal');
+const { createSustainGoalModel, SustainGoal } = require('../Models/SustainGoal');
+const { CompanyNSustain, createCompanyNSustain } = require('../Models/CompanyNSustain');
+const { Company, createCompanyModel } = require('../Models/Company');
 // const User = require('../Models/Users');
 // const Documents = require('../Models/Document');
 // const { syncModel } = require('../Models');
@@ -44,6 +46,8 @@ const dbConnect = async () => {
         createUserRelationModel(sequelize, DataTypes);
         createLanguageModel(sequelize, DataTypes);
         createSustainGoalModel(sequelize, DataTypes);
+        createCompanyNSustain(sequelize, DataTypes);
+        createCompanyModel(sequelize, DataTypes);
 
         User.hasMany(Document, { foreignKey: 'userid', as: 'document' });
         Document.belongsTo(User, { foreignKey: 'userid' });
@@ -52,6 +56,26 @@ const dbConnect = async () => {
         // User.hasMany(UserRelation, { foreignKey: 'investorId' });
 
         UserRelation.belongsTo(User, { foreignKey: 'advisorId', foreignKey: 'investorId' });
+
+        // SustainGoal.hasMany()
+        // CompanyNSustain.belongsTo(SustainGoal,{foreignKey:'sustaingoalid'})
+        Company.belongsToMany(SustainGoal, {
+            through: 'CompanyNSustain', foreignKey: 'companyid',
+            otherKey: 'sustaingoalid', sourceKey: 'id',
+        });
+
+        SustainGoal.belongsToMany(Company, {
+            through: 'CompanyNSustain',
+            foreignKey: 'sustaingoalid', // Use the same column name as in CompanyNSustain
+            otherKey: 'companyid', // Use the same column name as in CompanyNSustain
+            sourceKey: 'id', // Use the primary key column name in SustainGoal
+        });
+
+        // CompanyNSustain.belongsToMany(Company, {
+        //     through: CompanyNSustain, foreignKey: 'companyid',
+        //     otherKey: 'sustaingoalid', sourceKey: 'id',
+        // });
+
         // UserRelation.belongsTo(User, { foreignKey: 'investorId' });
 
         await sequelize.sync({ alter: false });

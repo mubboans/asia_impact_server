@@ -23,7 +23,7 @@ const createLanguageModel = (sequelize, DataTypes) => {
             language_code: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                unique: true,
+                // unique: true,
                 comment: 'Language code following ISO 639-1 or ISO 639-2 standard',
             },
             language_name: {
@@ -43,12 +43,12 @@ const createLanguageModel = (sequelize, DataTypes) => {
             createdBy: {
                 type: DataTypes.INTEGER,
                 allowNull: true,
-                foreignKey: true,
-                onDelete: "cascade",
-                references: {
-                    model: "User",
-                    key: "id",
-                },
+                // foreignKey: true,
+                // onDelete: "cascade",
+                // references: {
+                //     model: "User",
+                //     key: "id",
+                // },
             },
             lastUsedIp: {
                 type: DataTypes.STRING,

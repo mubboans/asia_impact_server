@@ -10,12 +10,12 @@ const createModelInitObj = (obj, DataTypes) => {
         updatedBy: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            foreignKey: true,
-            onDelete: "cascade",
-            references: {
-                model: "User",
-                key: "id",
-            },
+            // foreignKey: true,
+            // onDelete: "cascade",
+            // references: {
+            //     model: "User",
+            //     key: "id",
+            // },
         },
         lastUpdateDate: {
             type: DataTypes.STRING,
@@ -24,12 +24,12 @@ const createModelInitObj = (obj, DataTypes) => {
         createdBy: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            foreignKey: true,
-            onDelete: "cascade",
-            references: {
-                model: "User",
-                key: "id",
-            },
+            // foreignKey: true,
+            // onDelete: "cascade",
+            // references: {
+            //     model: "User",
+            //     key: "id",
+            // },
         },
         createdOn: {
             type: DataTypes.STRING,
@@ -43,12 +43,12 @@ const createModelInitObj = (obj, DataTypes) => {
         deletedBy: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            foreignKey: true,
-            onDelete: "cascade",
-            references: {
-                model: "User",
-                key: "id",
-            },
+            // foreignKey: true,
+            // onDelete: "cascade",
+            // references: {
+            //     model: "User",
+            //     key: "id",
+            // },
         },
     }
 

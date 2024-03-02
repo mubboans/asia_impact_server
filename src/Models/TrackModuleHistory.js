@@ -26,12 +26,12 @@ const createModuleHistoryModel = (sequelize, DataTypes) => {
             deletedBy: {
                 type: DataTypes.INTEGER,
                 allowNull: true,
-                foreignKey: true,
-                onDelete: "cascade",
-                references: {
-                    model: "User",
-                    key: "id",
-                },
+                // foreignKey: true,
+                // onDelete: "cascade",
+                // references: {
+                //     model: "User",
+                //     key: "id",
+                // },
             },
             deletionDate: {
                 type: DataTypes.STRING,

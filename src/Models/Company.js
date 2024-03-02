@@ -18,16 +18,20 @@ const createCompanyModel = (sequelize, DataTypes) => {
                 lang_id: {
                     type: DataTypes.INTEGER,
                     allowNull: false,
-                    foreignKey: true,
-                    onDelete: "cascade",
-                    references: {
-                        model: "Language",
-                        key: "id",
-                    },
+                    // foreignKey: true,
+                    // onDelete: "cascade",
+                    // references: {
+                    //     model: "Language",
+                    //     key: "id",
+                    // },
+                },
+                companylogo: {
+                    type: DataTypes.STRING,
+                    allowNull: true
                 },
                 companycode: {
                     type: DataTypes.STRING,
-                    allowNull: true
+                    allowNull: false
                 },
                 country: {
                     type: DataTypes.ENUM,

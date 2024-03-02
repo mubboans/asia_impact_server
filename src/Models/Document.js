@@ -15,28 +15,32 @@ const createDocument = (sequelize, DataTypes) => {
                 userid: {
                     type: DataTypes.INTEGER,
                     allowNull: true,
-                    foreignKey: true,
-                    onDelete: "cascade",
-                    references: {
-                        model: "User",
-                        key: "id",
-                    },
+                    // foreignKey: true,
+                    // onDelete: "cascade",
+                    // references: {
+                    //     model: "User",
+                    //     key: "id",
+                    // },
                 },
                 documenturl: {
                     type: DataTypes.STRING,
                     allowNull: false,
+                    comment: "Document file url"
                 },
                 documenttype: {
                     type: DataTypes.STRING,
-                    allowNull: false
+                    allowNull: false,
+                    comment: "Document file type"
                 },
                 documentname: {
                     type: DataTypes.STRING,
-                    allowNull: true
+                    allowNull: true,
+                    comment: "Document Name to save"
                 },
                 documentdetail: {
                     type: DataTypes.STRING,
-                    allowNull: true
+                    allowNull: true,
+                    comment: "Document other detail to save"
                 },
                 remark: {
                     type: DataTypes.STRING,
@@ -63,5 +67,4 @@ const createDocument = (sequelize, DataTypes) => {
     });
 }
 
-console.log('Documents exported');
 module.exports = { Document, createDocument };

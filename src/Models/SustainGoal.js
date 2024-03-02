@@ -17,12 +17,12 @@ const createSustainGoalModel = (sequelize, DataTypes) => {
             lang_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
-                foreignKey: true,
-                onDelete: "cascade",
-                references: {
-                    model: "Language",
-                    key: "id",
-                },
+                // foreignKey: true,
+                // onDelete: "cascade",
+                // references: {
+                //     model: "Language",
+                //     key: "id",
+                // },
             },
             type: {
                 type: DataTypes.STRING,
@@ -35,12 +35,12 @@ const createSustainGoalModel = (sequelize, DataTypes) => {
             createdBy: {
                 type: DataTypes.INTEGER,
                 allowNull: true,
-                foreignKey: true,
-                onDelete: "cascade",
-                references: {
-                    model: "User",
-                    key: "id",
-                },
+                // foreignKey: true,
+                // onDelete: "cascade",
+                // references: {
+                //     model: "User",
+                //     key: "id",
+                // },
             },
             lastUsedIp: {
                 type: DataTypes.STRING,

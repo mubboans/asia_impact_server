@@ -111,7 +111,7 @@ const Register = TryCatch(async (req, res, next) => {
             }
         }
         let emailbody = getEmailBody(email);
-        // await ShootMail({ html: emailbody, recieveremail: body.email, subject: "Successfully Register" });
+        await ShootMail({ html: emailbody, recieveremail: body.email, subject: "Successfully Register" });
         return returnResponse(res, 200, 'Register Succesfully');
     }
 
@@ -179,12 +179,10 @@ const SendOTP = TryCatch(async (req, res, next) => {
             }
         }
         let emailbody = getEmailBody(email);
-        // await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
+        await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
         query = {
             email: body.email
         }
-        // let checkRecord = fnUpdate(Otp, modelobj, { email: body.email })
-        // 
     }
     else {
         // otp sms controller
@@ -206,8 +204,9 @@ const SendOTP = TryCatch(async (req, res, next) => {
         }
     }).catch((err) => {
         console.log(err, 'err');
+        return next(customErrorClass.InternalServerError("Internal Server Error"))
     });
-    return
+
     // let createOtp = await fnPost(Otp, modelobj);
 
 }

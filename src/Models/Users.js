@@ -111,12 +111,12 @@ const createUser = (sequelize, DataTypes) => {
             lang_id: {
                 type: DataTypes.INTEGER,
                 allowNull: true,
-                foreignKey: true,
-                onDelete: "cascade",
-                references: {
-                    model: "Language",
-                    key: "id",
-                },
+                // foreignKey: true,
+                // onDelete: "cascade",
+                // references: {
+                //     model: "Language",
+                //     key: "id",
+                // },
             }
         },
         {

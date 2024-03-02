@@ -43,7 +43,20 @@ const fnPost = async (modelname, obj, include = [], req) => {
         throw new CustomError(error?.message, 400)
     }
 }
-
+const fnbulkCreate = async (modelname, arr, req) => {
+    try {
+        let modifiedarr = arr.map((x) => {
+            console.log(x, 'x check in bulk');
+            let d = setUserDetails(req, x);
+            return d;
+        });
+        const data = await modelname.bulkCreate(modifiedarr);
+        return data;
+    } catch (error) {
+        console.log(error, 'error');
+        throw new CustomError(error?.message, 400)
+    }
+}
 const fnUpdate = async (model, obj, condition, req) => {
     try {
         let d = setUserDetails(req, obj,)
@@ -82,5 +95,6 @@ module.exports = {
     fnGet,
     fnPost,
     fnUpdate,
-    fnDelete
+    fnDelete,
+    fnbulkCreate
 }

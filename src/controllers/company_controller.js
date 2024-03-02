@@ -1,0 +1,85 @@
+const { Company } = require("../Models/Company");
+const { CompanyNSustain } = require("../Models/CompanyNSustain");
+const { SustainGoal } = require("../Models/SustainGoal");
+const customErrorClass = require("../error/customErrorClass");
+const { returnResponse } = require("../helper/responseHelper");
+const TryCatch = require("../utils/TryCatchHelper");
+const { fnGet, fnUpdate, fnDelete, fnPost, fnbulkCreate } = require("../utils/dbCommonfn");
+
+const getCompany = TryCatch(async (req, res, next) => {
+    console.log(req.user, 'user token data');
+    let GetAllCompany = await fnGet(Company, req.query || {});
+
+    if (req.query.id) {
+        let GetCompanysustaingoal = await fnGet(CompanyNSustain, { companyid: req.query.id }, [
+            {
+                model: Company,
+                sourceKey: "companyid",
+                foreignKey: "id",
+            },
+            {
+                model: SustainGoal,
+                sourceKey: "sustaingoalid",
+                foreignKey: "id",
+            }
+        ]);
+        console.log(GetCompanysustaingoal, 'GetCompanysustaingoal');
+    }
+
+
+    return returnResponse(res, 200, 'Successfully Get Company', GetAllCompany)
+}
+)
+
+const updateCompany = TryCatch(async (req, res, next) => {
+    let updateStatus = await fnUpdate(Company, req.body, { id: req.body.id }, req)
+    console.log(updateStatus, 'updateStatus');
+    return returnResponse(res, 200, 'Successfully Update Company')
+}
+)
+
+const deleteCompany = TryCatch(async (req, res, next) => {
+    if (!req.query) {
+        next(customErrorClass.BadRequest('id required'))
+    }
+    await fnDelete(Company, req.query, req, "News_" + req.query.id)
+    return returnResponse(res, 200, 'Successfully Delete Company')
+}
+)
+
+const postCompany = TryCatch(async (req, res, next) => {
+    let companycode = await createRandomCode(News);
+    let body = req.body;
+    if (body.isNew) {
+        if (body.companycode) {
+            return next(customErrorClass.BadRequest('Code is not allowed on new data'))
+        }
+        body = {
+            ...body,
+            companycode
+        }
+    }
+    else {
+        if (!body.companycode) {
+            return next(customErrorClass.BadRequest('Company Code Require'))
+        }
+    }
+
+    let cmp = await fnPost(Company, body, [], req);
+
+    let sustainarr = req.body.sustainarr.map((x) => {
+        return {
+            companyid: cmp.id, sustaingoalid: x
+        }
+    })
+    await fnbulkCreate(CompanyNSustain, sustainarr, req);
+    return returnResponse(res, 201, 'Successfully Added Company');
+}
+)
+
+module.exports = {
+    getCompany,
+    updateCompany,
+    deleteCompany,
+    postCompany
+}

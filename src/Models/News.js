@@ -21,12 +21,12 @@ const createNewsModel = (sequelize, DataTypes) => {
                 lang_id: {
                     type: DataTypes.INTEGER,
                     allowNull: false,
-                    foreignKey: true,
-                    onDelete: "cascade",
-                    references: {
-                        model: "Language",
-                        key: "id",
-                    },
+                    // foreignKey: true,
+                    // onDelete: "cascade",
+                    // references: {
+                    //     model: "Language",
+                    //     key: "id",
+                    // },
                 },
                 newcode: {
                     type: DataTypes.STRING,
