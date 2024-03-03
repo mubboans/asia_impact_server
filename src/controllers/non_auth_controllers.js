@@ -13,6 +13,7 @@ const { attachedToken } = require("../utils/jwt");
 const { ValidateEmail, getCurrentFormatedDate, formatDateTime, StringtoDate } = require("../utils/functionalHelper");
 const moment = require("moment");
 const { Otp } = require("../Models/Opt");
+const { Sequelize } = require("sequelize");
 const registerJoi = Joi.object({
     firstname: Joi.string().required(),
     lastname: Joi.string().required(),
@@ -72,7 +73,16 @@ const Register = TryCatch(async (req, res, next) => {
     if (error) {
         throw new CustomErrorObj(error?.details[0]?.message, 400)
     }
-    let userCheck = await fnGet(User, { email: body.email });
+    let userCheck = await User.findOne({
+        where: {
+            [Sequelize.Op.or]: [
+                { email: body.email },
+                { contact: body.contact },
+            ]
+        },
+        // logging: console.log,
+        raw: true
+    })
     if (userCheck.length > 0 && userCheck) {
         return next(customErrorClass.recordExists('User Detail Already Exists'))
     }
