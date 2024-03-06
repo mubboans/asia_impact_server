@@ -29,7 +29,7 @@ const deleteNotification = TryCatch(async (req, res, next) => {
 )
 
 const postNotification = TryCatch(async (req, res, next) => {
-    let notificationcode = await createRandomCode(Notification);
+    let notificationcode = await createRandomCode(Notification, 'notificationcode');
     let body = req.body;
     if (body.isNew) {
         if (body.notificationcode) {

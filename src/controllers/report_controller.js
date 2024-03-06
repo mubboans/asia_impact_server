@@ -55,7 +55,7 @@ const deleteReport = TryCatch(async (req, res, next) => {
 )
 
 const postReport = TryCatch(async (req, res, next) => {
-    let reportcode = await createRandomCode(Report);
+    let reportcode = await createRandomCode(Report, 'reportcode');
     let body = req.body;
     if (body.isNew) {
         if (body.reportcode) {

@@ -50,7 +50,7 @@ const createInsightModel = (sequelize, DataTypes) => {
                     allowNull: true
                 },
                 file_name: {
-                    type: DataTypes.BOOLEAN,
+                    type: DataTypes.STRING,
                     allowNull: true
                 }
             },

@@ -172,6 +172,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
     }
     console.log(body, 'body check');
     let query;
+    let emailbody;
     if (body.sendby == 'mail') {
         const email = {
             body: {
@@ -189,8 +190,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
                 outro: `Your One Time Password (OTP) for verification on Asia Impact is ${modelobj.otp} which is valid for 10 minutes.`
             }
         }
-        let emailbody = getEmailBody(email);
-        await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
+        emailbody = getEmailBody(email);
         query = {
             email: body.email
         }
@@ -217,7 +217,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
         console.log(err, 'err');
         return next(customErrorClass.InternalServerError("Internal Server Error"))
     });
-
+    await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
     // let createOtp = await fnPost(Otp, modelobj);
 
 }

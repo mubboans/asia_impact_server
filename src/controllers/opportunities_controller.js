@@ -41,7 +41,7 @@ const deleteOpportunity = TryCatch(async (req, res, next) => {
 )
 
 const postOpportunity = TryCatch(async (req, res, next) => {
-    let opportunitycode = await createRandomCode(Opportunity);
+    let opportunitycode = await createRandomCode(Opportunity, 'opportunitycode');
     let body = req.body;
     if (body.isNew) {
         if (body.opportunitycode) {

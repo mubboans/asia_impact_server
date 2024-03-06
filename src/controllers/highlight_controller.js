@@ -42,7 +42,7 @@ const deleteHighlight = TryCatch(async (req, res, next) => {
 )
 
 const postHighlight = TryCatch(async (req, res, next) => {
-    let highlightcode = await createRandomCode(Highlight);
+    let highlightcode = await createRandomCode(Highlight, 'highlightcode');
     let body = req.body;
     if (body.isNew) {
         if (body.highlightcode) {

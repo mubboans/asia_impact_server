@@ -2,6 +2,7 @@ const momentjsDate = require('moment');
 const moment = require('moment-timezone');
 const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 const crypto = require("crypto");
+const CustomErrorObj = require('../error/CustomErrorObj');
 function ValidateEmail(email) {
     if (emailRegex.test(email)) {
         return true;
@@ -83,15 +84,26 @@ const setUserDelete = (req, obj) => {
     // obj.lastUsedIp = req.socket?.remoteAddress
     return obj;
 }
-async function createRandomCode(modelname) {
+async function createRandomCode(modelname, fieldname) {
     let code = crypto.randomBytes(6).toString('hex');
-    // let code = '56cd1538f871';
-    let checkCode = await modelname.findOne({
-        newcode: code
-    })
-    console.log(checkCode, checkCode?.newcode, 'checkCode?.newcode');
-    let newCode = checkCode?.newcode ? crypto.randomBytes(6).toString('hex') : code;
-    return newCode;
+    // let codecheck = fieldname ? `${fieldname}:${code}` : '';
+    let q = {
+        [fieldname]: code
+        // fieldname,: code
+    }
+    console.log(q, 'fieldname');
+    let checkCode;
+    try {
+
+        checkCode = await modelname.findOne({
+            where: q
+        })
+        console.log(checkCode, checkCode?.[fieldname], 'checkCode?.newcode');
+        let newCode = checkCode?.[fieldname] ? crypto.randomBytes(6).toString('hex') : code;
+        return newCode;
+    } catch (error) {
+        throw CustomErrorObj(error?.message, 400)
+    }
 }
 module.exports = {
     formatDateTime, getCurrentFormatedDate, setUserDetails, setUserDelete, ValidateEmail,

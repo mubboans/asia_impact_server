@@ -6,7 +6,7 @@ const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
 
 const getLanguage = TryCatch(async (req, res, next) => {
     console.log(req.user, 'user token data');
-    let GetAllLanguage = await fnGet(Language, req.query || {});
+    let GetAllLanguage = await fnGet(Language, req.query || {}, [], true);
     return returnResponse(res, 200, 'Successfully Get Language', GetAllLanguage)
 }
 )

@@ -14,6 +14,7 @@ const { createOpportunityModel, Opportunity } = require('../Models/Opportunities
 const { createNotificationModel } = require('../Models/Notification');
 const { Highlight, createHighLightsModel } = require('../Models/Highlight');
 const { HighlightDetail, createHighlightsOtherDetailModel } = require('../Models/HighlightDetail');
+const { createInsightModel } = require('../Models/Insight');
 // const User = require('../Models/Users');
 // const Documents = require('../Models/Document');
 // const { syncModel } = require('../Models');
@@ -58,6 +59,7 @@ const dbConnect = async () => {
         createNotificationModel(sequelize, DataTypes);
         createHighLightsModel(sequelize, DataTypes);
         createHighlightsOtherDetailModel(sequelize, DataTypes);
+        createInsightModel(sequelize, DataTypes);
 
         User.hasMany(Document, { foreignKey: 'userid', as: 'document' });
         Document.belongsTo(User, { foreignKey: 'userid' });

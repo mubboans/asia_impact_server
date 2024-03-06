@@ -76,7 +76,9 @@ const postCompany = TryCatch(async (req, res, next) => {
             companyid: cmp.id, sustaingoalid: x
         }
     })
-    await fnbulkCreate(CompanyNSustain, sustainarr, req);
+    if (req.body.sustainarr && req.body.sustainarr.length > 0) {
+        await fnbulkCreate(CompanyNSustain, sustainarr, req);
+    }
     return returnResponse(res, 201, 'Successfully Added Company');
 }
 )

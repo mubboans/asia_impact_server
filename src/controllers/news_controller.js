@@ -33,7 +33,7 @@ const deleteNews = TryCatch(async (req, res, next) => {
 )
 
 const postNews = TryCatch(async (req, res, next) => {
-    let newcode = await createRandomCode(News);
+    let newcode = await createRandomCode(News, 'newcode');
     console.log('post news');
     let body = req.body;
     if (body.isNew) {
