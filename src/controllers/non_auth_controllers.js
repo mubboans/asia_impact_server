@@ -19,15 +19,15 @@ const registerJoi = Joi.object({
     lastname: Joi.string().required(),
     password: Joi.string().required(),
     email: Joi.string().email().required(),
-    contact: Joi.string().required(),
-    gender: Joi.string().required(),
-    dateofbirth: Joi.string().required(),
+    contact: Joi.string().optional(),
+    gender: Joi.string().optional(),
+    dateofbirth: Joi.string().optional(),
     img: Joi.string().optional(),
     role: Joi.string().optional(),
     country: Joi.string().optional(),
     // documentId: Joi.string().required(),
     // documentType: Joi.string().required(),
-    countrycode: Joi.string().required(),
+    countrycode: Joi.string().optional(),
     linkDevice: Joi.string().optional(),
     document: Joi.object().optional(),
     lang_id: Joi.number().optional(),
@@ -84,7 +84,7 @@ const Register = TryCatch(async (req, res, next) => {
         // logging: console.log,
         raw: true
     })
-    if (userCheck.length > 0 && userCheck) {
+    if (userCheck?.length > 0 && userCheck) {
         return next(customErrorClass.recordExists('User Detail Already Exists'))
     }
     else {

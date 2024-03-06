@@ -10,6 +10,7 @@ const { postReport, deleteReport, updateReport, getReport } = require("../contro
 const { getOpportunity, updateOpportunity, deleteOpportunity, postOpportunity } = require("../controllers/opportunities_controller");
 const { postNotification, deleteNotification, updateNotification, getNotification } = require("../controllers/notification_controller");
 const { getHighlight, updateHighlight, deleteHighlight, postHighlight } = require("../controllers/highlight_controller");
+const { getInsight, updateInsight, deleteInsight, postInsight } = require("../controllers/insight_controller");
 
 const route = express.Router();
 
@@ -34,6 +35,7 @@ route.route('/notification').get(getNotification).put(updateNotification).delete
 
 route.route('/highlight').get(getHighlight).put(updateHighlight).delete(deleteHighlight).post(postHighlight);
 
+route.route('/insight').get(getInsight).put(updateInsight).delete(deleteInsight).post(postInsight);
 
 route.post("/user/add", postUser);
 route.delete("/user/del", deleteUser)

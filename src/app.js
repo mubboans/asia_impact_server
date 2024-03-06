@@ -8,6 +8,7 @@ const non_auth_route = require("./route/non-authroutes")
 const auth_route = require('./route/authroutes');
 const { dbConnect } = require('./dbConfig/dbConfig');
 const checkToken = require('./middleware/verifyRequest');
+const { route_not_found } = require('./helper/responseHelper');
 
 const app = express()
 const port = process.env.PORT || 8001;
@@ -58,6 +59,9 @@ app.get('/life-check', (req, res) => {
 })
 
 app.use(errorresponse)
+
+app.use(route_not_found)
+
 
 app.listen(port, async () => {
   await dbConnect();

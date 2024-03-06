@@ -8,7 +8,7 @@ const { fnGet, fnUpdate, fnDelete, fnPost, fnbulkCreate } = require("../utils/db
 const { createRandomCode } = require("../utils/functionalHelper");
 
 const getCompany = TryCatch(async (req, res, next) => {
-    let GetAllCompany = await fnGet(Company, req.query || {});
+    let GetAllCompany = await fnGet(Company, req.query || {}, [], true);
     if (req.query.id) {
         let GetAllCompanySustain = await fnGet(CompanyNSustain, { companyid: req.query.id }, [
             // {
@@ -25,8 +25,9 @@ const getCompany = TryCatch(async (req, res, next) => {
                 ]
             }
         ]);
-
+        // console.log(GetAllCompanySustain, 'GetAllCompanySustain');
         GetAllCompany[0].sustaingoaldata = GetAllCompanySustain
+
     }
     return returnResponse(res, 200, 'Successfully Get Company', GetAllCompany)
 }
@@ -51,7 +52,7 @@ const deleteCompany = TryCatch(async (req, res, next) => {
 )
 
 const postCompany = TryCatch(async (req, res, next) => {
-    let companycode = await createRandomCode(Company);
+    let companycode = await createRandomCode(Company, 'companycode');
     let body = req.body;
     if (body.isNew) {
         if (body.companycode) {
