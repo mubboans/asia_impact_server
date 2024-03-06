@@ -4,8 +4,9 @@ const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost, fnbulkCreate } = require("../utils/dbCommonfn");
 const { createRandomCode } = require("../utils/functionalHelper");
 const { Company } = require("../Models/Company");
-const { Highlight } = require("../Models/HIghlight");
+
 const { HighlightDetail } = require("../Models/HighlightDetail");
+const { Highlight } = require("../Models/Highlight");
 
 const getHighlight = TryCatch(async (req, res, next) => {
     let include = [];
