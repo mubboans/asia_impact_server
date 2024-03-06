@@ -10,13 +10,13 @@ const createCompanyNSustain = (sequelize, DataTypes) => {
             {
                 companyid: {
                     type: DataTypes.INTEGER,
-                    allowNull: true,
-                    foreignKey: true,
-                    onDelete: "cascade",
-                    references: {
-                        model: "Company",
-                        key: "id",
-                    },
+                    allowNull: false,
+                    // foreignKey: true,
+                    // onDelete: "cascade",
+                    // references: {
+                    //     model: "Company",
+                    //     key: "id",
+                    // },
                 },
                 sustaingoalid: {
                     type: DataTypes.INTEGER,

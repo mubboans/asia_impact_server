@@ -9,6 +9,11 @@ const { createLanguageModel } = require('../Models/Language');
 const { createSustainGoalModel, SustainGoal } = require('../Models/SustainGoal');
 const { CompanyNSustain, createCompanyNSustain } = require('../Models/CompanyNSustain');
 const { Company, createCompanyModel } = require('../Models/Company');
+const { createReportModel, Report } = require('../Models/Report');
+const { createOpportunityModel, Opportunity } = require('../Models/Opportunities');
+const { createNotificationModel } = require('../Models/Notification');
+const { Highlight, createHighLightsModel } = require('../Models/HIghlight');
+const { HighlightDetail, createHighlightsOtherDetailModel } = require('../Models/HighlightDetail');
 // const User = require('../Models/Users');
 // const Documents = require('../Models/Document');
 // const { syncModel } = require('../Models');
@@ -48,6 +53,11 @@ const dbConnect = async () => {
         createSustainGoalModel(sequelize, DataTypes);
         createCompanyNSustain(sequelize, DataTypes);
         createCompanyModel(sequelize, DataTypes);
+        createReportModel(sequelize, DataTypes);
+        createOpportunityModel(sequelize, DataTypes);
+        createNotificationModel(sequelize, DataTypes);
+        createHighLightsModel(sequelize, DataTypes);
+        createHighlightsOtherDetailModel(sequelize, DataTypes);
 
         User.hasMany(Document, { foreignKey: 'userid', as: 'document' });
         Document.belongsTo(User, { foreignKey: 'userid' });
@@ -57,19 +67,32 @@ const dbConnect = async () => {
 
         UserRelation.belongsTo(User, { foreignKey: 'advisorId', foreignKey: 'investorId' });
 
-        // SustainGoal.hasMany()
-        // CompanyNSustain.belongsTo(SustainGoal,{foreignKey:'sustaingoalid'})
-        Company.belongsToMany(SustainGoal, {
-            through: 'CompanyNSustain', foreignKey: 'companyid',
-            otherKey: 'sustaingoalid', sourceKey: 'id',
-        });
+        SustainGoal.hasMany(CompanyNSustain, { foreignKey: 'sustaingoalid' });
+        CompanyNSustain.belongsTo(SustainGoal, { foreignKey: 'sustaingoalid' });
 
-        SustainGoal.belongsToMany(Company, {
-            through: 'CompanyNSustain',
-            foreignKey: 'sustaingoalid', // Use the same column name as in CompanyNSustain
-            otherKey: 'companyid', // Use the same column name as in CompanyNSustain
-            sourceKey: 'id', // Use the primary key column name in SustainGoal
-        });
+        Company.hasMany(Report, { foreignKey: 'companyid' });
+        Report.belongsTo(Company, { foreignKey: 'companyid' });
+
+        Company.hasMany(Opportunity, { foreignKey: 'companyid' });
+        Opportunity.belongsTo(Company, { foreignKey: 'companyid' });
+
+
+        Highlight.hasMany(HighlightDetail, { foreignKey: 'highlightid', as: 'highligthdetail' });
+        HighlightDetail.belongsTo(Highlight, { foreignKey: 'highlightid' });
+
+        // Company.belongsToMany(SustainGoal, {
+        //     through: CompanyNSustain,
+        //     foreignKey: 'companyid',
+        //     // otherKey: 'sustaingoalid',
+        //     sourceKey: 'id',
+        // });
+
+        // SustainGoal.belongsToMany(Company, {
+        //     through: CompanyNSustain,
+        //     foreignKey: 'sustaingoalid', // Use the same column name as in CompanyNSustain
+        //     // otherKey: 'companyid', // Use the same column name as in CompanyNSustain
+        //     sourceKey: 'id', // Use the primary key column name in SustainGoal
+        // });
 
         // CompanyNSustain.belongsToMany(Company, {
         //     through: CompanyNSustain, foreignKey: 'companyid',

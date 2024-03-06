@@ -25,7 +25,7 @@ const deleteSustainGoal = TryCatch(async (req, res, next) => {
     if (!req.query) {
         next(customErrorClass.BadRequest('id required'))
     }
-    let deleteStatus = await fnDelete(SustainGoal, req.query, req, "SustainGoal" + req.query.id)
+    let deleteStatus = await fnDelete(SustainGoal, req.query, req, "SustainGoal_" + req.query.id)
     return returnResponse(res, 200, 'Successfully Delete SustainGoal')
 }
 )

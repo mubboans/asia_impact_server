@@ -46,7 +46,10 @@ const createSustainGoalModel = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
-
+            isNew: {
+                type: DataTypes.BOOLEAN,
+                allowNull: true
+            }
         },
         {
             sequelize,

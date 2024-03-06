@@ -49,6 +49,30 @@ const setUserDetails = (req, obj) => {
     }
     return obj;
 };
+const setUserDetailsUpdate = (req, obj) => {
+    // Check if the user is authenticated and user data is available in req.user
+
+    // Set user id in the object
+    console.log(req?.user, 'users');
+    obj = {
+        ...obj,
+        // createdBy: req?.user?.userId,
+        updatedBy: req?.user?.userId,
+        lastUsedIp: req?.socket?.remoteAddress
+    }
+
+
+
+
+    // Iterate over the object properties
+    for (const key in obj) {
+        if (obj.hasOwnProperty(key) && typeof obj[key] === 'object') {
+            // Recursively call the function for nested objects
+            setUserDetails(req, obj[key]);
+        }
+    }
+    return obj;
+};
 const setUserDelete = (req, obj) => {
     obj = {
         ...obj,
@@ -71,5 +95,5 @@ async function createRandomCode(modelname) {
 }
 module.exports = {
     formatDateTime, getCurrentFormatedDate, setUserDetails, setUserDelete, ValidateEmail,
-    StringtoDate, createRandomCode
+    StringtoDate, createRandomCode, setUserDetailsUpdate
 }

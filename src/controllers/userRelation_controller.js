@@ -28,19 +28,21 @@ const getUserWithRelation = TryCatch(async (req, res, next) => {
         //     foreignKey: "id",
         // }
         // ]
-        [{
-            model: User,
-            sourceKey: "investorId",
-            foreignKey: "id",
-        },
-        {
-            model: User,
-            sourceKey: "advisorId",
-            foreignKey: "id",
-        }
-        ]
+        [
+            //     {
+            //     model: User,
+            //     sourceKey: "investorId",
+            //     foreignKey: "id",
+            // },
+            {
+                model: User,
+                sourceKey: "advisorId",
+                foreignKey: "id",
+            }
+        ];
+
     console.log(query, 'hit user');
-    let data = await fnGet(UserRelation, req.query || {}, include);
+    let data = await fnGet(UserRelation, req.query || {}, include, false);
     return returnResponse(res, 200, 'Successfully Get Data ', data)
 }
 )

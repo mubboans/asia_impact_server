@@ -3,17 +3,40 @@ const { Model } = require('sequelize');
 
 const { createModelInitObj } = require('.');
 
-class Company extends Model {
+class Report extends Model {
 
 }
 
-const createCompanyModel = (sequelize, DataTypes) => {
-    Company.init(
+const createReportModel = (sequelize, DataTypes) => {
+    Report.init(
         createModelInitObj( //pass only needed field with datatype
             {
-                name: {
+                reporttype: {
                     type: DataTypes.STRING,
                     allowNull: false,
+                    // month-wise report e.g :- monthwise, quaterly and yearly
+                },
+                tag: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                },
+                fromDate: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                },
+                toDate: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                },
+                companyid: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    foreignKey: true,
+                    onDelete: "cascade",
+                    references: {
+                        model: "Company",
+                        key: "id",
+                    },
                 },
                 lang_id: {
                     type: DataTypes.INTEGER,
@@ -25,47 +48,34 @@ const createCompanyModel = (sequelize, DataTypes) => {
                     //     key: "id",
                     // },
                 },
-                companylogo: {
+                fileurl: {
                     type: DataTypes.STRING,
                     allowNull: true
                 },
-                companycode: {
+                filename: {
+                    type: DataTypes.STRING,
+                    allowNull: true
+                },
+                reportcode: {
                     type: DataTypes.STRING,
                     allowNull: false
-                },
-                country: {
-                    type: DataTypes.ENUM,
-                    values: ['india', 'indonesia', 'philippines'],
-                },
-                value: {
-                    type: DataTypes.FLOAT,
-                    allowNull: false,
-                },
-                type: {
-                    type: DataTypes.STRING,
-                    allowNull: true,
-                    defaultValue: "DRs"
-                },
-                sustaingoalarchiveddesc: {
-                    type: DataTypes.TEXT,
-                    allowNull: true,
                 },
                 summarydesc: {
                     type: DataTypes.TEXT,
                     allowNull: true
                 },
-                summaryturnover: {
-                    type: DataTypes.STRING,
-                    allowNull: true
-                },
-                summarycustomerserved: {
-                    type: DataTypes.STRING,
-                    allowNull: true
-                },
-                summaryemployee: {
-                    type: DataTypes.STRING,
-                    allowNull: true
-                },
+                // summaryturnover: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
+                // summarycustomerserved: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
+                // summaryemployee: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
                 impactdecs: {
                     type: DataTypes.TEXT,
                     allowNull: true
@@ -102,22 +112,18 @@ const createCompanyModel = (sequelize, DataTypes) => {
                 otherdetail: {
                     type: DataTypes.STRING,
                     allowNull: true
-                },
-                isNew: {
-                    type: DataTypes.BOOLEAN,
-                    allowNull: true
                 }
             },
             DataTypes
         ),
         {
             sequelize,
-            modelName: 'Company',
+            modelName: 'Report',
             freezeTableName: true,
         },
     )
 };
 
 module.exports = {
-    Company, createCompanyModel
+    Report, createReportModel
 }

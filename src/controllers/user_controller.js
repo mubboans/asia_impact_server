@@ -10,7 +10,7 @@ const getUser = TryCatch(async (req, res, next) => {
     console.log('hit user 10');
     let query = getUserByRole(req, req.query);
     console.log(query, 'hit user');
-    let data = await fnGet(User, query || {}, include);
+    let data = await fnGet(User, query || {}, [], false);
     return returnResponse(res, 200, 'Successfully Get Data ', data)
 }
 )

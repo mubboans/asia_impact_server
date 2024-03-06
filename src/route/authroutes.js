@@ -6,6 +6,10 @@ const { deleteUser, updateUser, getUser, postUser } = require("../controllers/us
 const { getSustainGoal, updateSustainGoal, deleteSustainGoal, postSustainGoal } = require("../controllers/sustain_goal_controller");
 const { getDocument, updateDocument, postDocument, deleteDocument } = require("../controllers/document_controller");
 const { getCompany, updateCompany, deleteCompany, postCompany } = require("../controllers/company_controller");
+const { postReport, deleteReport, updateReport, getReport } = require("../controllers/report_controller");
+const { getOpportunity, updateOpportunity, deleteOpportunity, postOpportunity } = require("../controllers/opportunities_controller");
+const { postNotification, deleteNotification, updateNotification, getNotification } = require("../controllers/notification_controller");
+const { getHighlight, updateHighlight, deleteHighlight, postHighlight } = require("../controllers/highlight_controller");
 
 const route = express.Router();
 
@@ -21,6 +25,15 @@ route.route('/user').put(updateUser).get(getUser);
 route.route('/sustaingoal').get(getSustainGoal).put(updateSustainGoal).delete(deleteSustainGoal).post(postSustainGoal);
 
 route.route('/company').get(getCompany).put(updateCompany).delete(deleteCompany).post(postCompany);
+
+route.route('/report').get(getReport).put(updateReport).delete(deleteReport).post(postReport);
+
+route.route('/opportunity').get(getOpportunity).put(updateOpportunity).delete(deleteOpportunity).post(postOpportunity);
+
+route.route('/notification').get(getNotification).put(updateNotification).delete(deleteNotification).post(postNotification);
+
+route.route('/highlight').get(getHighlight).put(updateHighlight).delete(deleteHighlight).post(postHighlight);
+
 
 route.post("/user/add", postUser);
 route.delete("/user/del", deleteUser)

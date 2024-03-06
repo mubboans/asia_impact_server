@@ -22,7 +22,7 @@ const deleteLanguage = TryCatch(async (req, res, next) => {
     if (!req.query) {
         next(customErrorClass.BadRequest('id required'))
     }
-    await fnDelete(Language, req.query, req, "News_" + req.query.id)
+    await fnDelete(Language, req.query, req, "Language_" + req.query.id)
     return returnResponse(res, 200, 'Successfully Delete Language')
 }
 )

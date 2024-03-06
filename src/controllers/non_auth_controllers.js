@@ -43,11 +43,12 @@ const Login = TryCatch(async (req, res, next) => {
         console.log(error);
         next(customErrorClass.BadRequest(error));
     }
-    let userCheck = await fnGet(User, { email: body.email });
+    let userCheck = await fnGet(User, { email: body.email }, [], true);
     if (userCheck.length > 0 && userCheck) {
         let userDetails = userCheck[0]
         // console.log(userDetails, 'userDetails');
         let hashPass = body.email + body.password;
+        // console.log(hashPass, userDetails.password, 'user password');
         if (bcrypt.compareSync(hashPass, userDetails.password)) {
             const newPayload = { userId: userDetails.id, email: userDetails.email, role: userDetails.role };
             let data = attachedToken(newPayload)
@@ -129,7 +130,7 @@ const Register = TryCatch(async (req, res, next) => {
 async function checkUserverification(body) {
     // return new Promise(async (resolve, reject) => {
     try {
-        let d = await fnGet(Otp, { email: body.email, contact: body.contact, status: 'verify' })
+        let d = await fnGet(Otp, { email: body.email, contact: body.contact, status: 'verify' }, [], true)
         console.log(d, 'otp check user');
         if (d.length > 0) {
             return true
@@ -200,7 +201,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
             contact: body.contact
         }
     }
-    fnGet(Otp, query).then(async (result) => {
+    fnGet(Otp, query, [], true).then(async (result) => {
         console.log(result, 'result check');
         if (result.length > 0) {
             console.log('record found');
@@ -223,7 +224,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
 )
 const VerifyOTP = TryCatch(async (req, res, next) => {
     let body = req.body;
-    let otpData = await fnGet(Otp, { otp: body.otp, ...req.query });
+    let otpData = await fnGet(Otp, { otp: body.otp, ...req.query }, [], true);
     if (otpData && otpData.length > 0) {
         console.log(otpData, 'otpData');
         let data = otpData[0];
@@ -250,7 +251,8 @@ const CheckUserAvailable = TryCatch(async (req, res, next) => {
     if (!req.body.email) {
         throw new CustomErrorObj("Email Required", 400)
     }
-    const user = await fnGet(User, { email: req.body.email })
+    const user = await fnGet(User, { email: req.body.email }, [], true);
+    console.log(user, 'check user');
     if (user.length > 0 && user) {
         return returnResponse(res, 200, "Request Process", { userexists: true })
     }

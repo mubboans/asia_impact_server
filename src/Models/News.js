@@ -61,6 +61,10 @@ const createNewsModel = (sequelize, DataTypes) => {
                 link: {
                     type: DataTypes.STRING,
                     allowNull: true
+                },
+                isNew: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull: true
                 }
             },
             DataTypes

@@ -1,12 +1,13 @@
 const { raw } = require("mysql2");
 const { sequelize } = require("../dbConfig/dbConfig");
 const CustomError = require("../error/CustomErrorObj");
-const { setUserDetails, setUserDelete } = require("./functionalHelper");
+const { setUserDetails, setUserDelete, setUserDetailsUpdate } = require("./functionalHelper");
 const { ModuleHistory } = require("../Models/TrackModuleHistory");
 
-const fnGet = async (modelname, query = {}, include = []) => {
+const fnGet = async (modelname, query = {}, include = [], raw = false) => {
     try {
         let options;
+        raw ? raw = true : raw = false;
         if (query.limit && query.offset) {
             options = {
                 ...options,
@@ -18,7 +19,8 @@ const fnGet = async (modelname, query = {}, include = []) => {
         }
         options = {
             ...options,
-            raw: true,
+            // raw: true,
+            raw,
             where: { ...query },
             order: [["id", "DESC"]],
             include: include.length > 0 ? include : '',
@@ -43,14 +45,22 @@ const fnPost = async (modelname, obj, include = [], req) => {
         throw new CustomError(error?.message, 400)
     }
 }
-const fnbulkCreate = async (modelname, arr, req) => {
+const fnbulkCreate = async (modelname, arr, keys, req) => {
     try {
+        let options = {};
         let modifiedarr = arr.map((x) => {
             console.log(x, 'x check in bulk');
             let d = setUserDetails(req, x);
             return d;
         });
-        const data = await modelname.bulkCreate(modifiedarr);
+        if (keys && keys.length > 0) {
+            options = {
+                updateOnDuplicate: [...keys]
+            }
+        }
+        console.log(modifiedarr, 'modifiedarr');
+        const data = await modelname.bulkCreate(modifiedarr, options);
+        // console.log(data, 'bulk update');
         return data;
     } catch (error) {
         console.log(error, 'error');
@@ -59,7 +69,7 @@ const fnbulkCreate = async (modelname, arr, req) => {
 }
 const fnUpdate = async (model, obj, condition, req) => {
     try {
-        let d = setUserDetails(req, obj,)
+        let d = setUserDetailsUpdate(req, obj)
         console.log(d, condition, 'before update ');
         const data = await model.update(d, { where: condition });
         if (data[0] == 1) {
