@@ -9,7 +9,7 @@ const { sequelize, db } = require("../dbConfig/dbConfig");
 const { User } = require("../Models/Users");
 const { Document } = require("../Models/Document");
 const { getEmailBody, ShootMail } = require("../utils/sendmail");
-const { attachedToken } = require("../utils/jwt");
+const { attachedToken, validateToken } = require("../utils/jwt");
 const { ValidateEmail, getCurrentFormatedDate, formatDateTime, StringtoDate } = require("../utils/functionalHelper");
 const moment = require("moment");
 const { Otp } = require("../Models/Opt");
@@ -35,6 +35,12 @@ const registerJoi = Joi.object({
 const loginJoi = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
+})
+const OTPJoi = Joi.object({
+    email: Joi.string().email().required(),
+    contact: Joi.string().required(),
+    type: Joi.string().required(),
+    sendby: Joi.string().optional()
 })
 const Login = TryCatch(async (req, res, next) => {
     let body = req.body;
@@ -160,7 +166,15 @@ const ForgotPassword = () => {
 }
 
 const SendOTP = TryCatch(async (req, res, next) => {
+
     let body = req.body;
+
+    const { error } = await OTPJoi.validate(body);
+    if (error) {
+        console.log(error);
+        next(customErrorClass.BadRequest(error));
+    }
+
     let modelobj = {
         ...body,
         otp: generateOTP(),
@@ -176,9 +190,9 @@ const SendOTP = TryCatch(async (req, res, next) => {
     if (body.sendby == 'mail') {
         const email = {
             body: {
-                title: 'One time password (OTP) for verification',
-                name: `${body.firstname} ${body.lastname}`,
-                intro: 'Your OTP is generated',
+                title: 'OTP Verification',
+                // name: `${body.firstname} ${body.lastname}`,
+                intro: `Your OTP is generated for ${body.email}`,
                 // action: {
                 //     instructions: 'To get started with us, please Verify ',
                 //     button: {
@@ -187,7 +201,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
                 //         link: 'https://mailgen.js/confirm?s=d9729feb74992cc3482b350163a1a010'
                 //     }
                 // }
-                outro: `Your One Time Password (OTP) for verification on Asia Impact is ${modelobj.otp} which is valid for 10 minutes.`
+                outro: `Your One Time Password (OTP) for verification on Asia Impact is ${modelobj.otp} which is valid for 5 minutes.`
             }
         }
         emailbody = getEmailBody(email);
@@ -261,6 +275,18 @@ const CheckUserAvailable = TryCatch(async (req, res, next) => {
     }
 }
 )
+
+const refereshToken = TryCatch(async (req, res, next) => {
+    let body = req.body;
+    let validateRefreshToken = validateToken(body.token, process.env.REFRESH_TOKEN_SECRET);
+    if (validateRefreshToken.role && validateRefreshToken.userId) {
+        console.log(req.user);
+        next();
+    }
+    else {
+        return next(customErrorClass.InvalidToken("Token is invalid"));
+    }
+})
 module.exports = {
     Login,
     Register,
