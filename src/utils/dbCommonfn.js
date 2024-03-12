@@ -72,7 +72,8 @@ const fnUpdate = async (model, obj, condition, req) => {
         let d = setUserDetailsUpdate(req, obj)
         console.log(d, condition, 'before update ');
         const data = await model.update(d, { where: condition });
-        if (data[0] == 1) {
+        console.log(data, 'data check');
+        if (data[0] !== 0) {
             return true
         }
         else {

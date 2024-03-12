@@ -3,6 +3,7 @@ const express = require('express')
 const cors = require("cors");
 const morgan = require('morgan');
 require('./dbConfig/dbConfig');
+const fileUpload = require('express-fileupload');
 const errorresponse = require('./error/apiErrorHandler')
 const non_auth_route = require("./route/non-authroutes")
 const auth_route = require('./route/authroutes');
@@ -13,6 +14,11 @@ const { route_not_found } = require('./helper/responseHelper');
 const app = express()
 const port = process.env.PORT || 8001;
 
+app.use(fileUpload(
+  //   {
+  //   limits: { fileSize: 3 * 1024 }, // file size
+  // }
+));
 
 const corsOptions = {
   // origin: 'http://127.0.0.1:5173', // to allow specific origin

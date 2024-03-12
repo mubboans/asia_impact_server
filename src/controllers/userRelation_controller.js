@@ -4,7 +4,7 @@ const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
-
+const { Op } = require("sequelize");
 const getUserWithRelation = TryCatch(async (req, res, next) => {
     console.log('hit user 8');
     let d = setUserId(req);
@@ -13,36 +13,23 @@ const getUserWithRelation = TryCatch(async (req, res, next) => {
         ...req.query,
         ...d
     }
-    let include =
-        // req.user.role == 'advisor' ?
-        // [{
-        //     model: User,
-        //     sourceKey: "investorId",
-        //     foreignKey: "id",
-        // }
-        // ]
-        // :
-        // [{
-        //     model: User,
-        //     sourceKey: "advisorId",
-        //     foreignKey: "id",
-        // }
-        // ]
-        [
-            //     {
-            //     model: User,
-            //     sourceKey: "investorId",
-            //     foreignKey: "id",
-            // },
-            {
-                model: User,
-                sourceKey: "advisorId",
-                foreignKey: "id",
+    let include = [
+        {
+            model: User, as: 'advisor', attributes: {
+                exclude: ['password']
             }
-        ];
+        },
+        {
+            model: User, as: 'investor', attributes: {
+                exclude: ['password']
+            }
+        },
+    ];
 
     console.log(query, 'hit user');
     let data = await fnGet(UserRelation, req.query || {}, include, false);
+
+
     return returnResponse(res, 200, 'Successfully Get Data ', data)
 }
 )
@@ -106,6 +93,7 @@ function setUserDetail(user, body) {
         return body;
     }
 }
+
 module.exports = {
     getUserWithRelation,
     updateRelation,

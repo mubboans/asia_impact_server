@@ -15,12 +15,6 @@ const createDocument = (sequelize, DataTypes) => {
                 userid: {
                     type: DataTypes.INTEGER,
                     allowNull: true,
-                    // foreignKey: true,
-                    // onDelete: "cascade",
-                    // references: {
-                    //     model: "User",
-                    //     key: "id",
-                    // },
                 },
                 documenturl: {
                     type: DataTypes.STRING,

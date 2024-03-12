@@ -3,7 +3,7 @@ const { createUser, User } = require('../Models/Users');
 const { createDocument, Document } = require('../Models/Document');
 const { createNewsModel } = require('../Models/News');
 const { createModuleHistoryModel } = require('../Models/TrackModuleHistory');
-const { createOtpModel } = require('../Models/Opt');
+const { createOtpModel } = require('../Models/Otp');
 const { createUserRelationModel, UserRelation } = require('../Models/UserRelation');
 const { createLanguageModel } = require('../Models/Language');
 const { createSustainGoalModel, SustainGoal } = require('../Models/SustainGoal');
@@ -64,10 +64,15 @@ const dbConnect = async () => {
         User.hasMany(Document, { foreignKey: 'userid', as: 'document' });
         Document.belongsTo(User, { foreignKey: 'userid' });
 
-        User.hasMany(UserRelation, { foreignKey: 'advisorId', foreignKey: 'investorId' });
+        User.hasMany(UserRelation, { foreignKey: 'advisorId', as: 'advisor' });
+        User.hasMany(UserRelation, { foreignKey: 'investorId', as: 'investor' });
         // User.hasMany(UserRelation, { foreignKey: 'investorId' });
 
-        UserRelation.belongsTo(User, { foreignKey: 'advisorId', foreignKey: 'investorId' });
+        // UserRelation.belongsTo(User, { foreignKey: 'advisorId', foreignKey: 'investorId' });
+
+        UserRelation.belongsTo(User, { foreignKey: 'advisorId', as: 'advisor' });
+        UserRelation.belongsTo(User, { foreignKey: 'investorId', as: 'investor' });
+
 
         SustainGoal.hasMany(CompanyNSustain, { foreignKey: 'sustaingoalid' });
         CompanyNSustain.belongsTo(SustainGoal, { foreignKey: 'sustaingoalid' });

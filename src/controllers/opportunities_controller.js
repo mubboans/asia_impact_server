@@ -9,14 +9,20 @@ const { createRandomCode } = require("../utils/functionalHelper");
 const { Company } = require("../Models/Company");
 
 const getOpportunity = TryCatch(async (req, res, next) => {
-    let include = [];
-    if (req.query.id) {
-        include = [{
+    let include = [
+        {
             model: Company,
             sourceKey: "companyid",
             foreignKey: "id",
-        }]
-    }
+        }
+    ];
+    // if (req.query.id) {
+    //     include = [{
+    //         model: Company,
+    //         sourceKey: "companyid",
+    //         foreignKey: "id",
+    //     }]
+    // }
     let GetAllOpportunity = await fnGet(Opportunity, req.query || {}, include, false);
     return returnResponse(res, 200, 'Successfully Get Opportunity', GetAllOpportunity)
 }

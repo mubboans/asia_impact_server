@@ -38,7 +38,7 @@ route.route('/highlight').get(getHighlight).put(updateHighlight).delete(deleteHi
 route.route('/insight').get(getInsight).put(updateInsight).delete(deleteInsight).post(postInsight);
 
 route.post("/user/add", postUser);
-route.delete("/user/del", deleteUser)
+route.delete("/user/del", deleteUser);
 
 
 route.route('/document').get(getDocument).put(updateDocument).post(postDocument).delete(deleteDocument);

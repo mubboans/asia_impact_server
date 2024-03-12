@@ -27,7 +27,19 @@ const createOpportunityModel = (sequelize, DataTypes) => {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
-
+                noofdr: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                },
+                priceperdr: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                },
+                
+                bidprice: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                },
                 langid: {
                     type: DataTypes.STRING,
                     allowNull: false,

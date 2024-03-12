@@ -14,7 +14,7 @@ const createOtpModel = (sequelize, DataTypes) => {
         {
             contact: {
                 type: DataTypes.STRING,
-                allowNull: false,
+                allowNull: true,
             },
             email: {
                 type: DataTypes.STRING,

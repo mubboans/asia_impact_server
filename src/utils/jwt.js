@@ -14,7 +14,7 @@ function validateToken(token, secret) {
         return jwt.verify(token, secret);
     } catch (error) {
         console.error('Invalid token:', error.message);
-        throw new CustomErrorObj(error.message, 403);
+        throw new CustomErrorObj(error?.message == 'invalid signature' ? 'Invalid Token' : error?.message, 403);
     }
 }
 

@@ -1,5 +1,6 @@
 const Joi = require("joi");
 const bcrypt = require('bcryptjs');
+
 const CustomErrorObj = require("../error/CustomErrorObj");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
@@ -12,8 +13,9 @@ const { getEmailBody, ShootMail } = require("../utils/sendmail");
 const { attachedToken, validateToken } = require("../utils/jwt");
 const { ValidateEmail, getCurrentFormatedDate, formatDateTime, StringtoDate } = require("../utils/functionalHelper");
 const moment = require("moment");
-const { Otp } = require("../Models/Opt");
+const { Otp } = require("../Models/Otp");
 const { Sequelize } = require("sequelize");
+const FileUpload = require("../utils/uploadFile");
 const registerJoi = Joi.object({
     firstname: Joi.string().required(),
     lastname: Joi.string().required(),
@@ -38,7 +40,7 @@ const loginJoi = Joi.object({
 })
 const OTPJoi = Joi.object({
     email: Joi.string().email().required(),
-    contact: Joi.string().required(),
+    contact: Joi.string().optional(),
     type: Joi.string().required(),
     sendby: Joi.string().optional()
 })
@@ -160,18 +162,24 @@ function generateOTP() {
         OTP += digits[Math.floor(Math.random() * 10)];
     }
     return OTP;
+    // const digits = '0123456789';
+    // let otp = '';
+
+    // for (let i = 0; i < 6; i++) {
+    //     const randomIndex = crypto.randomInt(0, digits.length);
+    //     otp += digits.charAt(randomIndex);
+    // }
+
+    // console.log(otp, 'otp check');
 }
 const ForgotPassword = () => {
 
 }
 
 const SendOTP = TryCatch(async (req, res, next) => {
-
     let body = req.body;
-
     const { error } = await OTPJoi.validate(body);
     if (error) {
-        console.log(error);
         next(customErrorClass.BadRequest(error));
     }
 
@@ -184,7 +192,6 @@ const SendOTP = TryCatch(async (req, res, next) => {
     if (!body.sendby || body.sendby == undefined) {
         next(customErrorClass.BadRequest('Send by required'))
     }
-    console.log(body, 'body check');
     let query;
     let emailbody;
     if (body.sendby == 'mail') {
@@ -215,30 +222,39 @@ const SendOTP = TryCatch(async (req, res, next) => {
             contact: body.contact
         }
     }
+    if (body.type == 'login') {
+        let checkUser = await fnGet(User, query, [], true)
+        if (checkUser.length <= 0) {
+            throw new CustomErrorObj('User not register for login', 404)
+        }
+    }
     fnGet(Otp, query, [], true).then(async (result) => {
         console.log(result, 'result check');
         if (result.length > 0) {
-            console.log('record found');
-            fnUpdate(Otp, modelobj, { email: body.email, status: "active" })
+            if (result[0].type !== body.type) {
+                fnPost(Otp, modelobj);
+            }
+            else {
+                console.log('record found');
+                fnUpdate(Otp, modelobj, query);
+            }
             return returnResponse(res, 201, "Successfully send otp")
         }
         else {
             console.log('no record found');
             fnPost(Otp, modelobj);
-            return returnResponse(res, 201, "Successfully send otp")
+            return returnResponse(res, 200, "Successfully send otp")
         }
     }).catch((err) => {
         console.log(err, 'err');
         return next(customErrorClass.InternalServerError("Internal Server Error"))
     });
     await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
-    // let createOtp = await fnPost(Otp, modelobj);
-
 }
 )
 const VerifyOTP = TryCatch(async (req, res, next) => {
     let body = req.body;
-    let otpData = await fnGet(Otp, { otp: body.otp, ...req.query }, [], true);
+    let otpData = await fnGet(Otp, { otp: body.otp, type: body.type, ...req.query }, [], true);
     if (otpData && otpData.length > 0) {
         console.log(otpData, 'otpData');
         let data = otpData[0];
@@ -247,10 +263,19 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
         console.log(StringtoDate(data.validto) >= currentDate, 'condition');
         if (StringtoDate(data.validto) >= currentDate && data.status == 'active') {
             fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss") }, { id: data.id })
-            return returnResponse(res, 200, "Otp Verify")
+            if (data.type == 'login') {
+                let user = await fnGet(User, { email: data.email }, [], true);
+                const newPayload = { userId: user[0].id, email: user[0].email, role: user[0].role };
+                let tokenData = attachedToken(newPayload)
+                return returnResponse(res, 200, 'Otp Verify',
+                    { ...tokenData, role: user[0].role, id: user[0].id, email: user[0].email, linkDevice: user[0].linkDevice });
+            }
+            else {
+                return returnResponse(res, 200, "Otp Verify")
+            }
         }
         else {
-            next(customErrorClass.BadRequest('Resend it seem your session expire'))
+            next(customErrorClass.BadRequest('It seem your session expire'))
         }
     }
     else {
@@ -278,20 +303,45 @@ const CheckUserAvailable = TryCatch(async (req, res, next) => {
 
 const refereshToken = TryCatch(async (req, res, next) => {
     let body = req.body;
+    console.log(process.env.REFRESH_TOKEN_SECRET);
     let validateRefreshToken = validateToken(body.token, process.env.REFRESH_TOKEN_SECRET);
     if (validateRefreshToken.role && validateRefreshToken.userId) {
-        console.log(req.user);
-        next();
+        delete validateRefreshToken.exp;
+        delete validateRefreshToken.iat;
+        console.log(validateRefreshToken, 'validateRefreshToken');
+        let data = attachedToken(validateRefreshToken);
+        return returnResponse(res, 200, 'Successfully Refresh Token', data);
     }
     else {
-        return next(customErrorClass.InvalidToken("Token is invalid"));
+        return next(customErrorClass.InvalidToken("Referesh token Expire"));
     }
 })
+
+
+const documentUpload = TryCatch(async (req, res, next) => {
+    console.log(req?.files?.file?.size, 'in controller');
+    if (!req.files) {
+        throw new CustomErrorObj('File Required', 400);
+    }
+    if (req?.files?.file.length > 1) {
+        throw new CustomErrorObj('Multiple file not allowed', 400);
+    }
+    if (req?.files?.file?.size > 5000) {
+        throw new CustomErrorObj('File should be within 5mb', 400);
+    }
+    let obj = await FileUpload(req?.files?.file);
+    return returnResponse(res, 200, 'Successfully Uploaded File', obj);
+})
+
+
 module.exports = {
     Login,
     Register,
     ForgotPassword,
     SendOTP,
     VerifyOTP,
-    CheckUserAvailable
+    CheckUserAvailable,
+    refereshToken,
+    documentUpload,
+
 }
