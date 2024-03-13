@@ -5,7 +5,7 @@ const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
 const { getCurrentFormatedDate } = require("../utils/functionalHelper");
-
+const { Sequelize } = require("sequelize");
 const getUser = TryCatch(async (req, res, next) => {
     console.log('hit user 10');
     let query = getUserByRole(req, req.query);
@@ -33,6 +33,21 @@ const deleteUser = TryCatch(async (req, res, next) => {
 )
 
 const postUser = TryCatch(async (req, res, next) => {
+    let body = req.body;
+    let userCheck = await User.findOne({
+        where: {
+            [Sequelize.Op.or]: [
+                { email: body.email },
+                { contact: body.contact },
+            ]
+        },
+        // logging: console.log,
+    })
+    console.log(userCheck, 'userCheck');
+    // if (userCheck !== undefined || userCheck || userCheck !== null) {
+    if (userCheck) {
+        return next(customErrorClass.recordExists('User Detail Already Exists'))
+    }
     fnPost(User, req.body, [], req);
     return returnResponse(res, 201, 'Successfully Added User');
 }

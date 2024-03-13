@@ -31,6 +31,11 @@ const createDocument = (sequelize, DataTypes) => {
                     allowNull: true,
                     comment: "Document Name to save"
                 },
+                documentdate: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
+                    comment: "Document date if any"
+                },
                 documentdetail: {
                     type: DataTypes.STRING,
                     allowNull: true,

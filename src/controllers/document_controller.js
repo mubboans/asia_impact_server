@@ -28,13 +28,12 @@ const deleteDocument = TryCatch(async (req, res, next) => {
     if (!req.query) {
         next(customErrorClass.BadRequest('id required'))
     }
-    await fnDelete(Document, req.query, req, "Report_" + req.query.id)
+    await fnDelete(Document, req.query, req, "Document_" + req.query.id)
     return returnResponse(res, 200, 'Successfully Delete Document')
 }
 )
 
 const postDocument = TryCatch(async (req, res, next) => {
-    console.log('post news');
     await fnPost(Document, req.body, [], req);
     return returnResponse(res, 201, 'Successfully Added Document');
 }

@@ -54,6 +54,22 @@ const createUser = (sequelize, DataTypes) => {
                 type: DataTypes.ENUM,
                 values: ['india', 'indonesia', 'philippines'],
             },
+            zipcode: {
+                type: DataTypes.STRING,
+                allowNull: true
+            },
+            city: {
+                type: DataTypes.STRING,
+                allowNull: true
+            },
+            street: {
+                type: DataTypes.STRING,
+                allowNull: true
+            },
+            housenumber: {
+                type: DataTypes.STRING,
+                allowNull: true
+            },
             contact: {
                 type: DataTypes.STRING,
                 allowNull: false,

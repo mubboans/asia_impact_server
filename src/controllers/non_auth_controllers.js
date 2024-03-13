@@ -90,9 +90,8 @@ const Register = TryCatch(async (req, res, next) => {
             ]
         },
         // logging: console.log,
-        raw: true
     })
-    if (userCheck?.length > 0 && userCheck) {
+    if (userCheck) {
         return next(customErrorClass.recordExists('User Detail Already Exists'))
     }
     else {
@@ -138,7 +137,8 @@ const Register = TryCatch(async (req, res, next) => {
 async function checkUserverification(body) {
     // return new Promise(async (resolve, reject) => {
     try {
-        let d = await fnGet(Otp, { email: body.email, contact: body.contact, status: 'verify' }, [], true)
+        // let d = await fnGet(Otp, { email: body.email, contact: body.contact, status: 'verify' }, [], true)
+        let d = await fnGet(Otp, { email: body.email, status: 'verify' }, [], true)
         console.log(d, 'otp check user');
         if (d.length > 0) {
             return true
@@ -279,7 +279,6 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
         }
     }
     else {
-        console.log('No data found');
         next(customErrorClass.NotFound('No data found'))
         // return returnResponse(res, 200, "Otp No Verify")
     }
