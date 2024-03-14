@@ -41,6 +41,7 @@ const postUser = TryCatch(async (req, res, next) => {
                 { contact: body.contact },
             ]
         },
+        // raw: true
         // logging: console.log,
     })
     console.log(userCheck, 'userCheck');
