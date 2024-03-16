@@ -16,6 +16,7 @@ const moment = require("moment");
 const { Otp } = require("../Models/Otp");
 const { Sequelize } = require("sequelize");
 const FileUpload = require("../utils/uploadFile");
+const sendsms = require("../utils/sendsms");
 const registerJoi = Joi.object({
     firstname: Joi.string().required(),
     lastname: Joi.string().required(),
@@ -249,7 +250,12 @@ const SendOTP = TryCatch(async (req, res, next) => {
         console.log(err, 'err');
         return next(customErrorClass.InternalServerError("Internal Server Error"))
     });
-    await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
+    if (body.sendby == 'mail') {
+        await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
+    }
+    else {
+        await sendsms(body.contact, modelobj.otp);
+    }
 }
 )
 const VerifyOTP = TryCatch(async (req, res, next) => {

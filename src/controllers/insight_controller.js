@@ -10,7 +10,14 @@ const { createRandomCode } = require("../utils/functionalHelper");
 
 // })
 const getInsight = TryCatch(async (req, res, next) => {
-    let GetAllInsight = await fnGet(Insight, req.query || {}, [], true);
+    let options = {
+        ...req.query,
+        attribute: { exclude: ['description'] }
+    }
+    if (req.query.id) {
+        delete options.attribute;
+    }
+    let GetAllInsight = await fnGet(Insight, options, [], true);
     return returnResponse(res, 200, 'Successfully Get Insight', GetAllInsight)
 }
 )

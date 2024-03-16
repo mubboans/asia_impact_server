@@ -11,7 +11,15 @@ const { createRandomCode } = require("../utils/functionalHelper");
 // })
 const getNews = TryCatch(async (req, res, next) => {
     console.log(req.user, 'user token data');
-    let GetAllNews = await fnGet(News, req.query || {});
+    let options = {
+        ...req.query,
+        attribute: { exclude: ['description'] }
+    }
+    if (req.query.id) {
+        delete options.attribute;
+    }
+
+    let GetAllNews = await fnGet(News, options, [], true);
     return returnResponse(res, 200, 'Successfully Get News', GetAllNews)
 }
 )

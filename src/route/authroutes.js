@@ -95,7 +95,7 @@ route
 route
     .route("/notification")
     .get(getNotification)
-    .put(verifyRole("admin"), updateNotification)
+    .put(verifyRole("admin", "investor", "advisor", "legalrepresent"), updateNotification)
     .delete(verifyRole("admin"), deleteNotification)
     .post(verifyRole("admin"), postNotification);
 
@@ -123,9 +123,9 @@ route
 
 route
     .route("/document")
-    .get(verifyRole("admin", "investor", "advisor", "explorer"), getDocument)
-    .put(verifyRole("admin", "investor", "advisor", "explorer"), updateDocument)
-    .post(verifyRole("admin", "investor", "advisor", "explorer"), postDocument)
+    .get(verifyRole("admin", "investor", "advisor", "legalrepresent"), getDocument)
+    .put(verifyRole("admin", "investor", "advisor", "legalrepresent"), updateDocument)
+    .post(verifyRole("admin", "investor", "advisor", "legalrepresent"), postDocument)
     .delete(
         verifyRole("admin", "investor", "advisor", "explorer"),
         deleteDocument

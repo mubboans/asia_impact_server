@@ -37,79 +37,40 @@ const createUser = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            img: {
-                type: DataTypes.STRING,
-                allowNull: true
-            },
+
             email: {
                 type: DataTypes.STRING,
                 allowNull: false,
                 // unique: true
             },
+            contact: {
+                type: DataTypes.STRING,
+                allowNull: true
+            },
             countrycode: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            country: {
+            type: {
                 type: DataTypes.ENUM,
-                values: ['india', 'indonesia', 'philippines'],
-            },
-            zipcode: {
-                type: DataTypes.STRING,
-                allowNull: true
-            },
-            city: {
-                type: DataTypes.STRING,
-                allowNull: true
-            },
-            street: {
-                type: DataTypes.STRING,
-                allowNull: true
-            },
-            housenumber: {
-                type: DataTypes.STRING,
-                allowNull: true
-            },
-            contact: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                // unique: true
+                values: ['admin', 'user'],
+                allowNull: false
             },
             role: {
                 type: DataTypes.ENUM,
                 values: ['explorer', 'investor', 'advisor', 'legalrepresent', 'admin'],
                 defaultValue: "explorer"
             },
-            gender: {
-                type: DataTypes.STRING,
-                allowNull: true
-            },
             isActive: {
                 type: DataTypes.BOOLEAN,
                 allowNull: true,
                 defaultValue: true,
             },
-            dateofbirth: {
-                type: DataTypes.DATE,
-                allowNull: true
-            },
-            // documentId: {
-            //     type: DataTypes.STRING,
-            //     allowNull: true,
-            // },
-            // documentType: {
-            //     type: DataTypes.STRING,
-            //     allowNull: true,
-            //     comment: 'This is a column value may very with document'
-            // },
-            linkDevice: {
-                type: DataTypes.STRING,
-                allowNull: true
-            },
+
             createdDate: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: getCurrentFormatedDate()
+                // defaultValue: getCurrentFormatedDate()
             },
             lastUpdateDate: {
                 type: DataTypes.STRING,
@@ -157,72 +118,5 @@ const createUser = (sequelize, DataTypes) => {
     });
 
 }
-
-
-
-// const Users = (sequelize) => {
-//     return sequelize.define('User', {
-//         firstname: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         lastname: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         password: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         img: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         email: {
-//             type: DataTypes.STRING,
-//             allowNull: false,
-//             unique: true
-//         },
-//         countrycode: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         contact: {
-//             type: DataTypes.STRING,
-//             allowNull: false,
-//             unique: true
-//         },
-//         role: {
-//             type: DataTypes.STRING,
-//             allowNull: true,
-//             defaultValue: "User"
-//         },
-//         gender: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         dateofbirth: {
-//             type: DataTypes.DATE,
-//             allowNull: true
-//         },
-//         documentId: {
-//             type: DataTypes.STRING,
-//             allowNull: true,
-//         },
-//         documentType: {
-//             type: DataTypes.STRING,
-//             allowNull: true,
-//             comment: 'This is a column value may very with document'
-//         },
-//         linkDevice: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         }
-//     }, {
-//         freezeTableName: true
-//     }
-//     )
-// }
-// User.hasMany(Document);
 console.log('user exported');
 module.exports = { User, createUser };

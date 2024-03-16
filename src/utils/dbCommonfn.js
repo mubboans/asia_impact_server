@@ -1,21 +1,31 @@
 const { raw } = require("mysql2");
 const { sequelize } = require("../dbConfig/dbConfig");
 const CustomError = require("../error/CustomErrorObj");
-const { setUserDetails, setUserDelete, setUserDetailsUpdate } = require("./functionalHelper");
+const { setUserDetails, setUserDelete, setUserDetailsUpdate, getCurrentFormatedDate } = require("./functionalHelper");
 const { ModuleHistory } = require("../Models/TrackModuleHistory");
 
 const fnGet = async (modelname, query = {}, include = [], raw = false) => {
     try {
         let options;
+
         raw ? raw = true : raw = false;
+        let pageno;
         if (query.limit && query.offset) {
+            pageno = Number(query.offset);
             options = {
                 ...options,
                 limit: Number(query.limit),
-                offset: Number(query.offset),
+                offset: (pageno - 1) * query.limit,
             }
             delete query.limit;
             delete query.offset;
+        }
+        if (query.attribute) {
+            options = {
+                ...options,
+                attributes: query.attribute
+            }
+            delete query.attribute;
         }
         options = {
             ...options,
@@ -25,18 +35,30 @@ const fnGet = async (modelname, query = {}, include = [], raw = false) => {
             order: [["id", "DESC"]],
             include: include.length > 0 ? include : '',
         }
-        console.log(options, 'options');
-        const data = await modelname.findAll(options);
-        return data;
+        console.log(options, 'check option', options.limit && options.offset);
+        if (options.limit) {
+            let { rows, count } = await modelname.findAndCountAll(options);
+            return {
+                totalPage: Math.ceil(count / options.limit),
+                totalRecords: count,
+                currentPage: pageno,
+                currentLimit: options.limit,
+                data: rows
+            }
+        }
+        else {
+            let data = await modelname.findAll(options);
+            return data;
+        }
     } catch (error) {
         console.log(error, 'error check');
         throw new CustomError(error?.message, 500)
     }
 }
-
 const fnPost = async (modelname, obj, include = [], req) => {
     try {
         let d = setUserDetails(req, obj);
+        d.createdDate = getCurrentFormatedDate();
         const data = await modelname.create(d, include);
         console.log('post data');
         return data;

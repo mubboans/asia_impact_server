@@ -10,46 +10,99 @@ class UserDetail extends Model {
 const createUserDetail = (sequelize, DataTypes) => {
     UserDetail.init(
         {
-            companyname: {
+            userid: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                references: {
+                    model: 'User',
+                    key: 'id',
+                },
+            },
+            img: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            companyincorporatedate: {
+            residencecountry: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            taxidentificationnumber: {
+            country: {
+                type: DataTypes.ENUM,
+                values: ['india', 'indonesia', 'philippines'],
+            },
+            zipcode: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            numberofubo: {
+            city: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            numberoflr: {
+            street: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            traderegisterurl: {
+            housenumber: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            authorizedsignatureurl: {
+            gender: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            articleassociateurl: {
+            dateofbirth: {
+                type: DataTypes.DATE,
+                allowNull: true
+            },
+            linkDevice: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            financialstatementurl: {
-                type: DataTypes.STRING,
-                allowNull: true
-            },
+
+
+
+
+
+
+            // companyname: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true
+            // },
+            // companyincorporatedate: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true
+            // },
+            // taxidentificationnumber: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true
+            // },
+            // numberofubo: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true
+            // },
+            // numberoflr: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true
+            // },
+            // traderegisterurl: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true
+            // },
+            // authorizedsignatureurl: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true
+            // },
+            // articleassociateurl: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true
+            // },
+            // financialstatementurl: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true
+            // },
             createdDate: {
                 type: DataTypes.STRING,
-                allowNull: true,
-                defaultValue: getCurrentFormatedDate()
+                allowNull: true
             },
             lastUpdateDate: {
                 type: DataTypes.STRING,
@@ -78,77 +131,10 @@ const createUserDetail = (sequelize, DataTypes) => {
         },
 
     )
-    UserDetail.beforeCreate(async (UserDetail, options) => {
-        UserDetail.dataValues.password = bcrypt.hashSync(UserDetail.dataValues.email + UserDetail.dataValues.password, 10); //encrypt password
-    });
+    // UserDetail.beforeCreate(async (UserDetail, options) => {
+    //     UserDetail.dataValues.password = bcrypt.hashSync(UserDetail.dataValues.email + UserDetail.dataValues.password, 10); //encrypt password
+    // });
 
 }
 
-
-
-// const UserDetails = (sequelize) => {
-//     return sequelize.define('UserDetail', {
-//         firstname: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         lastname: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         password: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         img: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         email: {
-//             type: DataTypes.STRING,
-//             allowNull: false,
-//             unique: true
-//         },
-//         countrycode: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         contact: {
-//             type: DataTypes.STRING,
-//             allowNull: false,
-//             unique: true
-//         },
-//         role: {
-//             type: DataTypes.STRING,
-//             allowNull: true,
-//             defaultValue: "UserDetail"
-//         },
-//         gender: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         },
-//         dateofbirth: {
-//             type: DataTypes.DATE,
-//             allowNull: true
-//         },
-//         documentId: {
-//             type: DataTypes.STRING,
-//             allowNull: true,
-//         },
-//         documentType: {
-//             type: DataTypes.STRING,
-//             allowNull: true,
-//             comment: 'This is a column value may very with document'
-//         },
-//         linkDevice: {
-//             type: DataTypes.STRING,
-//             allowNull: true
-//         }
-//     }, {
-//         freezeTableName: true
-//     }
-//     )
-// }
-// UserDetail.hasMany(Document);
-console.log('UserDetail exported');
 module.exports = { UserDetail, createUserDetail };
