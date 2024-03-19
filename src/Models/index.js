@@ -33,7 +33,7 @@ const createModelInitObj = (obj, DataTypes) => {
         },
         createdOn: {
             type: DataTypes.STRING,
-            defaultValue: () => getCurrentFormatedDate(),
+            // defaultValue: () => getCurrentFormatedDate(),
         },
         deletionDate: {
             type: DataTypes.STRING,

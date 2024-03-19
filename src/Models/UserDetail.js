@@ -34,6 +34,10 @@ const createUserDetail = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true
             },
+            state: {
+                type: DataTypes.STRING,
+                allowNull: true
+            },
             city: {
                 type: DataTypes.STRING,
                 allowNull: true
@@ -58,48 +62,6 @@ const createUserDetail = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-
-
-
-
-
-
-            // companyname: {
-            //     type: DataTypes.STRING,
-            //     allowNull: true
-            // },
-            // companyincorporatedate: {
-            //     type: DataTypes.STRING,
-            //     allowNull: true
-            // },
-            // taxidentificationnumber: {
-            //     type: DataTypes.STRING,
-            //     allowNull: true
-            // },
-            // numberofubo: {
-            //     type: DataTypes.STRING,
-            //     allowNull: true
-            // },
-            // numberoflr: {
-            //     type: DataTypes.STRING,
-            //     allowNull: true
-            // },
-            // traderegisterurl: {
-            //     type: DataTypes.STRING,
-            //     allowNull: true
-            // },
-            // authorizedsignatureurl: {
-            //     type: DataTypes.STRING,
-            //     allowNull: true
-            // },
-            // articleassociateurl: {
-            //     type: DataTypes.STRING,
-            //     allowNull: true
-            // },
-            // financialstatementurl: {
-            //     type: DataTypes.STRING,
-            //     allowNull: true
-            // },
             createdDate: {
                 type: DataTypes.STRING,
                 allowNull: true

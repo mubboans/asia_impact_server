@@ -13,7 +13,8 @@ function FileUpload(file, isMultiple) {
             resolve({
                 fileurl: 'https://epaper.mid-day.com/ePaperImg/md_11032024/?src=direct#epaper_Mumbai/3',
                 filename: file?.name,
-                filetype: file?.mimetype
+                filetype: file?.mimetype,
+                filesize: `${file?.size / 1024} KB`,
             })
 
         } catch (error) {

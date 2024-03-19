@@ -15,6 +15,9 @@ const { createNotificationModel } = require('../Models/Notification');
 const { Highlight, createHighLightsModel } = require('../Models/Highlight');
 const { HighlightDetail, createHighlightsOtherDetailModel } = require('../Models/HighlightDetail');
 const { createInsightModel } = require('../Models/Insight');
+const { createUserDetail, UserDetail } = require('../Models/UserDetail');
+const { createLrDetail, LrDetail } = require('../Models/LRDetail');
+const { createFileStore } = require('../Models/FIleStore');
 // const User = require('../Models/Users');
 // const Documents = require('../Models/Document');
 // const { syncModel } = require('../Models');
@@ -60,23 +63,41 @@ const dbConnect = async () => {
         createHighLightsModel(sequelize, DataTypes);
         createHighlightsOtherDetailModel(sequelize, DataTypes);
         createInsightModel(sequelize, DataTypes);
+        createUserDetail(sequelize, DataTypes);
+        createLrDetail(sequelize, DataTypes);
+        createFileStore(sequelize, DataTypes);
+
 
         User.hasMany(Document, { foreignKey: 'userid', as: 'document' });
         Document.belongsTo(User, { foreignKey: 'userid' });
 
+        User.hasMany(UserDetail, { foreignKey: 'userid', as: 'userdetail' });
+        UserDetail.belongsTo(User, { foreignKey: 'userid' });
+
+
+        User.hasMany(LrDetail, { foreignKey: 'userid', as: 'lrdetail' });
+        LrDetail.belongsTo(User, { foreignKey: 'userid' });
+
+        UserDetail.hasMany(LrDetail, { foreignKey: 'userdetailid', as: 'userlrdetail' });
+        LrDetail.belongsTo(UserDetail, { foreignKey: 'userdetailid' });
+
+
+        UserDetail.hasMany(Document, { foreignKey: 'userdetailid', as: 'document' });
+        Document.belongsTo(UserDetail, { foreignKey: 'userdetailid' });
+
+        LrDetail.hasMany(Document, { foreignKey: 'lrdetailid', as: 'document' });
+        Document.belongsTo(LrDetail, { foreignKey: 'lrdetailid' });
+
+
+
         User.hasMany(UserRelation, { foreignKey: 'advisorId', as: 'advisor' });
         User.hasMany(UserRelation, { foreignKey: 'investorId', as: 'investor' });
-        // User.hasMany(UserRelation, { foreignKey: 'investorId' });
-
-        // UserRelation.belongsTo(User, { foreignKey: 'advisorId', foreignKey: 'investorId' });
-
         UserRelation.belongsTo(User, { foreignKey: 'advisorId', as: 'advisor' });
         UserRelation.belongsTo(User, { foreignKey: 'investorId', as: 'investor' });
 
 
         SustainGoal.hasMany(CompanyNSustain, { foreignKey: 'sustaingoalid' });
         CompanyNSustain.belongsTo(SustainGoal, { foreignKey: 'sustaingoalid' });
-
         Company.hasMany(Report, { foreignKey: 'companyid' });
         Report.belongsTo(Company, { foreignKey: 'companyid' });
 
@@ -87,28 +108,8 @@ const dbConnect = async () => {
         Highlight.hasMany(HighlightDetail, { foreignKey: 'highlightid', as: 'highligthdetail' });
         HighlightDetail.belongsTo(Highlight, { foreignKey: 'highlightid' });
 
-        // Company.belongsToMany(SustainGoal, {
-        //     through: CompanyNSustain,
-        //     foreignKey: 'companyid',
-        //     // otherKey: 'sustaingoalid',
-        //     sourceKey: 'id',
-        // });
 
-        // SustainGoal.belongsToMany(Company, {
-        //     through: CompanyNSustain,
-        //     foreignKey: 'sustaingoalid', // Use the same column name as in CompanyNSustain
-        //     // otherKey: 'companyid', // Use the same column name as in CompanyNSustain
-        //     sourceKey: 'id', // Use the primary key column name in SustainGoal
-        // });
-
-        // CompanyNSustain.belongsToMany(Company, {
-        //     through: CompanyNSustain, foreignKey: 'companyid',
-        //     otherKey: 'sustaingoalid', sourceKey: 'id',
-        // });
-
-        // UserRelation.belongsTo(User, { foreignKey: 'investorId' });
-
-        await sequelize.sync({ alter: false });
+        await sequelize.sync({ alter: false, force: false });
 
     } catch (error) {
         console.log(error, 'error ');

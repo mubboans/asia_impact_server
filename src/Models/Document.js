@@ -1,7 +1,5 @@
 
 const { Model } = require('sequelize');
-const { User } = require("./Users");
-const { getCurrentFormatedDate } = require("../utils/functionalHelper");
 const { createModelInitObj } = require('.');
 
 class Document extends Model {
@@ -32,7 +30,7 @@ const createDocument = (sequelize, DataTypes) => {
                     type: DataTypes.INTEGER,
                     allowNull: true,
                     references: {
-                        model: 'UserDetail',
+                        model: 'LrDetail',
                         key: 'id',
                     },
                 },
@@ -68,6 +66,34 @@ const createDocument = (sequelize, DataTypes) => {
                 fileName: {
                     type: DataTypes.STRING,
                     allowNull: true,
+                },
+                isResidence: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull: true,
+                },
+                country: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
+                },
+                zipcode: {
+                    type: DataTypes.STRING,
+                    allowNull: true
+                },
+                state: {
+                    type: DataTypes.STRING,
+                    allowNull: true
+                },
+                city: {
+                    type: DataTypes.STRING,
+                    allowNull: true
+                },
+                street: {
+                    type: DataTypes.STRING,
+                    allowNull: true
+                },
+                housenumber: {
+                    type: DataTypes.STRING,
+                    allowNull: true
                 },
                 documentdetail: {
                     type: DataTypes.STRING,

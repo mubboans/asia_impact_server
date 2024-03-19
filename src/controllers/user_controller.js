@@ -1,3 +1,6 @@
+const { Document } = require("../Models/Document");
+const { LrDetail } = require("../Models/LRDetail");
+const { UserDetail } = require("../Models/UserDetail");
 const { UserRelation } = require("../Models/UserRelation");
 const { User } = require("../Models/Users");
 const customErrorClass = require("../error/customErrorClass");
@@ -8,9 +11,43 @@ const { getCurrentFormatedDate } = require("../utils/functionalHelper");
 const { Sequelize } = require("sequelize");
 const getUser = TryCatch(async (req, res, next) => {
     console.log('hit user 10');
+    let include = [];
     let query = getUserByRole(req, req.query);
+    // query = {
+
+    //     ...query,
+
+    // }
     console.log(query, 'hit user');
-    let data = await fnGet(User, query || {}, [], false);
+    if (req.query.id) {
+        if (req.query.limit || req.query.offset) {
+            next(customErrorClass.BadRequest("Invalid query with Id"))
+        }
+        include.push({
+            model: UserDetail,
+            // attributes: {
+            //         exclude: ['password']
+            //     }
+            include: [
+                {
+                    model: LrDetail,
+                    sourceKey: "userdetailid",
+                    foreignKey: "id",
+                    as: "userlrdetail",
+                    include: {
+                        model: Document,
+                        sourceKey: "lrdetailid",
+                        foreignKey: "id",
+                        as: 'document'
+                    }
+                }
+            ],
+            sourceKey: "userid",
+            foreignKey: "id",
+            as: "userdetail"
+        })
+    }
+    let data = await fnGet(User, query || {}, include, false);
     return returnResponse(res, 200, 'Successfully Get Data ', data)
 }
 )
@@ -34,6 +71,7 @@ const deleteUser = TryCatch(async (req, res, next) => {
 
 const postUser = TryCatch(async (req, res, next) => {
     let body = req.body;
+    let include;
     let userCheck = await User.findOne({
         where: {
             [Sequelize.Op.or]: [
@@ -49,18 +87,44 @@ const postUser = TryCatch(async (req, res, next) => {
     if (userCheck) {
         return next(customErrorClass.recordExists('User Detail Already Exists'))
     }
-    fnPost(User, req.body, [], req);
+    if (body.userdetail) {
+        include =
+        {
+            include: [
+                'userdetail'
+            ],
+        }
+
+    }
+    else {
+        include = [];
+    }
+    fnPost(User, req.body, include, req);
     return returnResponse(res, 201, 'Successfully Added User');
 }
 )
+
+const postUserDetail = TryCatch(async (req, res, next) => {
+    let body = req.body;
+    let include;
+    if (body.lrdetail) {
+        include = {
+            include: ['']
+        }
+    }
+    fnPost(UserDetail, body, { include }, req);
+    return returnResponse(res, 201, 'Successfully Added User');
+}
+)
+
 function getUserByRole(req, option) {
     if (req.user.role == 'admin') {
         return option;
     }
     else {
-        option = {
+        return option = {
             ...option,
-            role: 'explorer'
+            role: req.user.role
         }
     }
 }
@@ -68,5 +132,6 @@ module.exports = {
     getUser,
     updateUser,
     deleteUser,
-    postUser
+    postUser,
+    postUserDetail
 }

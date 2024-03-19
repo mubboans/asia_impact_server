@@ -44,6 +44,12 @@ const createOtpModel = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true
             },
+            isUsed: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+                defaultValue: 0
+                // Onlyy used in tha case of Forgot password after verfication
+            }
         },
         {
             sequelize,

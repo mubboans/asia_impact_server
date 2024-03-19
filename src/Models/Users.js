@@ -4,21 +4,6 @@ const { getCurrentFormatedDate } = require("../utils/functionalHelper");
 
 class User extends Model {
 
-    firstname;
-    lastname;
-    password;
-    imgurl;
-    email;
-    contact;
-    countrycode;
-    role;
-    gender;
-    dateofbirth;
-    linkDevice;
-    createdDate;
-    lastUpdateDate;
-    deletionDate;
-    lastUsedIp;
 }
 
 
@@ -59,7 +44,8 @@ const createUser = (sequelize, DataTypes) => {
             role: {
                 type: DataTypes.ENUM,
                 values: ['explorer', 'investor', 'advisor', 'legalrepresent', 'admin'],
-                defaultValue: "explorer"
+                // defaultValue: "explorer"
+                allowNull: true
             },
             isActive: {
                 type: DataTypes.BOOLEAN,
@@ -87,13 +73,7 @@ const createUser = (sequelize, DataTypes) => {
             },
             lang_id: {
                 type: DataTypes.INTEGER,
-                allowNull: true,
-                // foreignKey: true,
-                // onDelete: "cascade",
-                // references: {
-                //     model: "Language",
-                //     key: "id",
-                // },
+                allowNull: true
             }
         },
         {
@@ -102,16 +82,7 @@ const createUser = (sequelize, DataTypes) => {
             tableName: 'User',
             freezeTableName: true,
 
-        },
-        // {
-        //     indexes: [
-        //         // Create a unique index on email
-        //         {
-        //             unique: true,
-        //             fields: ['email']
-        //         },
-        //     ]
-        // }
+        }
     )
     User.beforeCreate(async (user, options) => {
         user.dataValues.password = bcrypt.hashSync(user.dataValues.email + user.dataValues.password, 10); //encrypt password

@@ -8,7 +8,8 @@ const {
     getDocument,
     updateDocument,
     postDocument,
-    deleteDocument
+    deleteDocument,
+    documentUpload
 } = require("../controllers/document_controller");
 const {
     getCompany,
@@ -46,6 +47,7 @@ const {
     postInsight
 } = require("../controllers/insight_controller");
 const verifyRole = require("../middleware/verifyRole");
+const { postLrDetail, updateLrDetail, getLrDetail, deleteLrDetail } = require("../controllers/lr_controller");
 
 const route = express.Router();
 
@@ -130,5 +132,15 @@ route
         verifyRole("admin", "investor", "advisor", "explorer"),
         deleteDocument
     );
+
+route
+    .route("/lrdetail")
+    .post(postLrDetail)
+    .put(updateLrDetail)
+    .get(getLrDetail)
+    .delete(deleteLrDetail);
+
+route.post("/documentUpload", documentUpload)
+
 
 module.exports = route;

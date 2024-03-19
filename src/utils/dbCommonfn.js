@@ -16,6 +16,7 @@ const fnGet = async (modelname, query = {}, include = [], raw = false) => {
                 ...options,
                 limit: Number(query.limit),
                 offset: (pageno - 1) * query.limit,
+                logging: console.log
             }
             delete query.limit;
             delete query.offset;
@@ -34,6 +35,7 @@ const fnGet = async (modelname, query = {}, include = [], raw = false) => {
             where: { ...query },
             order: [["id", "DESC"]],
             include: include.length > 0 ? include : '',
+            logging: console.log
         }
         console.log(options, 'check option', options.limit && options.offset);
         if (options.limit) {
@@ -59,6 +61,7 @@ const fnPost = async (modelname, obj, include = [], req) => {
     try {
         let d = setUserDetails(req, obj);
         d.createdDate = getCurrentFormatedDate();
+        d.createdOn = getCurrentFormatedDate();
         const data = await modelname.create(d, include);
         console.log('post data');
         return data;

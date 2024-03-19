@@ -16,7 +16,6 @@ route.post('/auth/otp', SendOTP);
 route.post('/auth/checkusers', CheckUserAvailable);
 route.get('/language', getLanguage);
 route.post("/refreshtoken", refereshToken);
-route.post("/documentupload", documentUpload);
 route.get('/news', getNews);
 
 route.get('/insight', getInsight);

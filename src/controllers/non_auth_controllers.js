@@ -6,17 +6,17 @@ const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnPost, fnUpdate } = require("../utils/dbCommonfn");
-const { sequelize, db } = require("../dbConfig/dbConfig");
 const { User } = require("../Models/Users");
-const { Document } = require("../Models/Document");
+
 const { getEmailBody, ShootMail } = require("../utils/sendmail");
 const { attachedToken, validateToken } = require("../utils/jwt");
-const { ValidateEmail, getCurrentFormatedDate, formatDateTime, StringtoDate } = require("../utils/functionalHelper");
+const { StringtoDate } = require("../utils/functionalHelper");
 const moment = require("moment");
 const { Otp } = require("../Models/Otp");
 const { Sequelize } = require("sequelize");
-const FileUpload = require("../utils/uploadFile");
 const sendsms = require("../utils/sendsms");
+const { UserDetail } = require("../Models/UserDetail");
+
 const registerJoi = Joi.object({
     firstname: Joi.string().required(),
     lastname: Joi.string().required(),
@@ -53,6 +53,7 @@ const Login = TryCatch(async (req, res, next) => {
         next(customErrorClass.BadRequest(error));
     }
     let userCheck = await fnGet(User, { email: body.email }, [], true);
+    console.log(userCheck, 'userCheck');
     if (userCheck.length > 0 && userCheck) {
         let userDetails = userCheck[0]
         // console.log(userDetails, 'userDetails');
@@ -76,8 +77,8 @@ const Login = TryCatch(async (req, res, next) => {
 
 }
 )
+
 const Register = TryCatch(async (req, res, next) => {
-    console.log(User, sequelize.models);
     let body = req.body;
     const { error } = await registerJoi.validate(body);
     if (error) {
@@ -135,6 +136,7 @@ const Register = TryCatch(async (req, res, next) => {
     }
 
 })
+
 async function checkUserverification(body) {
     // return new Promise(async (resolve, reject) => {
     try {
@@ -173,9 +175,6 @@ function generateOTP() {
 
     // console.log(otp, 'otp check');
 }
-const ForgotPassword = () => {
-
-}
 
 const SendOTP = TryCatch(async (req, res, next) => {
     let body = req.body;
@@ -201,15 +200,15 @@ const SendOTP = TryCatch(async (req, res, next) => {
                 title: 'OTP Verification',
                 // name: `${body.firstname} ${body.lastname}`,
                 intro: `Your OTP is generated for ${body.email}`,
-                // action: {
-                //     instructions: 'To get started with us, please Verify ',
-                //     button: {
-                //         color: '#22BC66', // Optional action button color
-                //         text: 'Confirm your account',
-                //         link: 'https://mailgen.js/confirm?s=d9729feb74992cc3482b350163a1a010'
-                //     }
-                // }
-                outro: `Your One Time Password (OTP) for verification on Asia Impact is ${modelobj.otp} which is valid for 5 minutes.`
+                action: {
+                    instructions: 'To get started with us, please Verify otp',
+                    button: {
+                        color: '#22BC66', // Optional action button color
+                        text: body.type.charAt(0).toUpperCase() + body.type.slice(1),
+                        // link: 'https://mailgen.js/confirm?s=d9729feb74992cc3482b350163a1a010'
+                    }
+                },
+                outro: `Your One Time Password (OTP) for ${body.type} on Asia Impact is ${modelobj.otp} which is valid for 5 minutes.`
             }
         }
         emailbody = getEmailBody(email);
@@ -218,15 +217,14 @@ const SendOTP = TryCatch(async (req, res, next) => {
         }
     }
     else {
-        // otp sms controller
         query = {
             contact: body.contact
         }
     }
-    if (body.type == 'login') {
+    if (body.type == 'login' || body.type == 'forgot-password') {
         let checkUser = await fnGet(User, query, [], true)
         if (checkUser.length <= 0) {
-            throw new CustomErrorObj('User not register for login', 404)
+            throw new CustomErrorObj('User not register', 404)
         }
     }
     fnGet(Otp, query, [], true).then(async (result) => {
@@ -237,7 +235,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
             }
             else {
                 console.log('record found');
-                fnUpdate(Otp, modelobj, query);
+                fnUpdate(Otp, { ...modelobj, verifyon: null, isUsed: 0 }, query);
             }
             return returnResponse(res, 201, "Successfully send otp")
         }
@@ -260,6 +258,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
 )
 const VerifyOTP = TryCatch(async (req, res, next) => {
     let body = req.body;
+
     let otpData = await fnGet(Otp, { otp: body.otp, type: body.type, ...req.query }, [], true);
     if (otpData && otpData.length > 0) {
         console.log(otpData, 'otpData');
@@ -270,11 +269,14 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
         if (StringtoDate(data.validto) >= currentDate && data.status == 'active') {
             fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss") }, { id: data.id })
             if (data.type == 'login') {
-                let user = await fnGet(User, { email: data.email }, [], true);
+                let user = await fnGet(User, { email: data.email }, [{
+                    model: UserDetail,
+                    as: 'userdetail'
+                }], false);
                 const newPayload = { userId: user[0].id, email: user[0].email, role: user[0].role };
                 let tokenData = attachedToken(newPayload)
                 return returnResponse(res, 200, 'Otp Verify',
-                    { ...tokenData, role: user[0].role, id: user[0].id, email: user[0].email, linkDevice: user[0].linkDevice });
+                    { ...tokenData, role: user[0].role, id: user[0].id, email: user[0].email, linkDevice: user[0].linkDevice, UserDetail: user[0].userdetail });
             }
             else {
                 return returnResponse(res, 200, "Otp Verify")
@@ -285,7 +287,7 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
         }
     }
     else {
-        next(customErrorClass.NotFound('No data found'))
+        next(customErrorClass.NotFound('Invalid Detail'))
         // return returnResponse(res, 200, "Otp No Verify")
     }
 }
@@ -323,21 +325,37 @@ const refereshToken = TryCatch(async (req, res, next) => {
 })
 
 
-const documentUpload = TryCatch(async (req, res, next) => {
-    console.log(req?.files?.file?.size, 'in controller');
-    if (!req.files) {
-        throw new CustomErrorObj('File Required', 400);
-    }
-    if (req?.files?.file.length > 1) {
-        throw new CustomErrorObj('Multiple file not allowed', 400);
-    }
-    if (req?.files?.file?.size > 5000) {
-        throw new CustomErrorObj('File should be within 5mb', 400);
-    }
-    let obj = await FileUpload(req?.files?.file);
-    return returnResponse(res, 200, 'Successfully Uploaded File', obj);
-})
 
+
+
+const ForgotPassword = TryCatch(async (req, res, next) => {
+    let otpData = await fnGet(Otp, { type: 'forgot-password', email: req.body.email, status: "verify" }, [], true);
+    console.log(otpData, 'otpData');
+    if (otpData && otpData.length > 0) {
+        let data = otpData[0];
+        if (data.isUsed == 1) {
+            return next(customErrorClass.BadRequest('Otp Already Used'))
+        }
+        let user = await User.findOne({
+            where: { email: req.body.email },
+        });
+        if (!user) {
+            next(customErrorClass.NotFound('User Not Found'))
+        }
+        user.password = bcrypt.hashSync(user.email + req.body.password, 10);
+        // console.log(user, 'user check');
+        await user.save();
+        await fnUpdate(Otp, { isUsed: 1 }, { email: req.body.email });
+        return returnResponse(res, 200, "Password Change Successfully")
+        // }
+        // else {
+        //     next(customErrorClass.BadRequest('It seem your session expire'))
+        // }
+    }
+    else {
+        next(customErrorClass.NotFound('User not verify'));
+    }
+})
 
 module.exports = {
     Login,
@@ -347,6 +365,6 @@ module.exports = {
     VerifyOTP,
     CheckUserAvailable,
     refereshToken,
-    documentUpload,
+    // documentUpload,
 
 }

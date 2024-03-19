@@ -68,7 +68,6 @@ const postCompany = TryCatch(async (req, res, next) => {
             return next(customErrorClass.BadRequest('Company Code Require'))
         }
     }
-
     let cmp = await fnPost(Company, body, [], req);
 
     let sustainarr = req.body.sustainarr.map((x) => {
@@ -77,7 +76,7 @@ const postCompany = TryCatch(async (req, res, next) => {
         }
     })
     if (req.body.sustainarr && req.body.sustainarr.length > 0) {
-        await fnbulkCreate(CompanyNSustain, sustainarr, req);
+        await fnbulkCreate(CompanyNSustain, sustainarr, [], req);
     }
     return returnResponse(res, 201, 'Successfully Added Company');
 }

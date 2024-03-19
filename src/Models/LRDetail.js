@@ -64,11 +64,11 @@ const createLrDetail = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            lrcountrycode: {
+            countrycode: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            lrcontact: {
+            contact: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
