@@ -182,7 +182,7 @@ const Register = TryCatch(async (req, res, next) => {
                     instructions: 'To get started with us, please Verify ',
                     button: {
                         color: '#22BC66', // Optional action button color
-                        text: 'Confirm your account',
+                        text: 'Confirm your account(Dummy)',
                         // link: 'https://mailgen.js/confirm?s=d9729feb74992cc3482b350163a1a010'
                     }
                 },
@@ -302,12 +302,12 @@ const SendOTP = TryCatch(async (req, res, next) => {
                 console.log('record found');
                 fnUpdate(Otp, { ...modelobj, verifyon: null, isUsed: 0 }, query);
             }
-            return returnResponse(res, 201, "Successfully send otp")
+
         }
         else {
             console.log('no record found');
             fnPost(Otp, modelobj);
-            return returnResponse(res, 200, "Successfully send otp")
+            // return returnResponse(res, 200, "Successfully send otp")
         }
     }).catch((err) => {
         console.log(err, 'err');
@@ -315,10 +315,12 @@ const SendOTP = TryCatch(async (req, res, next) => {
     });
     if (body.sendby == 'email') {
         await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
+
     }
     else {
         await sendsms(body.contact, modelobj.otp);
     }
+    return returnResponse(res, 201, "Successfully send otp")
 }
 )
 const VerifyOTP = TryCatch(async (req, res, next) => {

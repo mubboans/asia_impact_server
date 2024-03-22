@@ -1,5 +1,6 @@
 const { Document } = require("../Models/Document");
 const { FileStore } = require("../Models/FIleStore");
+const CustomErrorObj = require("../error/CustomErrorObj");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
