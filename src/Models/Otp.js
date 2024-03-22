@@ -7,8 +7,6 @@ class Otp extends Model {
 
 const createOtpModel = (sequelize, DataTypes) => {
 
-
-
     Otp.init(
         //pass only needed field with datatype
         {

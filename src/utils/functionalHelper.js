@@ -28,7 +28,9 @@ const getCurrentFormatedDate = () => {
 
 const setUserDetails = (req, obj) => {
     // Check if the user is authenticated and user data is available in req.user
-
+    if (!req) {
+        return obj;
+    }
     // Set user id in the object
     console.log(req?.user, 'users');
     obj = {

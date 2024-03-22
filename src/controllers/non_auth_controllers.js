@@ -18,20 +18,41 @@ const sendsms = require("../utils/sendsms");
 const { UserDetail } = require("../Models/UserDetail");
 
 const registerJoi = Joi.object({
-    firstname: Joi.string().required(),
-    lastname: Joi.string().required(),
-    password: Joi.string().optional(),
-    email: Joi.string().email().required(),
-    contact: Joi.string().optional(),
-    gender: Joi.string().optional(),
-    dateofbirth: Joi.string().optional(),
-    img: Joi.string().optional(),
-    role: Joi.string().optional(),
-    country: Joi.string().optional(),
-    type: Joi.string().optional(),
-    role: Joi.string().required(),
-    countrycode: Joi.string().optional(),
-    linkDevice: Joi.string().optional(),
+    firstname: Joi.string().optional(),
+    lastname: Joi.string().optional(),
+    password: Joi.string().when('type', {
+        is: 'admin',
+        then: Joi.string().required().messages({
+            'any.required': 'Password is to register admin'
+        }),
+        otherwise: Joi.string().optional()
+    }),
+    email: Joi.string().email().required().messages({
+        'any.required': "Email required to Register"
+    }),
+    contact: Joi.string(),
+    userdetail: Joi.object().optional(),
+    // gender: Joi.string().optional(),
+    // dateofbirth: Joi.string().optional(),
+    // img: Joi.string().optional(),
+    role: Joi.string().required().messages({
+        'any.required': "Role is Required"
+    }),
+    // country: Joi.string().optional(),
+    type: Joi.string().required().messages({
+        'any.required': "User Type is required"
+    }),
+    // role: Joi.string().required(),
+    countrycode: Joi.string().when('contact', {
+        is: Joi.string().required(), // Change to Joi.string().required() if contact is required
+        then: Joi.string().required().messages({
+            'any.required': "Can't proceed without country code"
+        }),
+        otherwise: Joi.string().forbidden().messages({
+            'any.required': "Country code Not Allowed without Contact Number"
+        }),
+    }),
+    // linkDevice: Joi.string().optional(),
     document: Joi.object().optional(),
     lang_id: Joi.number().optional(),
 })
@@ -41,9 +62,15 @@ const loginJoi = Joi.object({
 })
 const OTPJoi = Joi.object({
     email: Joi.string().email().required(),
-    contact: Joi.string().optional(),
+    contact: Joi.string().when('sendby', {
+        is: 'sms',
+        then: Joi.string().required().messages({
+            'any.required': 'Contact is required when send method is "sms"'
+        }),
+        otherwise: Joi.string().optional()
+    }),
     type: Joi.string().required(),
-    sendby: Joi.string().optional()
+    sendby: Joi.string().valid('email', 'sms').required(),
 })
 const Login = TryCatch(async (req, res, next) => {
     let body = req.body;
@@ -94,59 +121,81 @@ const Register = TryCatch(async (req, res, next) => {
     if (error) {
         throw new CustomErrorObj(error?.details[0]?.message, 400)
     }
+    let options = [
+        { email: body.email }
+    ]
+
+    if (body.contact) {
+        options.push({ contact: body?.contact })
+    }
     let userCheck = await User.findOne({
         where: {
-            [Sequelize.Op.or]: [
-                { email: body.email },
-                { contact: body.contact },
-            ]
+            [Sequelize.Op.or]: options
         },
-        // logging: console.log,
+        logging: console.log,
     })
     if (userCheck) {
         return next(customErrorClass.recordExists('User Detail Already Exists'))
     }
     else {
         body.lastUsedIp = req.socket?.remoteAddress;
-        if (body?.document) {
-            body.document.lastUsedIp = req.socket?.remoteAddress;
-        }
-        let checkUserVerification = await checkUserverification(body);
-        if (!checkUserVerification) {
-            return next(customErrorClass.NotFound("User Not Verified"))
-        }
-        if (body.role == 'admin') {
-            if (!body.password) {
-                return next(customErrorClass.BadRequest("Password Required for admin"))
+        if (body?.type !== 'admin') {
+            // body.document.lastUsedIp = req.socket?.remoteAddress;
+            let checkUserVerification = await checkUserverification(body);
+            if (!checkUserVerification) {
+                return next(customErrorClass.NotFound("User Not Verified"))
             }
         }
-        body.role == 'admin' ? body.role : null;
-        let user = await fnPost(User, body, {
+        // body.role == 'admin' ? body.role : null;
+        let pstdata;
+        if (body.role == 'admin') {
+            pstdata = body
+        }
+        else {
+            pstdata = { ...body, role: null }
+        }
+        let user = await fnPost(User, pstdata, {
             include: [
-                'document'
+                'userdetail'
             ],
-        })
-        delete user.dataValues.document;
-        console.log(user.dataValues, 'users');
-        // req.user = user.dataValues;
+        }, req)
+        console.log(user.dataValues, 'user.dataValues');
+        const newPayload = {
+            userId: user.id, email: user.email, role: body.role,
+            userdetail: {
+                userdetailid: user?.userdetail ? user?.userdetail[0]?.id : null
+            }
+        };
+        if (!body.userdetail) {
+            delete newPayload.userdetail;
+        }
+
+        let data = attachedToken(newPayload);
+
+
+
         const email = {
             body: {
-                name: `${body.firstname} ${body.lastname}`,
-                intro: 'Welcome! We\'re very excited to have you on board.',
-                // action: {
-                //     instructions: 'To get started with us, please Verify ',
-                //     button: {
-                //         color: '#22BC66', // Optional action button color
-                //         text: 'Confirm your account',
-                //         link: 'https://mailgen.js/confirm?s=d9729feb74992cc3482b350163a1a010'
-                //     }
-                // },
+                name: `Welcome to AsiaImpact! We\'re very excited to have you on board. `,
+                intro: 'We recommend to update the profile if not updated.',
+                action: {
+                    instructions: 'To get started with us, please Verify ',
+                    button: {
+                        color: '#22BC66', // Optional action button color
+                        text: 'Confirm your account',
+                        // link: 'https://mailgen.js/confirm?s=d9729feb74992cc3482b350163a1a010'
+                    }
+                },
                 outro: 'Need help, or have questions? Just reply to this email, we\'d love to help.'
             }
         }
+
         let emailbody = getEmailBody(email);
         await ShootMail({ html: emailbody, recieveremail: body.email, subject: "Successfully Register" });
-        return returnResponse(res, 200, 'Register Succesfully');
+        await fnUpdate(Otp, { isUsed: 1 }, { email: body.email }, req);
+        return returnResponse(res, 201, 'Successfully Register',
+            { ...data, role: body.role, id: user.id, email: user.email, linkDevice: user.linkDevice, userDetail: user.userdetail });
+        // return returnResponse(res, 200, 'Register Succesfully');
     }
 
 })
@@ -155,9 +204,10 @@ async function checkUserverification(body) {
     // return new Promise(async (resolve, reject) => {
     try {
         // let d = await fnGet(Otp, { email: body.email, contact: body.contact, status: 'verify' }, [], true)
-        let d = await fnGet(Otp, { email: body.email, status: 'verify' }, [], true)
+        let d = await fnGet(Otp, { email: body.email, status: 'verify', }, [], true)
         console.log(d, 'otp check user');
         if (d.length > 0) {
+            if (d[0].isUsed == 1) throw new CustomErrorObj('Otp already in use')
             return true
         }
         else {
@@ -194,7 +244,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
     let body = req.body;
     const { error } = await OTPJoi.validate(body);
     if (error) {
-        next(customErrorClass.BadRequest(error));
+        return next(customErrorClass.BadRequest(error?.details[0]?.message));
     }
 
     let modelobj = {
@@ -203,26 +253,27 @@ const SendOTP = TryCatch(async (req, res, next) => {
         validto: moment().add(5, 'minutes').format('YYYY-MM-DD HH:mm:ss'),
         status: 'active',
     }
-    if (!body.sendby || body.sendby == undefined) {
-        next(customErrorClass.BadRequest('Send by required'))
+
+    if (body.sendby == 'sms' && !body.contact) {
+        return next(customErrorClass.BadRequest('Invalid Body'))
     }
     let query;
     let emailbody;
-    if (body.sendby == 'mail') {
+    if (body.sendby == 'email') {
         const email = {
             body: {
                 title: 'OTP Verification',
                 // name: `${body.firstname} ${body.lastname}`,
-                intro: `Your OTP is generated for ${body.email}`,
+                intro: `OTP is generated for ${body.email}`,
                 action: {
                     instructions: 'To get started with us, please Verify otp',
                     button: {
                         color: '#22BC66', // Optional action button color
-                        text: body.type.charAt(0).toUpperCase() + body.type.slice(1),
+                        text: modelobj.otp,
                         // link: 'https://mailgen.js/confirm?s=d9729feb74992cc3482b350163a1a010'
                     }
                 },
-                outro: `Your One Time Password (OTP) for ${body.type} on Asia Impact is ${modelobj.otp} which is valid for 5 minutes.`
+                outro: `Your One Time Password (OTP) for ${body.type.charAt(0).toUpperCase() + body.type.slice(1)} on Asia Impact is  valid for 5 minutes.`
             }
         }
         emailbody = getEmailBody(email);
@@ -262,7 +313,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
         console.log(err, 'err');
         return next(customErrorClass.InternalServerError("Internal Server Error"))
     });
-    if (body.sendby == 'mail') {
+    if (body.sendby == 'email') {
         await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
     }
     else {
@@ -281,7 +332,7 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
         console.log(StringtoDate(data.validto), currentDate, 'date check with format');
         console.log(StringtoDate(data.validto) >= currentDate, 'condition');
         if (StringtoDate(data.validto) >= currentDate && data.status == 'active') {
-            fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss") }, { id: data.id })
+            fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss") }, { id: data.id });
             if (data.type == 'login') {
                 let user = await fnGet(User, { email: data.email }, [{
                     model: UserDetail,

@@ -32,6 +32,10 @@ const createUser = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true
             },
+            isVerified: {
+                type: DataTypes.BOOLEAN,
+                allowNull: true
+            },
             countrycode: {
                 type: DataTypes.STRING,
                 allowNull: true

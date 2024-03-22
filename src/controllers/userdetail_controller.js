@@ -1,5 +1,7 @@
 const { Document } = require("../Models/Document");
+const { Otp } = require("../Models/Otp");
 const { UserDetail } = require("../Models/UserDetail");
+const { User } = require("../Models/Users");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
@@ -66,11 +68,22 @@ const postUserDetail = TryCatch(async (req, res, next) => {
     return returnResponse(res, 201, 'Successfully Added UserDetail');
 }
 )
-
+const verifyDetail = TryCatch(async (req, res, next) => {
+    let body = req.body;
+    let checkDetailwithOtp = await fnGet(Otp, { ...body, type: 'verification', status: 'verify' }, [], false);
+    if (checkDetailwithOtp && checkDetailwithOtp.length > 0) {
+        await fnUpdate(User, { verified: true }, body, req);
+        return returnResponse(res, 200, "Detail updated successfully", {});
+    }
+    else {
+        return next(customErrorClass.BadRequest("User Veification detail not found"));
+    }
+})
 
 module.exports = {
     getUserDetail,
     updateUserDetail,
     deleteUserDetail,
-    postUserDetail
+    postUserDetail,
+    verifyDetail
 }

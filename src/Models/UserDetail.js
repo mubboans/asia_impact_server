@@ -18,6 +18,14 @@ const createUserDetail = (sequelize, DataTypes) => {
                     key: 'id',
                 },
             },
+            firstname: {
+                type: DataTypes.STRING,
+                allowNull: true
+            },
+            lastname: {
+                type: DataTypes.STRING,
+                allowNull: true
+            },
             img: {
                 type: DataTypes.STRING,
                 allowNull: true

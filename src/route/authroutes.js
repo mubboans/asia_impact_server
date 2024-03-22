@@ -48,7 +48,7 @@ const {
 } = require("../controllers/insight_controller");
 const verifyRole = require("../middleware/verifyRole");
 const { postLrDetail, updateLrDetail, getLrDetail, deleteLrDetail } = require("../controllers/lr_controller");
-const { getUserDetail, updateUserDetail, deleteUserDetail, postUserDetail } = require("../controllers/userdetail_controller");
+const { getUserDetail, updateUserDetail, deleteUserDetail, postUserDetail, verifyDetail } = require("../controllers/userdetail_controller");
 
 const route = express.Router();
 
@@ -151,6 +151,6 @@ route
     .get(getUserDetail)
     .delete(deleteUserDetail);
 
-
+route.patch('/verifyDetail', verifyDetail);
 
 module.exports = route;
