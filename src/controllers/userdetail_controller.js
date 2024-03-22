@@ -72,7 +72,7 @@ const verifyDetail = TryCatch(async (req, res, next) => {
     let body = req.body;
     let checkDetailwithOtp = await fnGet(Otp, { ...body, type: 'verification', status: 'verify' }, [], false);
     if (checkDetailwithOtp && checkDetailwithOtp.length > 0) {
-        await fnUpdate(User, { verified: true }, body, req);
+        await fnUpdate(User, { isVerified: true }, body, req);
         return returnResponse(res, 200, "Detail updated successfully", {});
     }
     else {
