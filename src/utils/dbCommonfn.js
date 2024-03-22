@@ -35,7 +35,7 @@ const fnGet = async (modelname, query = {}, include = [], raw = false) => {
             where: { ...query },
             order: [["id", "DESC"]],
             include: include.length > 0 ? include : '',
-            logging: console.log
+            // logging: console.log
         }
         console.log(options, 'check option', options.limit && options.offset);
         if (options.limit) {
@@ -63,7 +63,7 @@ const fnPost = async (modelname, obj, include = [], req) => {
         d.createdDate = getCurrentFormatedDate();
         d.createdOn = getCurrentFormatedDate();
         const data = await modelname.create(d, include);
-        console.log('post data');
+        console.log('post data', include);
         return data;
     } catch (error) {
         console.log(error, 'error');
@@ -111,6 +111,7 @@ const fnUpdate = async (model, obj, condition, req) => {
 
 const fnDelete = async (model, condition, req, modulename) => {
     try {
+        if (!condition.id) throw new CustomError('No Id Found To Delete', 400)
         let obj = setUserDelete(req, {});
         console.log(obj, 'obj delete');
         await fnPost(ModuleHistory, { modulename, ...obj });

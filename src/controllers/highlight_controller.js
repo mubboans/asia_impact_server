@@ -33,7 +33,7 @@ const updateHighlight = TryCatch(async (req, res, next) => {
 )
 
 const deleteHighlight = TryCatch(async (req, res, next) => {
-    if (!req.query) {
+    if (!req.query.id) {
         next(customErrorClass.BadRequest('id required'))
     }
     await fnDelete(Highlight, req.query, req, "Highlight_" + req.query.id)

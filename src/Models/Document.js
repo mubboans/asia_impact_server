@@ -100,6 +100,10 @@ const createDocument = (sequelize, DataTypes) => {
                     allowNull: true,
                     // comment: "Document other detail to save"
                 },
+                status: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
+                }
             }, DataTypes),
         {
             sequelize,

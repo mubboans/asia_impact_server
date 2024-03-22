@@ -22,7 +22,7 @@ const updateSustainGoal = TryCatch(async (req, res, next) => {
 )
 
 const deleteSustainGoal = TryCatch(async (req, res, next) => {
-    if (!req.query) {
+    if (!req.query.id) {
         next(customErrorClass.BadRequest('id required'))
     }
     let deleteStatus = await fnDelete(SustainGoal, req.query, req, "SustainGoal_" + req.query.id)

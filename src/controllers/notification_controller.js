@@ -20,7 +20,7 @@ const updateNotification = TryCatch(async (req, res, next) => {
 )
 
 const deleteNotification = TryCatch(async (req, res, next) => {
-    if (!req.query) {
+    if (!req.query.id) {
         next(customErrorClass.BadRequest('id required'))
     }
     await fnDelete(Notification, req.query, req, "Notification_" + req.query.id)

@@ -105,7 +105,33 @@ async function createRandomCode(modelname, fieldname) {
         throw CustomErrorObj(error?.message, 400)
     }
 }
+
+function setUserIdonQuery(req) {
+    if (req.user.role === 'admin') {
+        return req?.query ? req?.query : {};
+    }
+    else {
+        return {
+            ...req.query,
+            userid: req.user.userId,
+        }
+    }
+
+}
+function setUserRoleonQuery(req) {
+    if (req.user.role == 'admin') {
+        return req?.query ? req?.query : {};
+    }
+    else {
+        return option = {
+            ...option,
+            role: req.user.role
+        }
+    }
+}
+
 module.exports = {
     formatDateTime, getCurrentFormatedDate, setUserDetails, setUserDelete, ValidateEmail,
-    StringtoDate, createRandomCode, setUserDetailsUpdate
+    StringtoDate, createRandomCode, setUserDetailsUpdate,
+    setUserIdonQuery, setUserRoleonQuery
 }

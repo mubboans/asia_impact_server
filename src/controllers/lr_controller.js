@@ -26,7 +26,7 @@ const updateLrDetail = TryCatch(async (req, res, next) => {
 )
 
 const deleteLrDetail = TryCatch(async (req, res, next) => {
-    if (!req.query) {
+    if (!req.query.id) {
         next(customErrorClass.BadRequest('id required'))
     }
     let deleteStatus = await fnDelete(LrDetail, req.query, req, "LrDetail_" + req.query.id)

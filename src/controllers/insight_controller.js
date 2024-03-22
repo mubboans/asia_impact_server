@@ -30,7 +30,7 @@ const updateInsight = TryCatch(async (req, res, next) => {
 )
 
 const deleteInsight = TryCatch(async (req, res, next) => {
-    if (!req.query) {
+    if (!req.query.id) {
         next(customErrorClass.BadRequest('id required'))
     }
     let deleteStatus = await fnDelete(Insight, req.query, req, "Insight_" + req.query.id)

@@ -38,7 +38,7 @@ const updateOpportunity = TryCatch(async (req, res, next) => {
 )
 
 const deleteOpportunity = TryCatch(async (req, res, next) => {
-    if (!req.query) {
+    if (!req.query.id) {
         next(customErrorClass.BadRequest('id required'))
     }
     await fnDelete(Opportunity, req.query, req, "Opportunity_" + req.query.id)

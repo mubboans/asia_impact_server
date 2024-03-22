@@ -32,7 +32,7 @@ const updateNews = TryCatch(async (req, res, next) => {
 )
 
 const deleteNews = TryCatch(async (req, res, next) => {
-    if (!req.query) {
+    if (!req.query.id) {
         next(customErrorClass.BadRequest('id required'))
     }
     let deleteStatus = await fnDelete(News, req.query, req, "News_" + req.query.id)

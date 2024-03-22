@@ -42,7 +42,7 @@ const updateRelation = TryCatch(async (req, res, next) => {
 )
 
 const deleteRelation = TryCatch(async (req, res, next) => {
-    if (!req.query) {
+    if (!req.query.id) {
         next(customErrorClass.BadRequest('id required'))
     }
     let deleteStatus = await fnDelete(UserRelation, req.query, req, "UserRelation _" + req.query.id)

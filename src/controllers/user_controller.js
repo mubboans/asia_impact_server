@@ -6,18 +6,13 @@ const { User } = require("../Models/Users");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
-const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
-const { getCurrentFormatedDate } = require("../utils/functionalHelper");
+const { fnGet, fnUpdate, fnPost } = require("../utils/dbCommonfn");
+const { getCurrentFormatedDate, setUserIdonQuery } = require("../utils/functionalHelper");
 const { Sequelize } = require("sequelize");
 const getUser = TryCatch(async (req, res, next) => {
-    console.log('hit user 10');
     let include = [];
-    let query = getUserByRole(req, req.query);
-    // query = {
+    let query = getUserById(req, req?.query);
 
-    //     ...query,
-
-    // }
     console.log(query, 'hit user');
     if (req.query.id) {
         if (req.query.limit || req.query.offset) {
@@ -25,9 +20,6 @@ const getUser = TryCatch(async (req, res, next) => {
         }
         include.push({
             model: UserDetail,
-            // attributes: {
-            //         exclude: ['password']
-            //     }
             include: [
                 {
                     model: LrDetail,
@@ -47,7 +39,7 @@ const getUser = TryCatch(async (req, res, next) => {
             as: "userdetail"
         })
     }
-    let data = await fnGet(User, query || {}, include, false);
+    let data = await fnGet(User, query, include, false);
     return returnResponse(res, 200, 'Successfully Get Data ', data)
 }
 )
@@ -104,27 +96,15 @@ const postUser = TryCatch(async (req, res, next) => {
 }
 )
 
-const postUserDetail = TryCatch(async (req, res, next) => {
-    let body = req.body;
-    let include;
-    if (body.lrdetail) {
-        include = {
-            include: ['']
-        }
-    }
-    fnPost(UserDetail, body, { include }, req);
-    return returnResponse(res, 201, 'Successfully Added User');
-}
-)
 
-function getUserByRole(req, option) {
+function getUserById(req, option) {
     if (req.user.role == 'admin') {
         return option;
     }
     else {
         return option = {
             ...option,
-            role: req.user.role
+            id: req.user.userId
         }
     }
 }
@@ -133,5 +113,4 @@ module.exports = {
     updateUser,
     deleteUser,
     postUser,
-    postUserDetail
 }

@@ -20,7 +20,7 @@ const { UserDetail } = require("../Models/UserDetail");
 const registerJoi = Joi.object({
     firstname: Joi.string().required(),
     lastname: Joi.string().required(),
-    password: Joi.string().required(),
+    password: Joi.string().optional(),
     email: Joi.string().email().required(),
     contact: Joi.string().optional(),
     gender: Joi.string().optional(),
@@ -28,8 +28,8 @@ const registerJoi = Joi.object({
     img: Joi.string().optional(),
     role: Joi.string().optional(),
     country: Joi.string().optional(),
-    // documentId: Joi.string().required(),
-    // documentType: Joi.string().required(),
+    type: Joi.string().optional(),
+    role: Joi.string().required(),
     countrycode: Joi.string().optional(),
     linkDevice: Joi.string().optional(),
     document: Joi.object().optional(),
@@ -52,7 +52,12 @@ const Login = TryCatch(async (req, res, next) => {
         console.log(error);
         next(customErrorClass.BadRequest(error));
     }
-    let userCheck = await fnGet(User, { email: body.email }, [], true);
+    let userCheck = await fnGet(User, { email: body.email }, [
+        {
+            model: UserDetail,
+            as: "userdetail"
+        }
+    ], false);
     console.log(userCheck, 'userCheck');
     if (userCheck.length > 0 && userCheck) {
         let userDetails = userCheck[0]
@@ -60,10 +65,15 @@ const Login = TryCatch(async (req, res, next) => {
         let hashPass = body.email + body.password;
         // console.log(hashPass, userDetails.password, 'user password');
         if (bcrypt.compareSync(hashPass, userDetails.password)) {
-            const newPayload = { userId: userDetails.id, email: userDetails.email, role: userDetails.role };
+            const newPayload = {
+                userId: userDetails.id, email: userDetails.email, role: userDetails.role,
+                userdetail: {
+                    userdetailid: userDetails.userdetail[0]?.id
+                }
+            };
             let data = attachedToken(newPayload)
             return returnResponse(res, 200, 'Login Succesfully',
-                { ...data, role: userDetails.role, id: userDetails.id, email: userDetails.email, linkDevice: userDetails.linkDevice });
+                { ...data, role: userDetails.role, id: userDetails.id, email: userDetails.email, linkDevice: userDetails.linkDevice, UserDetails: userDetails.userdetail });
         }
         else {
             console.log('incorrect password');
@@ -102,11 +112,15 @@ const Register = TryCatch(async (req, res, next) => {
             body.document.lastUsedIp = req.socket?.remoteAddress;
         }
         let checkUserVerification = await checkUserverification(body);
-
-        console.log(checkUserVerification);
         if (!checkUserVerification) {
             return next(customErrorClass.NotFound("User Not Verified"))
         }
+        if (body.role == 'admin') {
+            if (!body.password) {
+                return next(customErrorClass.BadRequest("Password Required for admin"))
+            }
+        }
+        body.role == 'admin' ? body.role : null;
         let user = await fnPost(User, body, {
             include: [
                 'document'

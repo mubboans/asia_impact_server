@@ -4,17 +4,12 @@ const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
+const { setUserIdonQuery } = require("../utils/functionalHelper");
 const FileUpload = require("../utils/uploadFile");
 
 const getDocument = TryCatch(async (req, res, next) => {
-    console.log(req.user, 'user token data');
-    // if (req.user.role !== 'admin') {
-    //     req.query = {
-    //         ...req.query,
-    //         userid:req.user.userId
-    //     }
-    // }
-    let GetAllDocument = await fnGet(Document, req.query || {});
+    let query = setUserIdonQuery(req)
+    let GetAllDocument = await fnGet(Document, query, [], false);
     return returnResponse(res, 200, 'Successfully Get Document', GetAllDocument)
 }
 )
@@ -27,7 +22,7 @@ const updateDocument = TryCatch(async (req, res, next) => {
 )
 
 const deleteDocument = TryCatch(async (req, res, next) => {
-    if (!req.query) {
+    if (!req.query.id) {
         next(customErrorClass.BadRequest('id required'))
     }
     await fnDelete(Document, req.query, req, "Document_" + req.query.id)

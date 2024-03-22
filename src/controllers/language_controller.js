@@ -19,7 +19,7 @@ const updateLanguage = TryCatch(async (req, res, next) => {
 )
 
 const deleteLanguage = TryCatch(async (req, res, next) => {
-    if (!req.query) {
+    if (!req.query.id) {
         next(customErrorClass.BadRequest('id required'))
     }
     await fnDelete(Language, req.query, req, "Language_" + req.query.id)

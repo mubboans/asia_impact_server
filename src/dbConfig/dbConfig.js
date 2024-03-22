@@ -109,7 +109,7 @@ const dbConnect = async () => {
         HighlightDetail.belongsTo(Highlight, { foreignKey: 'highlightid' });
 
 
-        await sequelize.sync({ alter: false, force: false });
+        await sequelize.sync({ alter: false });
 
     } catch (error) {
         console.log(error, 'error ');
