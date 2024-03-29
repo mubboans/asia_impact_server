@@ -2,13 +2,13 @@ const nodemailer = require("nodemailer");
 const Mailgen = require('mailgen');
 const CustomErrorObj = require("../error/CustomErrorObj");
 var mailGenerator = new Mailgen({
-    theme: 'default',
+    theme: 'salted',
     product: {
         // Appears in header & footer of e-mails
         name: 'Asia Impact',
-        link: process.env.FRONT_END_URL
+        link: process.env.FRONT_END_URL,
         // Optional product logo
-        // logo: 'https://mailgen.js/img/logo.png'
+        logo: 'https://mailgen.js/img/logo.png'
     }
 });
 let config = {

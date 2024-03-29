@@ -26,8 +26,10 @@ class customErrorClass {
         return new customErrorClass(401, "User failed to authenticate", false, error, 'Failed');
     }
     static ToManyRequest(error) {
-
         return new customErrorClass(429, 'Too many requests. Please try again later.', false, error, 'Failed');
+    }
+    static AccountNotActive(error) {
+        return new customErrorClass(403, "Account Not Active", false, error, 'Failed');
     }
 }
 module.exports = customErrorClass

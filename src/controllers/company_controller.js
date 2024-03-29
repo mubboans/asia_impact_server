@@ -8,6 +8,18 @@ const { fnGet, fnUpdate, fnDelete, fnPost, fnbulkCreate } = require("../utils/db
 const { createRandomCode } = require("../utils/functionalHelper");
 
 const getCompany = TryCatch(async (req, res, next) => {
+    if (!req?.query?.user) {
+        req.query.targetUser = 'explorer'
+    }
+    else {
+        req.query.targetUser = {
+            [Op.or]: {
+                [Op.eq]: req?.query?.user,
+                [Op.like]: `%${req?.query?.user}%`
+            }
+        }
+        delete req?.query?.user
+    }
     let GetAllCompany = await fnGet(Company, req.query || {}, [], true);
     if (req.query.id) {
         let GetAllCompanySustain = await fnGet(CompanyNSustain, { companyid: req.query.id }, [

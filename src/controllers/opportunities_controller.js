@@ -23,6 +23,18 @@ const getOpportunity = TryCatch(async (req, res, next) => {
     //         foreignKey: "id",
     //     }]
     // }
+    if (!req?.query?.user) {
+        req.query.targetUser = 'explorer'
+    }
+    else {
+        req.query.targetUser = {
+            [Op.or]: {
+                [Op.eq]: req?.query?.user,
+                [Op.like]: `%${req?.query?.user}%`
+            }
+        }
+        delete req?.query?.user
+    }
     let GetAllOpportunity = await fnGet(Opportunity, req.query || {}, include, false);
     return returnResponse(res, 200, 'Successfully Get Opportunity', GetAllOpportunity)
 }
@@ -47,6 +59,7 @@ const deleteOpportunity = TryCatch(async (req, res, next) => {
 )
 
 const postOpportunity = TryCatch(async (req, res, next) => {
+
     let opportunitycode = await createRandomCode(Opportunity, 'opportunitycode');
     let body = req.body;
     if (body.isNew) {

@@ -53,8 +53,7 @@ const createUser = (sequelize, DataTypes) => {
             },
             isActive: {
                 type: DataTypes.BOOLEAN,
-                allowNull: true,
-                defaultValue: true,
+                defaultValue: false,
             },
 
             createdDate: {
@@ -89,7 +88,11 @@ const createUser = (sequelize, DataTypes) => {
         }
     )
     User.beforeCreate(async (user, options) => {
-        user.dataValues.password = bcrypt.hashSync(user.dataValues.email + user.dataValues.password, 10); //encrypt password
+        console.log(user.dataValues.password, 'user.dataValues.password set');
+        if (user.dataValues.password) {
+            user.dataValues.password = bcrypt.hashSync(user.dataValues.email + user.dataValues.password, 10)  //encrypt password 
+        }
+        console.log(user.dataValues.password, 'user.dataValues.password after');
     });
 
 }

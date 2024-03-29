@@ -1,4 +1,4 @@
-const Joi = require("joi");
+const { Op } = require('sequelize');
 const { News } = require("../Models/News");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
@@ -11,6 +11,19 @@ const { createRandomCode } = require("../utils/functionalHelper");
 // })
 const getNews = TryCatch(async (req, res, next) => {
     console.log(req.user, 'user token data');
+
+    if (!req?.query?.user) {
+        req.query.targetUser = 'explorer'
+    }
+    else {
+        req.query.targetUser = {
+            [Op.or]: {
+                [Op.eq]: req?.query?.user,
+                [Op.like]: `%${req?.query?.user}%`
+            }
+        }
+        delete req?.query?.user
+    }
     let options = {
         ...req.query,
         attribute: { exclude: ['description'] }

@@ -91,6 +91,9 @@ const Login = TryCatch(async (req, res, next) => {
         // console.log(userDetails, 'userDetails');
         let hashPass = body.email + body.password;
         // console.log(hashPass, userDetails.password, 'user password');
+        if (!userDetails.isActive) {
+            return next(customErrorClass.AccountNotActive('It seems your account is inactive'));
+        }
         if (bcrypt.compareSync(hashPass, userDetails.password)) {
             const newPayload = {
                 userId: userDetails.id, email: userDetails.email, role: userDetails.role,
@@ -109,7 +112,7 @@ const Login = TryCatch(async (req, res, next) => {
         // return returnResponse(res, 200, 'Login Succesfully');
     }
     else {
-        return next(customErrorClass.NotFound('No Record found'));
+        return next(customErrorClass.NotFound('User not found with your credentials'));
     }
 
 }
@@ -143,13 +146,14 @@ const Register = TryCatch(async (req, res, next) => {
             // body.document.lastUsedIp = req.socket?.remoteAddress;
             let checkUserVerification = await checkUserverification(body);
             if (!checkUserVerification) {
-                return next(customErrorClass.NotFound("User Not Verified"))
+                return next(customErrorClass.AccountNotActive("User Not Verified"))
             }
         }
         // body.role == 'admin' ? body.role : null;
         let pstdata;
         if (body.role == 'admin') {
             pstdata = body
+            pstdata.isActive = true;
         }
         else {
             pstdata = { ...body, role: null }
@@ -182,7 +186,7 @@ const Register = TryCatch(async (req, res, next) => {
                     instructions: 'To get started with us, please Verify ',
                     button: {
                         color: '#22BC66', // Optional action button color
-                        text: 'Confirm your account(Dummy)',
+                        text: 'Confirm account Dum',
                         // link: 'https://mailgen.js/confirm?s=d9729feb74992cc3482b350163a1a010'
                     }
                 },
@@ -192,7 +196,7 @@ const Register = TryCatch(async (req, res, next) => {
 
         let emailbody = getEmailBody(email);
         await ShootMail({ html: emailbody, recieveremail: body.email, subject: "Successfully Register" });
-        await fnUpdate(Otp, { isUsed: 1 }, { email: body.email }, req);
+        await Otp.update({ isUsed: 1 }, { where: { email: body.email } });
         return returnResponse(res, 201, 'Successfully Register',
             { ...data, role: body.role, id: user.id, email: user.email, linkDevice: user.linkDevice, userDetail: user.userdetail });
         // return returnResponse(res, 200, 'Register Succesfully');
@@ -325,7 +329,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
 )
 const VerifyOTP = TryCatch(async (req, res, next) => {
     let body = req.body;
-
+    if (!body.type || !body.otp) throw new CustomErrorObj("Invalid otp body", 400)
     let otpData = await fnGet(Otp, { otp: body.otp, type: body.type, ...req.query }, [], true);
     if (otpData && otpData.length > 0) {
         console.log(otpData, 'otpData');
@@ -340,6 +344,9 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
                     model: UserDetail,
                     as: 'userdetail'
                 }], false);
+                if (!user[0].isActive) {
+                    return next(customErrorClass.AccountNotActive('It seems your account is inactive'));
+                }
                 const newPayload = { userId: user[0].id, email: user[0].email, role: user[0].role };
                 let tokenData = attachedToken(newPayload)
                 return returnResponse(res, 200, 'Otp Verify',
@@ -350,11 +357,11 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
             }
         }
         else {
-            next(customErrorClass.BadRequest('It seem your session expire'))
+            return next(customErrorClass.BadRequest('It seem your session expire'))
         }
     }
     else {
-        next(customErrorClass.NotFound('Invalid Detail'))
+        return next(customErrorClass.NotFound('Invalid Detail'))
         // return returnResponse(res, 200, "Otp No Verify")
     }
 }
