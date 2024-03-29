@@ -47,7 +47,7 @@ const createUser = (sequelize, DataTypes) => {
             },
             role: {
                 type: DataTypes.ENUM,
-                values: ['explorer', 'investor', 'advisor', 'legalrepresent', 'admin'],
+                values: ['explorer', 'individual investor', 'advisor', 'legalrepresent', 'admin'],
                 // defaultValue: "explorer"
                 allowNull: true
             },
