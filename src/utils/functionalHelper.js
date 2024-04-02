@@ -101,10 +101,10 @@ async function createRandomCode(modelname, fieldname) {
             where: q
         })
         console.log(checkCode, checkCode?.[fieldname], 'checkCode?.newcode');
-        let newCode = checkCode?.[fieldname] ? crypto.randomBytes(6).toString('hex') : code;
-        return newCode;
+        let langcode = checkCode?.[fieldname] ? crypto.randomBytes(6).toString('hex') : code;
+        return langcode;
     } catch (error) {
-        throw CustomErrorObj(error?.message, 400)
+        throw new CustomErrorObj(error?.message, 400)
     }
 }
 

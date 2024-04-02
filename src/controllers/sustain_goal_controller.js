@@ -31,7 +31,7 @@ const deleteSustainGoal = TryCatch(async (req, res, next) => {
 )
 
 const postSustainGoal = TryCatch(async (req, res, next) => {
-    let sustaincode = await createRandomCode(SustainGoal);
+    let sustaincode = await createRandomCode(SustainGoal, 'sustaincode');
     let body = req.body;
     if (body.isNew) {
         if (body.sustaincode) {
