@@ -5,6 +5,10 @@ const { validateToken } = require("../utils/jwt");
 const checkToken = TryCatch(async (req, res, next) => {
     let token;
     const authHeader = req.headers.authorization;
+    console.log(req.url, 'url check');
+    if (req.url.includes('/auth')) {
+        return next()
+    }
     if (authHeader && authHeader.startsWith("Bearer")) {
         token = authHeader.split(" ")[1];
     }

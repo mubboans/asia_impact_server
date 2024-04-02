@@ -14,10 +14,10 @@ route.post('/auth/otp', SendOTP);
 route.get('/auth/verifyotp', VerifyOTP);
 route.post('/auth/otp', SendOTP);
 route.post('/auth/checkusers', CheckUserAvailable);
-route.get('/language', getLanguage);
-route.post("/refreshtoken", refereshToken);
-route.get('/news', getNews);
+route.get('/auth/language', getLanguage);
+route.post("/auth/refreshtoken", refereshToken);
+route.get('/auth/news', getNews);
 
-route.get('/insight', getInsight);
+route.get('/auth/insight', getInsight);
 
 module.exports = route;
