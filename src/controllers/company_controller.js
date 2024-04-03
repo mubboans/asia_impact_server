@@ -1,33 +1,35 @@
 const { Company } = require("../Models/Company");
 const { CompanyNSustain } = require("../Models/CompanyNSustain");
+const { SectionData } = require("../Models/SectionData");
 const { SustainGoal } = require("../Models/SustainGoal");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost, fnbulkCreate } = require("../utils/dbCommonfn");
 const { createRandomCode } = require("../utils/functionalHelper");
-
+const { Op } = require('sequelize');
 const getCompany = TryCatch(async (req, res, next) => {
-    if (!req?.query?.user) {
-        req.query.targetUser = 'explorer'
-    }
-    else {
-        req.query.targetUser = {
-            [Op.or]: {
-                [Op.eq]: req?.query?.user,
-                [Op.like]: `%${req?.query?.user}%`
-            }
+    // if (!req?.query?.user) {
+    //     req.query.targetUser = 'explorer'
+    // }
+    // else {
+    //     req.query.targetUser = {
+    //         [Op.or]: {
+    //             [Op.eq]: req?.query?.user,
+    //             [Op.like]: `%${req?.query?.user}%`
+    //         }
+    //     }
+    //     delete req?.query?.user
+    // }
+    let GetAllCompany = await fnGet(Company, req.query || {}, [
+        {
+            model: SectionData,
+            as: 'sectiondata'
         }
-        delete req?.query?.user
-    }
-    let GetAllCompany = await fnGet(Company, req.query || {}, [], true);
+    ], false);
     if (req.query.id) {
         let GetAllCompanySustain = await fnGet(CompanyNSustain, { companyid: req.query.id }, [
-            // {
-            //     model: Company,
-            //     sourceKey: "companyid",
-            //     foreignKey: "id",
-            // },
+
             {
                 model: SustainGoal,
                 sourceKey: "sustaingoalid",
@@ -38,7 +40,7 @@ const getCompany = TryCatch(async (req, res, next) => {
             }
         ]);
         // console.log(GetAllCompanySustain, 'GetAllCompanySustain');
-        GetAllCompany[0].sustaingoaldata = GetAllCompanySustain
+        GetAllCompany[0].dataValues.sustaingoaldata = GetAllCompanySustain
 
     }
     return returnResponse(res, 200, 'Successfully Get Company', GetAllCompany)
@@ -80,9 +82,13 @@ const postCompany = TryCatch(async (req, res, next) => {
             return next(customErrorClass.BadRequest('Company Code Require'))
         }
     }
-    let cmp = await fnPost(Company, body, [], req);
+    let cmp = await fnPost(Company, body, {
+        include: [
+            'sectiondata'
+        ],
+    }, req);
 
-    let sustainarr = req.body.sustainarr.map((x) => {
+    let sustainarr = req.body?.sustainarr?.map((x) => {
         return {
             companyid: cmp.id, sustaingoalid: x
         }

@@ -7,7 +7,7 @@ const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost, fnbulkCreate } = require("../utils/dbCommonfn");
 const { createRandomCode } = require("../utils/functionalHelper");
 const { Company } = require("../Models/Company");
-
+const { Op } = require('sequelize');
 const getOpportunity = TryCatch(async (req, res, next) => {
     let include = [
         {
@@ -23,18 +23,18 @@ const getOpportunity = TryCatch(async (req, res, next) => {
     //         foreignKey: "id",
     //     }]
     // }
-    if (!req?.query?.user) {
-        req.query.targetUser = 'explorer'
-    }
-    else {
-        req.query.targetUser = {
-            [Op.or]: {
-                [Op.eq]: req?.query?.user,
-                [Op.like]: `%${req?.query?.user}%`
-            }
-        }
-        delete req?.query?.user
-    }
+    // if (!req?.query?.user) {
+    //     req.query.targetUser = 'explorer'
+    // }
+    // else {
+    //     req.query.targetUser = {
+    //         [Op.or]: {
+    //             [Op.eq]: req?.query?.user,
+    //             [Op.like]: `%${req?.query?.user}%`
+    //         }
+    //     }
+    //     delete req?.query?.user
+    // }
     let GetAllOpportunity = await fnGet(Opportunity, req.query || {}, include, false);
     return returnResponse(res, 200, 'Successfully Get Opportunity', GetAllOpportunity)
 }

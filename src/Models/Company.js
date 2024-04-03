@@ -46,51 +46,64 @@ const createCompanyModel = (sequelize, DataTypes) => {
                     allowNull: true,
                     defaultValue: "DRs"
                 },
-                sustaingoalarchiveddesc: {
-                    type: DataTypes.TEXT,
-                    allowNull: true,
-                },
-                summarydesc: {
-                    type: DataTypes.TEXT,
-                    allowNull: true
-                },
-                summaryturnover: {
-                    type: DataTypes.STRING,
-                    allowNull: true
-                },
-                summarycustomerserved: {
-                    type: DataTypes.STRING,
-                    allowNull: true
-                },
-                summaryemployee: {
-                    type: DataTypes.STRING,
-                    allowNull: true
-                },
-                impactdecs: {
-                    type: DataTypes.TEXT,
-                    allowNull: true
-                },
-                impactplasticcollect: {
-                    type: DataTypes.STRING,
-                    allowNull: true
-                },
 
-                impactplasticrecycle: {
+                activerequest: {
                     type: DataTypes.STRING,
-                    allowNull: true
+                    allowNull: false,
                 },
-                impactvolumesold: {
+                ebita: {
                     type: DataTypes.STRING,
-                    allowNull: true
+                    allowNull: false,
                 },
-                impactpremiumsale: {
+                turnover: {
                     type: DataTypes.STRING,
-                    allowNull: true
+                    allowNull: false,
                 },
-                impactgranulesproduced: {
-                    type: DataTypes.STRING,
-                    allowNull: true
-                },
+                // sustaingoalarchiveddesc: {
+                //     type: DataTypes.TEXT,
+                //     allowNull: true,
+                // },
+                // summarydesc: {
+                //     type: DataTypes.TEXT,
+                //     allowNull: true
+                // },
+                // summaryturnover: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
+                // summarycustomerserved: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
+                // summaryemployee: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
+                // impactdecs: {
+                //     type: DataTypes.TEXT,
+                //     allowNull: true
+                // },
+                // impactplasticcollect: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
+
+                // impactplasticrecycle: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
+                // impactvolumesold: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
+                // impactpremiumsale: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
+                // impactgranulesproduced: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
                 targetUser: {
                     type: DataTypes.STRING,
                     allowNull: true

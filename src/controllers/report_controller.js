@@ -7,7 +7,7 @@ const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost, fnbulkCreate } = require("../utils/dbCommonfn");
 const { createRandomCode } = require("../utils/functionalHelper");
 const { Company } = require("../Models/Company");
-
+const { Op } = require('sequelize');
 const getReport = TryCatch(async (req, res, next) => {
     let include = [];
     if (req.query.id) {
@@ -17,18 +17,18 @@ const getReport = TryCatch(async (req, res, next) => {
             foreignKey: "id",
         }]
     }
-    if (!req?.query?.user) {
-        req.query.targetUser = 'explorer'
-    }
-    else {
-        req.query.targetUser = {
-            [Op.or]: {
-                [Op.eq]: req?.query?.user,
-                [Op.like]: `%${req?.query?.user}%`
-            }
-        }
-        delete req?.query?.user
-    }
+    // if (!req?.query?.user) {
+    //     req.query.targetUser = 'explorer'
+    // }
+    // else {
+    //     req.query.targetUser = {
+    //         [Op.or]: {
+    //             [Op.eq]: req?.query?.user,
+    //             [Op.like]: `%${req?.query?.user}%`
+    //         }
+    //     }
+    //     delete req?.query?.user
+    // }
     let GetAllReport = await fnGet(Report, req.query || {}, include, false);
     // if (req.query.id) {
     //     let GetAllCompanySustain = await fnGet(CompanyNSustain, { companyid: req.query.id }, [
@@ -69,6 +69,7 @@ const deleteReport = TryCatch(async (req, res, next) => {
 const postReport = TryCatch(async (req, res, next) => {
     let reportcode = await createRandomCode(Report, 'reportcode');
     let body = req.body;
+
     if (body.isNew) {
         if (body.reportcode) {
             return next(customErrorClass.BadRequest('Code is not allowed on new data'))

@@ -18,6 +18,7 @@ const { createInsightModel } = require('../Models/Insight');
 const { createUserDetail, UserDetail } = require('../Models/UserDetail');
 const { createLrDetail, LrDetail } = require('../Models/LRDetail');
 const { createFileStore } = require('../Models/FIleStore');
+const { createSectionData, SectionData } = require('../Models/SectionData');
 // const User = require('../Models/Users');
 // const Documents = require('../Models/Document');
 // const { syncModel } = require('../Models');
@@ -66,6 +67,7 @@ const dbConnect = async () => {
         createUserDetail(sequelize, DataTypes);
         createLrDetail(sequelize, DataTypes);
         createFileStore(sequelize, DataTypes);
+        createSectionData(sequelize, DataTypes);
 
 
         User.hasMany(Document, { foreignKey: 'userid', as: 'document' });
@@ -98,6 +100,7 @@ const dbConnect = async () => {
 
         SustainGoal.hasMany(CompanyNSustain, { foreignKey: 'sustaingoalid' });
         CompanyNSustain.belongsTo(SustainGoal, { foreignKey: 'sustaingoalid' });
+
         Company.hasMany(Report, { foreignKey: 'companyid' });
         Report.belongsTo(Company, { foreignKey: 'companyid' });
 
@@ -107,6 +110,13 @@ const dbConnect = async () => {
 
         Highlight.hasMany(HighlightDetail, { foreignKey: 'highlightid', as: 'highligthdetail' });
         HighlightDetail.belongsTo(Highlight, { foreignKey: 'highlightid' });
+
+
+        Company.hasMany(SectionData, { foreignKey: 'companyid', as: 'sectiondata' });
+        SectionData.belongsTo(Company, { foreignKey: 'companyid' });
+
+        Report.hasMany(SectionData, { foreignKey: 'reportid', as: 'sectiondata' });
+        SectionData.belongsTo(Report, { foreignKey: 'reportid' });
 
 
         await sequelize.sync({ alter: false });
