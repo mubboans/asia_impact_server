@@ -22,11 +22,19 @@ const createHighLightsModel = (sequelize, DataTypes) => {
                     type: DataTypes.STRING,
                     allowNull: true,
                 },
-                tag: {
+                subtype: {
                     type: DataTypes.STRING,
                     allowNull: true,
                 },
                 imageUrl: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
+                },
+                provience: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
+                },
+                country: {
                     type: DataTypes.STRING,
                     allowNull: true,
                 },
