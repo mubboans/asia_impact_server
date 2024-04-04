@@ -8,6 +8,7 @@ const { fnGet, fnUpdate, fnDelete, fnPost, fnbulkCreate } = require("../utils/db
 const { createRandomCode } = require("../utils/functionalHelper");
 const { Company } = require("../Models/Company");
 const { Op } = require('sequelize');
+const { SectionData } = require("../Models/SectionData");
 const getReport = TryCatch(async (req, res, next) => {
     let include = [];
     if (req.query.id) {
@@ -15,7 +16,18 @@ const getReport = TryCatch(async (req, res, next) => {
             model: Company,
             sourceKey: "companyid",
             foreignKey: "id",
-        }]
+            include: [
+                {
+                    model: SectionData,
+                    as: 'sectiondata'
+                }
+            ]
+        },
+        {
+            model: SectionData,
+            as: 'sectiondata'
+        }
+        ]
     }
     // if (!req?.query?.user) {
     //     req.query.targetUser = 'explorer'
@@ -85,7 +97,11 @@ const postReport = TryCatch(async (req, res, next) => {
         }
     }
 
-    let cmp = await fnPost(Report, body, [], req);
+    let cmp = await fnPost(Report, body, {
+        include: [
+            'sectiondata'
+        ],
+    }, req);
 
     // let sustainarr = req.body.sustainarr.map((x) => {
     //     return {

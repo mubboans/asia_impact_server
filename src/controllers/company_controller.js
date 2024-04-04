@@ -21,15 +21,9 @@ const getCompany = TryCatch(async (req, res, next) => {
     //     }
     //     delete req?.query?.user
     // }
-    let GetAllCompany = await fnGet(Company, req.query || {}, [
-        {
-            model: SectionData,
-            as: 'sectiondata'
-        }
-    ], false);
+    let GetAllCompanySustain = [], include = [];
     if (req.query.id) {
-        let GetAllCompanySustain = await fnGet(CompanyNSustain, { companyid: req.query.id }, [
-
+        GetAllCompanySustain = await fnGet(CompanyNSustain, { companyid: req.query.id }, [
             {
                 model: SustainGoal,
                 sourceKey: "sustaingoalid",
@@ -39,8 +33,27 @@ const getCompany = TryCatch(async (req, res, next) => {
                 ]
             }
         ]);
-        // console.log(GetAllCompanySustain, 'GetAllCompanySustain');
-        GetAllCompany[0].dataValues.sustaingoaldata = GetAllCompanySustain
+        include.push({
+            model: SectionData,
+            as: 'sectiondata'
+        })
+
+    }
+    let GetAllCompany = await fnGet(Company, req.query || {}, include, false);
+    if (GetAllCompanySustain.length > 0 && GetAllCompanySustain.length !== 0) {
+        // let GetAllCompanySustain = await fnGet(CompanyNSustain, { companyid: req.query.id }, [
+        //     {
+        //         model: SustainGoal,
+        //         sourceKey: "sustaingoalid",
+        //         foreignKey: "id",
+        //         order: [
+        //             [SustainGoal, 'id', 'DESC']
+        //         ]
+        //     }
+        // ]);
+        // console.log(GetAllCompany, 'GetAllCompanySustain', GetAllCompanySustain);
+        // GetAllCompany[0] = GetAllCompany[0]?.dataValues ? GetAllCompany[0].dataValues.sustainarr = GetAllCompanySustain : GetAllCompany[0]
+        GetAllCompany[0].dataValues.sustainarr = GetAllCompanySustain;
 
     }
     return returnResponse(res, 200, 'Successfully Get Company', GetAllCompany)
@@ -50,7 +63,8 @@ const getCompany = TryCatch(async (req, res, next) => {
 const updateCompany = TryCatch(async (req, res, next) => {
     let updateStatus = await fnUpdate(Company, req.body, { id: req.body.id }, req)
     console.log(updateStatus, 'updateStatus');
-    await fnbulkCreate(CompanyNSustain, req.body.sustainarr, ['companyid', 'sustaingoalid', 'lastUsedIp', 'updatedBy'], req) // to bulk update the field to be update on db
+    await fnbulkCreate(CompanyNSustain, req.body.sustainarr, ['companyid', 'sustaingoalid', 'lastUsedIp', 'updatedBy'], req); // to bulk update the field to be update on db
+    await fnbulkCreate(SectionData, req.body.sectiondata, ['companyid', 'sectionname', 'key', 'value', 'lastUsedIp', 'updatedBy'], req)
     return returnResponse(res, 200, 'Successfully Update Company')
 
 }
@@ -60,7 +74,8 @@ const deleteCompany = TryCatch(async (req, res, next) => {
     if (!req.query.id) {
         next(customErrorClass.BadRequest('id required'))
     }
-    await fnDelete(Company, req.query, req, "Report_" + req.query.id)
+    await fnDelete(CompanyNSustain, { companyid: Number(req.query.id) }, req, "CompanySustain_" + req.query.id)
+    await fnDelete(Company, req.query, req, "Company_" + req.query.id);
     return returnResponse(res, 200, 'Successfully Delete Company')
 }
 )

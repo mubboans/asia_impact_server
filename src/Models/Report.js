@@ -104,6 +104,10 @@ const createReportModel = (sequelize, DataTypes) => {
                     type: DataTypes.STRING,
                     allowNull: true
                 },
+                reportdate: {
+                    type: DataTypes.STRING,
+                    allowNull: true
+                }
             },
             DataTypes
         ),

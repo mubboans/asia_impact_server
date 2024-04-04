@@ -111,13 +111,14 @@ const fnUpdate = async (model, obj, condition, req) => {
 
 const fnDelete = async (model, condition, req, modulename) => {
     try {
-        if (!condition.id) throw new CustomError('No Id Found To Delete', 400)
+        // if (!condition.id) throw new CustomError('No Id Found To Delete', 400)
         let obj = setUserDelete(req, {});
         console.log(obj, 'obj delete');
-        await fnPost(ModuleHistory, { modulename, ...obj });
         console.log(condition, 'condition for delete');
-        const data = await model.destroy({ where: condition });
-        if (data == 1) {
+        const data = await model.destroy({ where: condition, logging: console.log });
+        console.log(data, 'data check');
+        if (data == 1 || data > 1) {
+            await fnPost(ModuleHistory, { modulename, ...obj });
             return true
         }
         else {
