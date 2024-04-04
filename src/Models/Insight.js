@@ -52,7 +52,11 @@ const createInsightModel = (sequelize, DataTypes) => {
                 file_name: {
                     type: DataTypes.STRING,
                     allowNull: true
-                }
+                },
+                targetUser: {
+                    type: DataTypes.STRING,
+                    allowNull: true
+                },
             },
             DataTypes
         ),

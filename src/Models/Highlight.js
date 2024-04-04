@@ -77,7 +77,11 @@ const createHighLightsModel = (sequelize, DataTypes) => {
                 meeturl: {
                     type: DataTypes.STRING,
                     allowNull: true
-                }
+                },
+                targetUser: {
+                    type: DataTypes.STRING,
+                    allowNull: true
+                },
 
             },
             DataTypes

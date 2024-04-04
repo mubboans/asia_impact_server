@@ -22,11 +22,11 @@ const createReportModel = (sequelize, DataTypes) => {
                 },
                 fromDate: {
                     type: DataTypes.STRING,
-                    allowNull: false,
+                    allowNull: true,
                 },
                 toDate: {
                     type: DataTypes.STRING,
-                    allowNull: false,
+                    allowNull: true,
                 },
                 companyid: {
                     type: DataTypes.INTEGER,
@@ -54,36 +54,36 @@ const createReportModel = (sequelize, DataTypes) => {
                     type: DataTypes.STRING,
                     allowNull: false
                 },
-                summarydesc: {
-                    type: DataTypes.TEXT,
-                    allowNull: true
-                },
+                // summarydesc: {
+                //     type: DataTypes.TEXT,
+                //     allowNull: true
+                // },
 
-                impactdecs: {
-                    type: DataTypes.TEXT,
-                    allowNull: true
-                },
-                impactplasticcollect: {
-                    type: DataTypes.STRING,
-                    allowNull: true
-                },
+                // impactdecs: {
+                //     type: DataTypes.TEXT,
+                //     allowNull: true
+                // },
+                // impactplasticcollect: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
 
-                impactplasticrecycle: {
-                    type: DataTypes.STRING,
-                    allowNull: true
-                },
-                impactvolumesold: {
-                    type: DataTypes.STRING,
-                    allowNull: true
-                },
-                impactpremiumsale: {
-                    type: DataTypes.STRING,
-                    allowNull: true
-                },
-                impactgranulesproduced: {
-                    type: DataTypes.STRING,
-                    allowNull: true
-                },
+                // impactplasticrecycle: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
+                // impactvolumesold: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
+                // impactpremiumsale: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
+                // impactgranulesproduced: {
+                //     type: DataTypes.STRING,
+                //     allowNull: true
+                // },
                 targetUser: {
                     type: DataTypes.STRING,
                     allowNull: true
@@ -99,7 +99,11 @@ const createReportModel = (sequelize, DataTypes) => {
                 isNew: {
                     type: DataTypes.BOOLEAN,
                     allowNull: true
-                }
+                },
+                tenure: {
+                    type: DataTypes.STRING,
+                    allowNull: true
+                },
             },
             DataTypes
         ),
