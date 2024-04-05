@@ -74,7 +74,8 @@ const deleteCompany = TryCatch(async (req, res, next) => {
     if (!req.query.id) {
         next(customErrorClass.BadRequest('id required'))
     }
-    await fnDelete(CompanyNSustain, { companyid: Number(req.query.id) }, req, "CompanySustain_" + req.query.id)
+    // await fnDelete(CompanyNSustain, { companyid: Number(req.query.id) }, req, "CompanySustain_" + req.query.id)
+    await CompanyNSustain.destroy({ where: { companyid: Number(req.query.id) } });
     await fnDelete(Company, req.query, req, "Company_" + req.query.id);
     return returnResponse(res, 200, 'Successfully Delete Company')
 }
