@@ -101,6 +101,9 @@ const dbConnect = async () => {
         SustainGoal.hasMany(CompanyNSustain, { foreignKey: 'sustaingoalid' });
         CompanyNSustain.belongsTo(SustainGoal, { foreignKey: 'sustaingoalid' });
 
+        Company.hasMany(CompanyNSustain, { foreignKey: 'companyid', as: "sustainarr" });
+        CompanyNSustain.belongsTo(Company, { foreignKey: 'companyid', as: "sustainarr" });
+
         Company.hasMany(Report, { foreignKey: 'companyid' });
         Report.belongsTo(Company, { foreignKey: 'companyid' });
 

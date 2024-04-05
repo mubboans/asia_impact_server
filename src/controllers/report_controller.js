@@ -9,6 +9,8 @@ const { createRandomCode } = require("../utils/functionalHelper");
 const { Company } = require("../Models/Company");
 const { Op } = require('sequelize');
 const { SectionData } = require("../Models/SectionData");
+const { SustainGoal } = require("../Models/SustainGoal");
+const { CompanyNSustain } = require("../Models/CompanyNSustain");
 const getReport = TryCatch(async (req, res, next) => {
     let include = [];
     if (req.query.id) {
@@ -20,6 +22,18 @@ const getReport = TryCatch(async (req, res, next) => {
                 {
                     model: SectionData,
                     as: 'sectiondata'
+                },
+                {
+                    model: CompanyNSustain,
+                    as: "sustainarr",
+                    include: {
+                        model: SustainGoal,
+                        sourceKey: "sustaingoalid",
+                        foreignKey: "id",
+                        order: [
+                            [SustainGoal, 'id', 'DESC']
+                        ]
+                    }
                 }
             ]
         },

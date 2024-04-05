@@ -36,20 +36,34 @@ const getCompany = TryCatch(async (req, res, next) => {
         include.push({
             model: SectionData,
             as: 'sectiondata'
-        })
+        },
+            {
+                model: CompanyNSustain,
+                as: "sustainarr",
+                include: {
+                    model: SustainGoal,
+                    sourceKey: "sustaingoalid",
+                    foreignKey: "id",
+                    order: [
+                        [SustainGoal, 'id', 'DESC']
+                    ]
+                }
+            }
+        )
+
 
     }
     let GetAllCompany = await fnGet(Company, req.query || {}, include, false);
     if (GetAllCompanySustain.length > 0 && GetAllCompanySustain.length !== 0) {
         // let GetAllCompanySustain = await fnGet(CompanyNSustain, { companyid: req.query.id }, [
         //     {
-        //         model: SustainGoal,
-        //         sourceKey: "sustaingoalid",
-        //         foreignKey: "id",
-        //         order: [
-        //             [SustainGoal, 'id', 'DESC']
-        //         ]
-        //     }
+        //     model: SustainGoal,
+        //     sourceKey: "sustaingoalid",
+        //     foreignKey: "id",
+        //     order: [
+        //         [SustainGoal, 'id', 'DESC']
+        //     ]
+        // }
         // ]);
         // console.log(GetAllCompany, 'GetAllCompanySustain', GetAllCompanySustain);
         // GetAllCompany[0] = GetAllCompany[0]?.dataValues ? GetAllCompany[0].dataValues.sustainarr = GetAllCompanySustain : GetAllCompany[0]
@@ -100,18 +114,19 @@ const postCompany = TryCatch(async (req, res, next) => {
     }
     let cmp = await fnPost(Company, body, {
         include: [
-            'sectiondata'
+            'sectiondata',
+            'sustainarr'
         ],
     }, req);
 
-    let sustainarr = req.body?.sustainarr?.map((x) => {
-        return {
-            companyid: cmp.id, sustaingoalid: x
-        }
-    })
-    if (req.body.sustainarr && req.body.sustainarr.length > 0) {
-        await fnbulkCreate(CompanyNSustain, sustainarr, [], req);
-    }
+    // let sustainarr = req.body?.sustainarr?.map((x) => {
+    //     return {
+    //         companyid: cmp.id, sustaingoalid: x
+    //     }
+    // })
+    // if (req.body.sustainarr && req.body.sustainarr.length > 0) {
+    //     await fnbulkCreate(CompanyNSustain, sustainarr, [], req);
+    // }
     return returnResponse(res, 201, 'Successfully Added Company');
 }
 )
