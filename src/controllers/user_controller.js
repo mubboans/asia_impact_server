@@ -98,6 +98,10 @@ const postUser = TryCatch(async (req, res, next) => {
 
 
 function getUserById(req, option) {
+    option = {
+        ...option,
+        deletionDate: null
+    }
     if (req.user.role == 'admin') {
         return option;
     }
