@@ -35,5 +35,26 @@ const checkToken = TryCatch(async (req, res, next) => {
     }
 }
 )
+const checkTokenForNews = (req) => {
+    const authHeader = req.headers.authorization;
+    let token;
+    if (authHeader && authHeader.startsWith("Bearer")) {
+        token = authHeader.split(" ")[1];
+    }
+    if (!token) {
 
-module.exports = checkToken
+        return false;
+    }
+    else {
+        try {
+            const head = validateToken(token, process.env.ACCESS_TOKEN_SECRET);
+            if (head.role && head.role == 'admin') {
+                return true;
+            }
+        } catch (error) {
+            return false;
+        }
+    }
+
+}
+module.exports = { checkToken, checkTokenForNews }

@@ -8,7 +8,7 @@ const errorresponse = require('./error/apiErrorHandler')
 const non_auth_route = require("./route/non-authroutes")
 const auth_route = require('./route/authroutes');
 const { dbConnect } = require('./dbConfig/dbConfig');
-const checkToken = require('./middleware/verifyRequest');
+const { checkToken } = require('./middleware/verifyRequest');
 const { route_not_found } = require('./helper/responseHelper');
 
 const app = express()

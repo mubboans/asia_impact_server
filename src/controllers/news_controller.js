@@ -5,19 +5,19 @@ const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
 const { createRandomCode } = require("../utils/functionalHelper");
+const { checkTokenForNews } = require('../middleware/verifyRequest');
 
 // let newJoi = Joi.object({
 
 // })
 const getNews = TryCatch(async (req, res, next) => {
-    console.log(req.user, 'user token data');
-
-    if (!req?.query?.user) {
-        req.query.targetUser = 'explorer'
-    }
-    else {
-        if (req?.user == 'admin') {
-            console.log('get all admin data');
+    let checkToken = checkTokenForNews(req);
+    console.log(checkToken, 'user token data');
+    if (checkToken) {
+        console.log('get all admin data');
+    } else {
+        if (!req?.query?.user) {
+            req.query.targetUser = 'explorer'
         }
         else {
             req.query.targetUser = {
@@ -30,6 +30,8 @@ const getNews = TryCatch(async (req, res, next) => {
         }
         delete req?.query?.user
     }
+
+
     let options = {
         ...req.query,
         attribute: { exclude: ['description'] }
