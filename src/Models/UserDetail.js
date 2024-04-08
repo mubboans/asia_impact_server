@@ -35,8 +35,8 @@ const createUserDetail = (sequelize, DataTypes) => {
                 allowNull: true
             },
             country: {
-                type: DataTypes.ENUM,
-                values: ['india', 'indonesia', 'philippines'],
+                type: DataTypes.STRING,
+                allowNull: true
             },
             zipcode: {
                 type: DataTypes.STRING,

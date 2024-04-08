@@ -16,11 +16,17 @@ const getNews = TryCatch(async (req, res, next) => {
         req.query.targetUser = 'explorer'
     }
     else {
-        req.query.targetUser = {
-            [Op.or]: {
-                [Op.eq]: req?.query?.user,
-                [Op.like]: `%${req?.query?.user}%`
+        if (req?.user == 'admin') {
+            console.log('get all admin data');
+        }
+        else {
+            req.query.targetUser = {
+                [Op.or]: {
+                    [Op.eq]: req?.query?.user,
+                    [Op.like]: `%${req?.query?.user}%`
+                }
             }
+
         }
         delete req?.query?.user
     }

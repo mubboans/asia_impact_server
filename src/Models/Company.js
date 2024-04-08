@@ -34,8 +34,8 @@ const createCompanyModel = (sequelize, DataTypes) => {
                     allowNull: false
                 },
                 country: {
-                    type: DataTypes.ENUM,
-                    values: ['india', 'indonesia', 'philippines'],
+                    type: DataTypes.STRING,
+                    allowNull: false
                 },
                 value: {
                     type: DataTypes.FLOAT,
