@@ -31,5 +31,8 @@ class customErrorClass {
     static AccountNotActive(error) {
         return new customErrorClass(403, "Account Not Active", false, error, 'Failed');
     }
+    static AccountDeleted(error) {
+        return new customErrorClass(403, "Account Deleted", false, error, 'Failed');
+    }
 }
 module.exports = customErrorClass
