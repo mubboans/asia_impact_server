@@ -92,7 +92,8 @@ const postUser = TryCatch(async (req, res, next) => {
     else {
         include = [];
     }
-    fnPost(User, req.body, include, req);
+    let d = await fnPost(User, req.body, include, req);
+    console.log(d, 'checl user');
     return returnResponse(res, 201, 'Successfully Added User');
 }
 )

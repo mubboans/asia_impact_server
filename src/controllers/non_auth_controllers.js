@@ -85,16 +85,15 @@ const Login = TryCatch(async (req, res, next) => {
             as: "userdetail"
         }
     ], false);
-    console.log(userCheck, 'userCheck');
+    // console.log(userCheck, 'userCheck');
     if (userCheck.length > 0 && userCheck) {
-        let userDetails = userCheck[0]
-        // console.log(userDetails, 'userDetails');
+        let userDetails = userCheck[0].dataValues;
+        console.log(userDetails, 'userDetails');
         let hashPass = body.email + body.password;
         // console.log(hashPass, userDetails.password, 'user password');
-        if (!userDetails.isActive) {
-            return next(customErrorClass.AccountNotActive('It seems your account is inactive'));
-        }
         if (bcrypt.compareSync(hashPass, userDetails.password)) {
+            if (!userDetails.isActive) return next(customErrorClass.AccountNotActive('It seems your account is inactive'));
+            if (userDetails.deletionDate) return next(customErrorClass.AccountDeleted('It seem your account is deleted'))
             const newPayload = {
                 userId: userDetails.id, email: userDetails.email, role: userDetails.role,
                 userdetail: {
