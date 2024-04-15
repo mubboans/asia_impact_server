@@ -3,6 +3,7 @@ const { LrDetail } = require("../Models/LRDetail");
 const { UserDetail } = require("../Models/UserDetail");
 const { UserRelation } = require("../Models/UserRelation");
 const { User } = require("../Models/Users");
+const CustomErrorObj = require("../error/CustomErrorObj");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
@@ -106,9 +107,12 @@ function getUserById(req, option) {
         return option;
     }
     else {
+        if (!req.query.role) {
+            throw new CustomErrorObj('Role Required', 400)
+        }
+        if (req.query.role == 'admin') throw new CustomErrorObj("Can't Get Admin", 400)
         return option = {
             ...option,
-            id: req.user.userId
         }
     }
 }

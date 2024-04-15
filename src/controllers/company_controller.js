@@ -130,10 +130,26 @@ const postCompany = TryCatch(async (req, res, next) => {
     return returnResponse(res, 201, 'Successfully Added Company');
 }
 )
-
+const deleteDetailEntries = TryCatch(async (req, res, next) => {
+    let { model } = req.query;
+    if (!req.query.id || !model) {
+        next(customErrorClass.BadRequest('Invalid Request'))
+    }
+    let modelName;
+    if (model == 'sustainarr') {
+        modelName = CompanyNSustain
+    }
+    else if (model == 'sectiondata') {
+        modelName = SectionData
+    }
+    delete req.query.model;
+    await fnDelete(modelName, req.query, req, `${modelName}_` + req.query.id);
+    return returnResponse(res, 201, 'Successfully Deleted Entry');
+})
 module.exports = {
     getCompany,
     updateCompany,
     deleteCompany,
-    postCompany
+    postCompany,
+    deleteDetailEntries
 }

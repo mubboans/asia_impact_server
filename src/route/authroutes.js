@@ -15,7 +15,8 @@ const {
     getCompany,
     updateCompany,
     deleteCompany,
-    postCompany
+    postCompany,
+    deleteDetailEntries
 } = require("../controllers/company_controller");
 const {
     postReport,
@@ -152,5 +153,7 @@ route
     .delete(deleteUserDetail);
 
 route.patch('/verifyDetail', verifyDetail);
+
+route.delete('/sectionentries', verifyRole("admin", "legalrepresent"), deleteDetailEntries)
 
 module.exports = route;
