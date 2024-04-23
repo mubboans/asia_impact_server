@@ -65,6 +65,10 @@ const createNewsModel = (sequelize, DataTypes) => {
                 isNew: {
                     type: DataTypes.BOOLEAN,
                     allowNull: true
+                },
+                addhome: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull: false
                 }
             },
             DataTypes

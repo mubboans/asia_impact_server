@@ -54,6 +54,10 @@ const createReportModel = (sequelize, DataTypes) => {
                     type: DataTypes.STRING,
                     allowNull: false
                 },
+                addhome: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull: false
+                },
                 // summarydesc: {
                 //     type: DataTypes.TEXT,
                 //     allowNull: true

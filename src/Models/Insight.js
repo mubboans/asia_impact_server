@@ -57,6 +57,10 @@ const createInsightModel = (sequelize, DataTypes) => {
                     type: DataTypes.STRING,
                     allowNull: true
                 },
+                addhome: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull: false
+                }
             },
             DataTypes
         ),
