@@ -3,7 +3,7 @@ const { Notification } = require("../Models/Notification");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
-const { fnGet, fnUpdate, fnDelete, fnPost, fnbulkCreate } = require("../utils/dbCommonfn");
+const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
 const { createRandomCode } = require("../utils/functionalHelper");
 
 const getNotification = TryCatch(async (req, res, next) => {

@@ -10,14 +10,14 @@ class User extends Model {
 const createUser = (sequelize, DataTypes) => {
     User.init(
         {
-            firstname: {
-                type: DataTypes.STRING,
-                allowNull: true
-            },
-            lastname: {
-                type: DataTypes.STRING,
-                allowNull: true
-            },
+            // firstname: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true
+            // },
+            // lastname: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true
+            // },
             password: {
                 type: DataTypes.STRING,
                 allowNull: true
@@ -47,7 +47,7 @@ const createUser = (sequelize, DataTypes) => {
             },
             role: {
                 type: DataTypes.ENUM,
-                values: ['explorer', 'individual investor', 'advisor', 'legalrepresent', 'admin'],
+                values: ['basic', 'intermediate', 'advanced', 'individual_investor', 'advisor', 'legalrepresent', 'admin', 'editor', 'ai_officer'],
                 // defaultValue: "explorer"
                 allowNull: true
             },

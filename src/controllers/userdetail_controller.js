@@ -1,7 +1,9 @@
 const { Document } = require("../Models/Document");
+const { LrDetail } = require("../Models/LRDetail");
 const { Otp } = require("../Models/Otp");
 const { UserDetail } = require("../Models/UserDetail");
 const { User } = require("../Models/Users");
+const CustomErrorObj = require("../error/CustomErrorObj");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
@@ -41,19 +43,38 @@ const deleteUserDetail = TryCatch(async (req, res, next) => {
 
 const postUserDetail = TryCatch(async (req, res, next) => {
     let body = req.body;
-    let include;
-    if (body.document) {
-        include =
-        {
-            include: [
-                'document'
-            ],
-        }
+    // let include;
+    // if (body.document) {
+    let include =
+    {
+        include: [
+            {
+                model: LrDetail,
+                as: 'userlrdetail',
+                include: [
+                    {
+                        model: Document,
+                        as: 'document'
+                    }
+                ]
+            },
+            {
+                model: Document,
+                as: 'document'
+            }
+        ]
     }
-    else {
-        include = [];
+    // }
+    // else {
+    //     include = [];
+    // }
+    if (typeof body.user == 'object') {
+        await fnUpdate(User, body.user, { id: body.userid }, req);
     }
     console.log(include, 'include');
+
+
+
     await fnPost(UserDetail, req.body, include, req)
     // let userdetailUpdate = await fnPost(UserDetail, req.body, include, req);
     // if (body.documents && body.documents.length > 0) {
@@ -68,6 +89,44 @@ const postUserDetail = TryCatch(async (req, res, next) => {
     return returnResponse(res, 201, 'Successfully Added UserDetail');
 }
 )
+
+const postuserdetaildocument = TryCatch(async (req, res, next) => {
+    const body = req.body;
+    if (!body.userid || !body.userdetailid) {
+        return next(customErrorClass.BadRequest("Id is missing"));
+    }
+    const checkuser = await fnGet(User, { email: body.email }, [], true);
+    if (checkuser.length > 0 && req.user.userId !== checkuser[0].id) {
+        return next(new CustomErrorObj("Email already belongs to another user", 403));
+    }
+    const user = { ...body };
+    delete user.password;
+    delete user.document;
+
+
+    const promiseArr = [];
+
+
+    if (body.document) {
+        if (Array.isArray(body.document) && body.document.length > 0) {
+            promiseArr.push(fnbulkCreate(Document, body.document, [], [], req));
+        }
+        else {
+            promiseArr.push(fnPost(Document, body.document, [], req));
+        }
+    }
+    // Add update promises for User and UserDetail
+    promiseArr.push(
+        fnUpdate(User, user, { id: body.userid }, req),
+        fnUpdate(UserDetail, user, { id: body.userdetailid }, req)
+    );
+
+    // Execute all promises in parallel
+    await Promise.all(promiseArr);
+
+    return returnResponse(res, 200, 'User details updated and document inserted successfully');
+});
+
 const verifyDetail = TryCatch(async (req, res, next) => {
     let body = req.body;
     let checkDetailwithOtp = await fnGet(Otp, { ...body, type: 'verification', status: 'verify' }, [], false);
@@ -85,5 +144,6 @@ module.exports = {
     updateUserDetail,
     deleteUserDetail,
     postUserDetail,
-    verifyDetail
+    verifyDetail,
+    postuserdetaildocument
 }

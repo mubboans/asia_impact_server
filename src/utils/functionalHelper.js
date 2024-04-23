@@ -32,7 +32,7 @@ const setUserDetails = (req, obj) => {
         return obj;
     }
     // Set user id in the object
-    console.log(req?.user, 'users');
+    // console.log(req?.user, 'users');
     obj = {
         ...obj,
         createdBy: req?.user?.userId,

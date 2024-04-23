@@ -11,7 +11,7 @@ route.post('/auth/login', Login);
 route.post('/auth/register', Register);
 route.post('/auth/forgot-password', ForgotPassword);
 route.post('/auth/otp', SendOTP);
-route.get('/auth/verifyotp', VerifyOTP);
+route.post('/auth/verifyotp', VerifyOTP);
 route.post('/auth/otp', SendOTP);
 route.post('/auth/checkusers', CheckUserAvailable);
 route.get('/auth/language', getLanguage);

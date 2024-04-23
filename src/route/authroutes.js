@@ -2,7 +2,7 @@ const express = require("express");
 const { postNews, updateNews, deleteNews } = require("../controllers/news_controller");
 const { getUserWithRelation, postRelation, updateRelation, deleteRelation } = require("../controllers/userRelation_controller");
 const { postLanguage, updateLanguage, deleteLanguage } = require("../controllers/language_controller");
-const { deleteUser, updateUser, getUser, postUser, } = require("../controllers/user_controller");
+const { deleteUser, updateUser, getUser, postUser, ChangePassword, } = require("../controllers/user_controller");
 const { getSustainGoal, updateSustainGoal, deleteSustainGoal, postSustainGoal } = require("../controllers/sustain_goal_controller");
 const {
     getDocument,
@@ -49,7 +49,7 @@ const {
 } = require("../controllers/insight_controller");
 const verifyRole = require("../middleware/verifyRole");
 const { postLrDetail, updateLrDetail, getLrDetail, deleteLrDetail } = require("../controllers/lr_controller");
-const { getUserDetail, updateUserDetail, deleteUserDetail, postUserDetail, verifyDetail } = require("../controllers/userdetail_controller");
+const { getUserDetail, updateUserDetail, deleteUserDetail, postUserDetail, verifyDetail, postuserdetaildocument } = require("../controllers/userdetail_controller");
 
 const route = express.Router();
 
@@ -131,15 +131,15 @@ route
     .put(verifyRole("admin", "investor", "advisor", "legalrepresent"), updateDocument)
     .post(verifyRole("admin", "investor", "advisor", "legalrepresent"), postDocument)
     .delete(
-        verifyRole("admin", "investor", "advisor", "explorer"),
+        verifyRole("admin", "investor", "advisor", "basic"),
         deleteDocument
     );
 
 route
     .route("/lrdetail")
-    .post(verifyRole("admin", "legalrepresent"), postLrDetail)
-    .put(verifyRole("admin", "legalrepresent"), updateLrDetail)
-    .get(verifyRole("admin", "legalrepresent"), getLrDetail)
+    .post(postLrDetail)
+    .put(updateLrDetail)
+    .get(getLrDetail)
     .delete(verifyRole("admin", "legalrepresent"), deleteLrDetail);
 
 route.post("/documentUpload", documentUpload)
@@ -154,6 +154,9 @@ route
 
 route.patch('/verifyDetail', verifyDetail);
 
-route.delete('/sectionentries', verifyRole("admin", "legalrepresent"), deleteDetailEntries)
+route.delete('/sectionentries', verifyRole("admin", "legalrepresent"), deleteDetailEntries);
 
+route.post('/userdetaildocument', postuserdetaildocument);
+
+route.patch('/updatepassword', ChangePassword);
 module.exports = route;

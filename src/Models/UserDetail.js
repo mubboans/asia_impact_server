@@ -90,6 +90,10 @@ const createUserDetail = (sequelize, DataTypes) => {
             lang_id: {
                 type: DataTypes.INTEGER,
                 allowNull: true,
+            },
+            about: {
+                type: DataTypes.STRING,
+                allowNull: true,
             }
         },
         {

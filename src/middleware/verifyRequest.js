@@ -22,7 +22,7 @@ const checkToken = TryCatch(async (req, res, next) => {
         const head = validateToken(token, process.env.ACCESS_TOKEN_SECRET);
         // console.log(head, 'head check');
         req.user = head;
-        if (head.role && head.userId) {
+        if ((head.role || head.email) && head.userId) {
             console.log(req.user);
             next();
         }
@@ -42,7 +42,6 @@ const checkTokenForNews = (req) => {
         token = authHeader.split(" ")[1];
     }
     if (!token) {
-
         return false;
     }
     else {

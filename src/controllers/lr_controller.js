@@ -36,29 +36,40 @@ const deleteLrDetail = TryCatch(async (req, res, next) => {
 
 const postLrDetail = TryCatch(async (req, res, next) => {
     let body = req.body;
-    let include;
-    if (body.document) {
-        include =
-        {
-            include: [
-                'document'
-            ],
-        }
-
+    const include =
+    {
+        include: [
+            'document'
+        ],
+    }
+    if (Array.isArray(body) && body.length > 0) {
+        // for (var i = 0; i > body.length; i++) {
+        //     let data = body[i];
+        // let include;
+        // if (body.document) {
+        // }
+        // else {
+        //     include = [];
+        // }
+        await fnbulkCreate(LrDetail, body, [], include, req);
+        // let lrdetail = await fnPost(LrDetail, req.body, include, req);
+        // }
     }
     else {
-        include = [];
+        let lrdetail = await fnPost(LrDetail, req.body, include, req);
     }
-    let lrdetail = await fnPost(LrDetail, req.body, include, req);
-    if (body.documents && body.documents.length > 0) {
-        let documentArr = body.documents.map((x) => {
-            return {
-                ...x,
-                lrdetailid: lrdetail.id
-            }
-        });
-        await fnbulkCreate(Document, documentArr, [], req);
-    }
+
+
+
+    // if (body.documents && body.documents.length > 0) {
+    //     let documentArr = body.documents.map((x) => {
+    //         return {
+    //             ...x,
+    //             lrdetailid: lrdetail.id
+    //         }
+    //     });
+    //     await fnbulkCreate(Document, documentArr, [], req);
+    // }
     return returnResponse(res, 201, 'Successfully Added LrDetail');
 }
 )

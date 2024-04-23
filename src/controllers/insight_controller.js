@@ -17,7 +17,7 @@ const getInsight = TryCatch(async (req, res, next) => {
         console.log('get all admin data');
     } else {
         if (!req?.query?.user) {
-            req.query.targetUser = 'explorer'
+            req.query.targetUser = 'basic'
         }
         else {
             req.query.targetUser = {

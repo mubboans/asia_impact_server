@@ -95,7 +95,7 @@ const Login = TryCatch(async (req, res, next) => {
             if (!userDetails.isActive) return next(customErrorClass.AccountNotActive('It seems your account is inactive'));
             if (userDetails.deletionDate) return next(customErrorClass.AccountDeleted('It seem your account is deleted'))
             const newPayload = {
-                userId: userDetails.id, email: userDetails.email, role: userDetails.role,
+                userId: userDetails.id, email: userDetails.email, role: userDetails.role, type: userDetails.type,
                 userdetail: {
                     userdetailid: userDetails.userdetail[0]?.id
                 }
@@ -150,56 +150,56 @@ const Register = TryCatch(async (req, res, next) => {
         }
         // body.role == 'admin' ? body.role : null;
         let pstdata;
-        if (body.role == 'admin') {
-            pstdata = body
-            pstdata.isActive = true;
-        }
-        else {
-            pstdata = { ...body, role: null }
-        }
-        let user = await fnPost(User, pstdata, {
-            include: [
-                'userdetail'
-            ],
-        }, req)
-        console.log(user.dataValues, 'user.dataValues');
-        const newPayload = {
-            userId: user.id, email: user.email, role: body.role,
-            userdetail: {
-                userdetailid: user?.userdetail ? user?.userdetail[0]?.id : null
-            }
-        };
-        if (!body.userdetail) {
-            delete newPayload.userdetail;
-        }
-
-        let data = attachedToken(newPayload);
-
-
-
-        const email = {
-            body: {
-                name: `Welcome to AsiaImpact! We\'re very excited to have you on board. `,
-                intro: 'We recommend to update the profile if not updated.',
-                action: {
-                    instructions: 'To get started with us, please Verify ',
-                    button: {
-                        color: '#22BC66', // Optional action button color
-                        text: 'Confirm account Dum',
-                        // link: 'https://mailgen.js/confirm?s=d9729feb74992cc3482b350163a1a010'
-                    }
-                },
-                outro: 'Need help, or have questions? Just reply to this email, we\'d love to help.'
-            }
-        }
-
-        let emailbody = getEmailBody(email);
-        await ShootMail({ html: emailbody, recieveremail: body.email, subject: "Successfully Register" });
-        await Otp.update({ isUsed: 1 }, { where: { email: body.email } });
-        return returnResponse(res, 201, 'Successfully Register',
-            { ...data, role: body.role, id: user.id, email: user.email, linkDevice: user.linkDevice, userDetail: user.userdetail });
-        // return returnResponse(res, 200, 'Register Succesfully');
+        // if (body.role == 'admin') {
+        // pstdata = body
+        // pstdata.isActive = true;
     }
+    // else {
+    pstdata = { ...body, isActive: true }
+    // }
+    let user = await fnPost(User, pstdata, [], req)
+    console.log(user.dataValues, 'user.dataValues');
+
+
+    let userdetail = await fnPost(UserDetail, { userid: user.id }, [], req);
+    const newPayload = {
+        userId: user.id, email: user.email, role: body.role, type: user.type,
+        userdetail: {
+            // userdetailid: user?.userdetail ? user?.userdetail[0]?.id : null
+            userdetailid: userdetail?.id
+        }
+    };
+    // if (!body.userdetail) {
+    //     delete newPayload.userdetail;
+    // }
+
+    let data = attachedToken(newPayload);
+
+
+
+    const email = {
+        body: {
+            name: `Welcome to AsiaImpact! We\'re very excited to have you on board. `,
+            intro: 'We recommend to update the profile if not updated.',
+            action: {
+                instructions: 'To get started with us, please Verify ',
+                button: {
+                    color: '#22BC66', // Optional action button color
+                    text: 'Confirm account Dum',
+                    // link: 'https://mailgen.js/confirm?s=d9729feb74992cc3482b350163a1a010'
+                }
+            },
+            outro: 'Need help, or have questions? Just reply to this email, we\'d love to help.'
+        }
+    }
+
+    let emailbody = getEmailBody(email);
+    await ShootMail({ html: emailbody, recieveremail: body.email, subject: "Successfully Register" });
+    // await Otp.update({ isUsed: 1 }, { where: { email: body.email } });
+    return returnResponse(res, 201, 'Successfully Register',
+        { ...data, role: body.role, id: user.id, email: user.email, linkDevice: user.linkDevice, userDetailId: userdetail?.id });
+    // return returnResponse(res, 200, 'Register Succesfully');
+
 
 })
 
@@ -210,7 +210,7 @@ async function checkUserverification(body) {
         let d = await fnGet(Otp, { email: body.email, status: 'verify', }, [], true)
         console.log(d, 'otp check user');
         if (d.length > 0) {
-            if (d[0].isUsed == 1) throw new CustomErrorObj('Otp already in use')
+            // if (d[0].isUsed == 1) throw new CustomErrorObj('Otp already in use')
             return true
         }
         else {
@@ -223,7 +223,6 @@ async function checkUserverification(body) {
     // })
 }
 function generateOTP() {
-
     // Declare a digits variable
     // which stores all digits 
     let digits = '987571920203123123';
@@ -281,16 +280,18 @@ const SendOTP = TryCatch(async (req, res, next) => {
         }
         emailbody = getEmailBody(email);
         query = {
-            email: body.email
+            email: body.email,
+            type: body.type
         }
     }
     else {
         query = {
-            contact: body.contact
+            contact: body.contact,
+            type: body.type
         }
     }
     if (body.type == 'login' || body.type == 'forgot-password') {
-        let checkUser = await fnGet(User, query, [], true)
+        let checkUser = await fnGet(User, { email: body.email }, [], true)
         if (checkUser.length <= 0) {
             throw new CustomErrorObj('User not register', 404)
         }
@@ -329,15 +330,18 @@ const SendOTP = TryCatch(async (req, res, next) => {
 const VerifyOTP = TryCatch(async (req, res, next) => {
     let body = req.body;
     if (!body.type || !body.otp) throw new CustomErrorObj("Invalid otp body", 400)
-    let otpData = await fnGet(Otp, { otp: body.otp, type: body.type, ...req.query }, [], true);
+    let otpData = await fnGet(Otp, { email: body.email, type: body.type }, [], true);
     if (otpData && otpData.length > 0) {
         console.log(otpData, 'otpData');
         let data = otpData[0];
         let currentDate = moment().format("YYYY-MM-DD HH:mm:ss")
         console.log(StringtoDate(data.validto), currentDate, 'date check with format');
         console.log(StringtoDate(data.validto) >= currentDate, 'condition');
+        if (data.isUsed == 1) throw new CustomErrorObj("Session Already Used", 403)
+        if (data.otp !== body.otp) {
+            return next(customErrorClass.BadRequest("Invalid OTP"))
+        }
         if (StringtoDate(data.validto) >= currentDate && data.status == 'active') {
-            fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss") }, { id: data.id });
             if (data.type == 'login') {
                 let user = await fnGet(User, { email: data.email }, [{
                     model: UserDetail,
@@ -346,12 +350,19 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
                 if (!user[0].isActive) {
                     return next(customErrorClass.AccountNotActive('It seems your account is inactive'));
                 }
-                const newPayload = { userId: user[0].id, email: user[0].email, role: user[0].role };
+
+                const newPayload = {
+                    userId: user[0].id, email: user[0].email, role: user[0].role, type: user[0].type, user, userdetail: {
+                        userdetailid: user[0].userdetail[0]?.id
+                    }
+                };
                 let tokenData = attachedToken(newPayload)
+                await fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss"), isUsed: 1 }, { id: data.id });
                 return returnResponse(res, 200, 'Otp Verify',
                     { ...tokenData, role: user[0].role, id: user[0].id, email: user[0].email, linkDevice: user[0].linkDevice, UserDetail: user[0].userdetail });
             }
             else {
+                await fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss"), isUsed: 1 }, { id: data.id });
                 return returnResponse(res, 200, "Otp Verify")
             }
         }
@@ -373,7 +384,9 @@ const CheckUserAvailable = TryCatch(async (req, res, next) => {
     const user = await fnGet(User, { email: req.body.email }, [], true);
     console.log(user, 'check user');
     if (user.length > 0 && user) {
-        return returnResponse(res, 200, "Request Process", { userexists: true })
+        let userobj = user[0];
+        let role = userobj.role ? userobj.role : 'basic'
+        return returnResponse(res, 200, `User Already Register as ${role}`, { userexists: true })
     }
     else {
         return returnResponse(res, 200, "Request Process", { userexists: false })

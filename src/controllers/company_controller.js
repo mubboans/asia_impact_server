@@ -77,10 +77,9 @@ const getCompany = TryCatch(async (req, res, next) => {
 const updateCompany = TryCatch(async (req, res, next) => {
     let updateStatus = await fnUpdate(Company, req.body, { id: req.body.id }, req)
     console.log(updateStatus, 'updateStatus');
-    await fnbulkCreate(CompanyNSustain, req.body.sustainarr, ['companyid', 'sustaingoalid', 'lastUsedIp', 'updatedBy'], req); // to bulk update the field to be update on db
-    await fnbulkCreate(SectionData, req.body.sectiondata, ['companyid', 'sectionname', 'key', 'value', 'lastUsedIp', 'updatedBy'], req)
+    await fnbulkCreate(CompanyNSustain, req.body.sustainarr, ['companyid', 'sustaingoalid', 'lastUsedIp', 'updatedBy'], [], req); // to bulk update the field to be update on db
+    await fnbulkCreate(SectionData, req.body.sectiondata, ['companyid', 'sectionname', 'key', 'value', 'lastUsedIp', 'updatedBy'], [], req)
     return returnResponse(res, 200, 'Successfully Update Company')
-
 }
 )
 

@@ -70,7 +70,7 @@ const fnPost = async (modelname, obj, include = [], req) => {
         throw new CustomError(error?.message, 400)
     }
 }
-const fnbulkCreate = async (modelname, arr, keys, req) => {
+const fnbulkCreate = async (modelname, arr, keys, include = [], req) => {
     try {
         let options = {};
         let modifiedarr = arr.map((x) => {
@@ -83,9 +83,15 @@ const fnbulkCreate = async (modelname, arr, keys, req) => {
                 updateOnDuplicate: [...keys]
             }
         }
-        console.log(modifiedarr, 'modifiedarr');
+        // if (include) {
+        options = {
+            ...options,
+            ...include
+        }
+        // }
+        console.log(options, 'modifiedarr');
         const data = await modelname.bulkCreate(modifiedarr, options);
-        // console.log(data, 'bulk update');
+        console.log(data.length, 'bulk update');
         return data;
     } catch (error) {
         console.log(error, 'error');
