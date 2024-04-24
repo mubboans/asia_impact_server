@@ -89,7 +89,14 @@ const getUser = TryCatch(async (req, res, next) => {
 )
 
 const updateUser = TryCatch(async (req, res, next) => {
-    delete req?.body?.password;
+    let body = req.body;
+    delete body?.password;
+    if (body?.email) {
+        const checkuser = await fnGet(User, { email: body.email }, [], true);
+        if (checkuser.length > 0 && req.user.userId !== checkuser[0].id) {
+            return next(new CustomErrorObj("Email already belongs to another user", 403));
+        }
+    }
     let updateStatus = await fnUpdate(User, req.body, { id: req.body.id }, req)
     if (req.body?.userdetail) {
         await fnUpdate(UserDetail, req?.body?.userdetail, { userid: req.body.id }, req)

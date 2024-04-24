@@ -40,7 +40,10 @@ const {
     getHighlight,
     updateHighlight,
     deleteHighlight,
-    postHighlight
+    postHighlight,
+    postHighlightInterestnFovourite,
+    deleteHighlightInterestnFovourite,
+    getHighlightInterestnFovourite
 } = require("../controllers/highlight_controller");
 const {
     updateInsight,
@@ -109,6 +112,9 @@ route
     .put(verifyRole("admin"), updateHighlight)
     .delete(verifyRole("admin"), deleteHighlight)
     .post(verifyRole("admin"), postHighlight);
+// .post("/interestnfovourite", postHighlightInterestnFovourite)
+// .delete("/interestnfovourite", deleteHighlightInterestnFovourite)
+// .get("/interestnfovourite", getHighlightInterestnFovourite)
 
 route
     .route("/insight")
@@ -159,4 +165,11 @@ route.delete('/sectionentries', verifyRole("admin", "legalrepresent"), deleteDet
 route.post('/userdetaildocument', postuserdetaildocument);
 
 route.patch('/updatepassword', ChangePassword);
+
+route.route("/interestnfovourite")
+    .post(verifyRole("admin"), postHighlightInterestnFovourite)
+    .delete(verifyRole("admin"), deleteHighlightInterestnFovourite)
+    .get(verifyRole("admin"), getHighlightInterestnFovourite);
+
+A
 module.exports = route;

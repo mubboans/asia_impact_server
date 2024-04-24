@@ -1,5 +1,6 @@
 const { Company } = require("../Models/Company");
 const { CompanyNSustain } = require("../Models/CompanyNSustain");
+const { HighlightDetail } = require("../Models/HighlightDetail");
 const { SectionData } = require("../Models/SectionData");
 const { SustainGoal } = require("../Models/SustainGoal");
 const customErrorClass = require("../error/customErrorClass");
@@ -140,6 +141,9 @@ const deleteDetailEntries = TryCatch(async (req, res, next) => {
     }
     else if (model == 'sectiondata') {
         modelName = SectionData
+    }
+    else if (model == 'highlight') {
+        modelName = HighlightDetail
     }
     delete req.query.model;
     await fnDelete(modelName, req.query, req, `${modelName}_` + req.query.id);

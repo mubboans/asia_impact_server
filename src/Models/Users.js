@@ -77,6 +77,10 @@ const createUser = (sequelize, DataTypes) => {
             lang_id: {
                 type: DataTypes.INTEGER,
                 allowNull: true
+            },
+            rejectionreason: {
+                type: DataTypes.STRING,
+                allowNull: true,
             }
         },
         {

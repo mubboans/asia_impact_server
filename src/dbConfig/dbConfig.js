@@ -19,6 +19,7 @@ const { createUserDetail, UserDetail } = require('../Models/UserDetail');
 const { createLrDetail, LrDetail } = require('../Models/LRDetail');
 const { createFileStore } = require('../Models/FIleStore');
 const { createSectionData, SectionData } = require('../Models/SectionData');
+const { HighlightInterestNFavourite, createHighlightInterestNFavourite } = require('../Models/HighlightInterestNFavourite');
 // const User = require('../Models/Users');
 // const Documents = require('../Models/Document');
 // const { syncModel } = require('../Models');
@@ -68,7 +69,7 @@ const dbConnect = async () => {
         createLrDetail(sequelize, DataTypes);
         createFileStore(sequelize, DataTypes);
         createSectionData(sequelize, DataTypes);
-
+        createHighlightInterestNFavourite(sequelize, DataTypes)
 
         User.hasMany(Document, { foreignKey: 'userid', as: 'document' });
         Document.belongsTo(User, { foreignKey: 'userid' });
@@ -113,6 +114,11 @@ const dbConnect = async () => {
 
         Highlight.hasMany(HighlightDetail, { foreignKey: 'highlightid', as: 'highligthdetail' });
         HighlightDetail.belongsTo(Highlight, { foreignKey: 'highlightid' });
+
+
+        Highlight.hasMany(HighlightInterestNFavourite, { foreignKey: 'highlightid' });
+        HighlightInterestNFavourite.belongsTo(Highlight, { foreignKey: 'highlightid' });
+
 
 
         Company.hasMany(SectionData, { foreignKey: 'companyid', as: 'sectiondata' });
