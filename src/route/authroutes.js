@@ -171,5 +171,5 @@ route.route("/interestnfovourite")
     .delete(verifyRole("admin"), deleteHighlightInterestnFovourite)
     .get(verifyRole("admin"), getHighlightInterestnFovourite);
 
-A
+
 module.exports = route;
