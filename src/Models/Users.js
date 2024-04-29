@@ -34,7 +34,11 @@ const createUser = (sequelize, DataTypes) => {
             },
             isVerified: {
                 type: DataTypes.BOOLEAN,
-                allowNull: true
+                defaultValue: false
+            },
+            status: {
+                type: DataTypes.STRING,
+                defaultValue: 'pending'
             },
             countrycode: {
                 type: DataTypes.STRING,
@@ -47,8 +51,13 @@ const createUser = (sequelize, DataTypes) => {
             },
             role: {
                 type: DataTypes.ENUM,
-                values: ['basic', 'intermediate', 'advanced', 'individual_investor', 'advisor', 'legalrepresent', 'admin', 'editor', 'ai_officer'],
+                values: ['basic', 'individual_investor', 'advisor', 'legalrepresent', 'admin', 'editor', 'ai_officer'],
                 // defaultValue: "explorer"
+                allowNull: true
+            },
+            access_group: {
+                type: DataTypes.ENUM,
+                values: ['basic', 'intermediate', 'advanced'],
                 allowNull: true
             },
             isActive: {

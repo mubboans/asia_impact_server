@@ -31,7 +31,7 @@ const registerJoi = Joi.object({
         'any.required': "Email required to Register"
     }),
     contact: Joi.string(),
-    userdetail: Joi.object().optional(),
+    // userdetail: Joi.object().optional(),
     // gender: Joi.string().optional(),
     // dateofbirth: Joi.string().optional(),
     // img: Joi.string().optional(),
@@ -53,7 +53,7 @@ const registerJoi = Joi.object({
         }),
     }),
     // linkDevice: Joi.string().optional(),
-    document: Joi.object().optional(),
+    // document: Joi.object().optional(),
     lang_id: Joi.number().optional(),
 })
 const loginJoi = Joi.object({
@@ -96,13 +96,23 @@ const Login = TryCatch(async (req, res, next) => {
             if (userDetails.deletionDate) return next(customErrorClass.AccountDeleted('It seem your account is deleted'))
             const newPayload = {
                 userId: userDetails.id, email: userDetails.email, role: userDetails.role, type: userDetails.type,
+                lang_id: userDetails.lang_id,
                 userdetail: {
                     userdetailid: userDetails.userdetail[0]?.id
                 }
             };
             let data = attachedToken(newPayload)
             return returnResponse(res, 200, 'Login Succesfully',
-                { ...data, role: userDetails.role, id: userDetails.id, email: userDetails.email, linkDevice: userDetails.linkDevice, UserDetails: userDetails.userdetail });
+                {
+                    ...data, role: userDetails.role,
+                    id: userDetails.id,
+                    isVerified: userDetails.isVerified,
+                    rejectionreason: userDetails.rejectionreason,
+                    email: userDetails.email,
+                    linkDevice: userDetails.linkDevice,
+                    status: userDetails.status,
+                    UserDetails: userDetails.userdetail
+                });
         }
         else {
             console.log('incorrect password');
@@ -163,7 +173,7 @@ const Register = TryCatch(async (req, res, next) => {
 
     let userdetail = await fnPost(UserDetail, { userid: user.id }, [], req);
     const newPayload = {
-        userId: user.id, email: user.email, role: body.role, type: user.type,
+        userId: user.id, email: user.email, role: body.role, type: user.type, lang_id: user.lang_id,
         userdetail: {
             // userdetailid: user?.userdetail ? user?.userdetail[0]?.id : null
             userdetailid: userdetail?.id
@@ -197,7 +207,17 @@ const Register = TryCatch(async (req, res, next) => {
     await ShootMail({ html: emailbody, recieveremail: body.email, subject: "Successfully Register" });
     // await Otp.update({ isUsed: 1 }, { where: { email: body.email } });
     return returnResponse(res, 201, 'Successfully Register',
-        { ...data, role: body.role, id: user.id, email: user.email, linkDevice: user.linkDevice, userDetailId: userdetail?.id });
+        {
+            ...data,
+            role: body.role,
+            id: user.id,
+            email: user.email,
+            isVerified: user.isVerified,
+            rejectionreason: user.rejectionreason,
+            linkDevice: user.linkDevice,
+            status: user.status,
+            userDetailId: userdetail?.id
+        });
     // return returnResponse(res, 200, 'Register Succesfully');
 
 
@@ -299,13 +319,13 @@ const SendOTP = TryCatch(async (req, res, next) => {
     fnGet(Otp, query, [], true).then(async (result) => {
         console.log(result, 'result check');
         if (result.length > 0) {
-            if (result[0].type !== body.type) {
-                fnPost(Otp, modelobj);
-            }
-            else {
-                console.log('record found');
-                fnUpdate(Otp, { ...modelobj, verifyon: null, isUsed: 0 }, query);
-            }
+            // if (result[0].type !== body.type) {
+            //     fnPost(Otp, modelobj);
+            // }
+            // else {
+            //     console.log('record found');
+            fnUpdate(Otp, { ...modelobj, verifyon: null, isUsed: 0 }, query);
+            // }
 
         }
         else {
@@ -319,7 +339,6 @@ const SendOTP = TryCatch(async (req, res, next) => {
     });
     if (body.sendby == 'email') {
         await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
-
     }
     else {
         await sendsms(body.contact, modelobj.otp);
@@ -352,14 +371,17 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
                 }
 
                 const newPayload = {
-                    userId: user[0].id, email: user[0].email, role: user[0].role, type: user[0].type, user, userdetail: {
+                    userId: user[0].id, email: user[0].email, role: user[0].role, type: user[0].type, user, lang_id: user[0].lang_id, userdetail: {
                         userdetailid: user[0].userdetail[0]?.id
                     }
                 };
-                let tokenData = attachedToken(newPayload)
+                let tokenData = attachedToken(newPayload);
                 await fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss"), isUsed: 1 }, { id: data.id });
                 return returnResponse(res, 200, 'Otp Verify',
-                    { ...tokenData, role: user[0].role, id: user[0].id, email: user[0].email, linkDevice: user[0].linkDevice, UserDetail: user[0].userdetail });
+                    {
+                        ...tokenData, role: user[0].role, id: user[0].id, email: user[0].email,
+                        linkDevice: user[0].linkDevice, isVerified: user[0].isVerified, status: user[0].status, rejectionreason: user[0].rejectionreason, UserDetail: user[0].userdetail
+                    });
             }
             else {
                 await fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss"), isUsed: 1 }, { id: data.id });

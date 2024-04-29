@@ -85,6 +85,10 @@ const createHighLightsModel = (sequelize, DataTypes) => {
                 addhome: {
                     type: DataTypes.BOOLEAN,
                     allowNull: false
+                },
+                eventendtime: {
+                    type: DataTypes.STRING,
+                    allowNull: true
                 }
             },
             DataTypes

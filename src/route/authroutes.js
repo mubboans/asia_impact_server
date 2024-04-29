@@ -2,7 +2,7 @@ const express = require("express");
 const { postNews, updateNews, deleteNews } = require("../controllers/news_controller");
 const { getUserWithRelation, postRelation, updateRelation, deleteRelation } = require("../controllers/userRelation_controller");
 const { postLanguage, updateLanguage, deleteLanguage } = require("../controllers/language_controller");
-const { deleteUser, updateUser, getUser, postUser, ChangePassword, } = require("../controllers/user_controller");
+const { deleteUser, updateUser, getUser, postUser, ChangePassword, verifyUser, } = require("../controllers/user_controller");
 const { getSustainGoal, updateSustainGoal, deleteSustainGoal, postSustainGoal } = require("../controllers/sustain_goal_controller");
 const {
     getDocument,
@@ -171,5 +171,5 @@ route.route("/interestnfovourite")
     .delete(verifyRole("admin"), deleteHighlightInterestnFovourite)
     .get(verifyRole("admin"), getHighlightInterestnFovourite);
 
-
+route.patch('/verifyuser', verifyRole("admin", "legalrepresent"), verifyUser)
 module.exports = route;

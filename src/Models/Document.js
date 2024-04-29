@@ -104,6 +104,10 @@ const createDocument = (sequelize, DataTypes) => {
                     type: DataTypes.STRING,
                     allowNull: true,
                     defaultValue: 'pending'
+                },
+                provience: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
                 }
             }, DataTypes),
         {

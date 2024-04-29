@@ -91,6 +91,10 @@ const getUser = TryCatch(async (req, res, next) => {
 const updateUser = TryCatch(async (req, res, next) => {
     let body = req.body;
     delete body?.password;
+    delete body?.role;
+    delete body?.status;
+    delete body?.access_group;
+    delete body?.isVerified;
     if (body?.email) {
         const checkuser = await fnGet(User, { email: body.email }, [], true);
         if (checkuser.length > 0 && req.user.userId !== checkuser[0].id) {
@@ -171,6 +175,22 @@ const postUser = TryCatch(async (req, res, next) => {
 }
 )
 
+const verifyUser = TryCatch(async (req, res, next) => {
+    let body = req.body;
+    if (body.document) {
+        if (Array.isArray(body.document) && body.document.length > 0) {
+            for (let i of body.document) {
+                await fnUpdate(Document, i, { id: i.id }, req);
+            }
+        }
+        else {
+            await fnUpdate(Document, body.document, { id: body.document.id }, req);
+        }
+        await fnUpdate(User, body, { id: body.id }, req);
+        return returnResponse(res, 200, 'Successfully Updated User', {});
+    }
+
+})
 
 function getUserById(req, option) {
     option = {
@@ -197,5 +217,6 @@ module.exports = {
     updateUser,
     deleteUser,
     postUser,
-    ChangePassword
+    ChangePassword,
+    verifyUser
 }
