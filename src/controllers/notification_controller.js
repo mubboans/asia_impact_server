@@ -1,4 +1,7 @@
 const { Notification } = require("../Models/Notification");
+const { UserDetail } = require("../Models/UserDetail");
+const { UserRelation } = require("../Models/UserRelation");
+const { User } = require("../Models/Users");
 
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
@@ -7,15 +10,27 @@ const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
 const { createRandomCode } = require("../utils/functionalHelper");
 
 const getNotification = TryCatch(async (req, res, next) => {
-    let GetAllReport = await fnGet(Notification, req.query || {}, [], true);
+    let include =
+        [
+            {
+                model: User,
+                sourceKey: "sender_id",
+                foreignKey: "id",
+                include: ['userdetail']
+            }
+        ]
+
+    let GetAllReport = await fnGet(Notification, req.query || {}, include, true);
     return returnResponse(res, 200, 'Successfully Get Notification', GetAllReport)
 }
 )
 
 const updateNotification = TryCatch(async (req, res, next) => {
+    if (req.body?.userrelation) {
+        await fnUpdate(UserRelation, { requestStatus: req.body?.userrelation?.requestStatus }, { notification_id: req.body.id }, req);
+    }
     await fnUpdate(Notification, req.body, { id: req.body.id }, req)
     return returnResponse(res, 200, 'Successfully Update Notification')
-
 }
 )
 

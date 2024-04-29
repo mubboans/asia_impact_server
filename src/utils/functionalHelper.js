@@ -45,7 +45,7 @@ const setUserDetails = (req, obj) => {
 
     // Iterate over the object properties
     for (const key in obj) {
-        if (obj.hasOwnProperty(key) && typeof obj[key] === 'object') {
+        if (obj.hasOwnProperty(key) && typeof obj[key] === 'object' && !(obj.lastUsedIp || obj.updatedBy)) {
             // Recursively call the function for nested objects
             setUserDetails(req, obj[key]);
         }

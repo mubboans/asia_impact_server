@@ -43,18 +43,15 @@ const getReport = TryCatch(async (req, res, next) => {
         }
         ]
     }
-    // if (!req?.query?.user) {
-    //     req.query.targetUser = 'explorer'
-    // }
-    // else {
-    //     req.query.targetUser = {
-    //         [Op.or]: {
-    //             [Op.eq]: req?.query?.user,
-    //             [Op.like]: `%${req?.query?.user}%`
-    //         }
-    //     }
-    //     delete req?.query?.user
-    // }
+    else {
+        include = [
+            {
+                model: Company,
+                sourceKey: "companyid",
+                attributes: ['id', 'name', 'companylogo', 'country'],
+            }
+        ]
+    }
     let GetAllReport = await fnGet(Report, req.query || {}, include, false);
     // if (req.query.id) {
     //     let GetAllCompanySustain = await fnGet(CompanyNSustain, { companyid: req.query.id }, [

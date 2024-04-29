@@ -11,7 +11,7 @@ const { CompanyNSustain, createCompanyNSustain } = require('../Models/CompanyNSu
 const { Company, createCompanyModel } = require('../Models/Company');
 const { createReportModel, Report } = require('../Models/Report');
 const { createOpportunityModel, Opportunity } = require('../Models/Opportunities');
-const { createNotificationModel } = require('../Models/Notification');
+const { createNotificationModel, Notification } = require('../Models/Notification');
 const { Highlight, createHighLightsModel } = require('../Models/Highlight');
 const { HighlightDetail, createHighlightsOtherDetailModel } = require('../Models/HighlightDetail');
 const { createInsightModel } = require('../Models/Insight');
@@ -111,7 +111,6 @@ const dbConnect = async () => {
         Company.hasMany(Opportunity, { foreignKey: 'companyid' });
         Opportunity.belongsTo(Company, { foreignKey: 'companyid' });
 
-
         Highlight.hasMany(HighlightDetail, { foreignKey: 'highlightid', as: 'highligthdetail' });
         HighlightDetail.belongsTo(Highlight, { foreignKey: 'highlightid' });
 
@@ -120,12 +119,20 @@ const dbConnect = async () => {
         HighlightInterestNFavourite.belongsTo(Highlight, { foreignKey: 'highlightid' });
 
 
-
         Company.hasMany(SectionData, { foreignKey: 'companyid', as: 'sectiondata' });
         SectionData.belongsTo(Company, { foreignKey: 'companyid' });
 
         Report.hasMany(SectionData, { foreignKey: 'reportid', as: 'sectiondata' });
         SectionData.belongsTo(Report, { foreignKey: 'reportid' });
+
+        Company.hasMany(Notification, { foreignKey: 'company_id' });
+        Notification.belongsTo(Company, { foreignKey: 'company_id' });
+
+        User.hasMany(Notification, { foreignKey: 'sender_id' });
+        Notification.belongsTo(User, { foreignKey: 'sender_id' });
+
+        Notification.hasMany(User, { foreignKey: 'notification_id' });
+        UserRelation.belongsTo(Notification, { foreignKey: 'notification_id' });
 
 
         await sequelize.sync({ alter: false });

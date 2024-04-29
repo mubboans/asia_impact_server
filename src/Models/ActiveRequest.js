@@ -21,7 +21,17 @@ const createActiveRequestModel = (sequelize, DataTypes) => {
                         key: "id",
                     },
                 },
-                userid: {
+                useridAdvisor: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    foreignKey: true,
+                    onDelete: "cascade",
+                    references: {
+                        model: "User",
+                        key: "id",
+                    },
+                },
+                useridInvestor: {
                     type: DataTypes.INTEGER,
                     allowNull: false,
                     foreignKey: true,
@@ -39,6 +49,12 @@ const createActiveRequestModel = (sequelize, DataTypes) => {
                     type: DataTypes.STRING,
                     allowNull: false,
                     // type of user initiated the request
+                },
+                aiofficermessage: {
+
+                },
+                aiofficerid: {
+
                 },
                 lang_id: {
                     type: DataTypes.INTEGER,

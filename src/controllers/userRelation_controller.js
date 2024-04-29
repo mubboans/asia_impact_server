@@ -1,3 +1,4 @@
+const { Notification } = require("../Models/Notification");
 const { UserRelation } = require("../Models/UserRelation");
 const { User } = require("../Models/Users");
 const customErrorClass = require("../error/customErrorClass");
@@ -5,6 +6,7 @@ const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
 const { Op } = require("sequelize");
+const { createRandomCode } = require("../utils/functionalHelper");
 const getUserWithRelation = TryCatch(async (req, res, next) => {
     console.log('hit user 8');
     let d = setUserId(req);
@@ -24,6 +26,9 @@ const getUserWithRelation = TryCatch(async (req, res, next) => {
                 exclude: ['password']
             }
         },
+        {
+            model: Notification
+        }
     ];
 
     console.log(query, 'hit user');
@@ -35,7 +40,15 @@ const getUserWithRelation = TryCatch(async (req, res, next) => {
 )
 
 const updateRelation = TryCatch(async (req, res, next) => {
-    let updateStatus = await fnUpdate(UserRelation, req.body, { id: req.body.id }, req)
+    let body = req.body;
+    let notify;
+    if (body.notification) {
+        notify = await fnPost(Notification, body.notification, [], req);
+    }
+    if (notify) {
+
+    }
+    let updateStatus = await fnUpdate(UserRelation, { ...body, notification_id: notify.id }, { id: req.body.id }, req)
     console.log(updateStatus, 'updateStatus');
     return returnResponse(res, 200, 'Successfully Update Data')
 }
@@ -52,8 +65,21 @@ const deleteRelation = TryCatch(async (req, res, next) => {
 
 const postRelation = TryCatch(async (req, res, next) => {
     let body = setUserDetail(req.user, req.body);
-    fnPost(UserRelation, body, [], req);
-    return returnResponse(res, 201, 'Successfully Added UserRelation');
+    if (body.notification) {
+        let UserDetail = await fnGet(User, { email: body.notification.email }, [], true);
+        let notificationcode = await createRandomCode(Notification, 'notificationcode');
+        let obj = {
+            ...body.notification,
+            sender_id: req.user.userId, // current user id
+            receiver_id: UserDetail[0].id, // user to recieve the notification
+            notificationcode,
+            isNew: true
+        }
+        let notifi = await fnPost(Notification, obj, [], req);
+        await fnPost(UserRelation, { ...body, notification_id: notifi?.id, req }, [], req);
+    }
+    // await Promise.all(promiseArr);
+    return returnResponse(res, 201, 'Successfully added userRelation and send notifications');
 }
 )
 function setUserId(req) {
@@ -79,19 +105,22 @@ function setUserDetail(user, body) {
         body = {
             ...body,
             advisorId: user.userId,
-            relationshipType: 0
+            relationshipType: 0,
+            requesterId: user.userId,
         }
     }
-    else if (user.role == 'investor') {
+    else if (user.role == 'investor' || user.role == 'legalrepresent') {
         body = {
             ...body,
             investorId: user.userId,
-            relationshipType: 1
+            relationshipType: 1,
+            requesterId: user.userId,
         }
     }
     else {
-        return body;
+        body = { ...body, requesterId: user.userId, };
     }
+    return body;
 }
 
 module.exports = {

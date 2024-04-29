@@ -13,7 +13,7 @@ const createNotificationModel = (sequelize, DataTypes) => {
             {
                 sender_id: {
                     type: DataTypes.INTEGER,
-                    allowNull: true,
+                    allowNull: false,
                     // sender id
                 },
                 receiver_id: {
@@ -32,10 +32,18 @@ const createNotificationModel = (sequelize, DataTypes) => {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
-                message_type: {
+                title: {
                     type: DataTypes.STRING,
-                    allowNull: false,
-                    //Optional field to classify the notification type (e.g., "info", "warning", "alert").
+                    allowNull: true,
+                },
+                severity: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
+                    defaultValue: 'warning'
+                },
+                redirectlink: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
                 },
                 is_read: {
                     type: DataTypes.BOOLEAN,
@@ -48,6 +56,10 @@ const createNotificationModel = (sequelize, DataTypes) => {
                 isNew: {
                     type: DataTypes.BOOLEAN,
                     allowNull: true
+                },
+                company_id: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true,
                 }
             },
             DataTypes
