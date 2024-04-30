@@ -84,12 +84,17 @@ const createHighLightsModel = (sequelize, DataTypes) => {
                 },
                 addhome: {
                     type: DataTypes.BOOLEAN,
-                    allowNull: false
+                    defaulValue: false
                 },
                 eventendtime: {
                     type: DataTypes.STRING,
                     allowNull: true
-                }
+                },
+                access_group: {
+                    type: DataTypes.ENUM,
+                    values: ['basic', 'intermediate', 'advanced'],
+                    allowNull: true
+                },
             },
             DataTypes
         ),

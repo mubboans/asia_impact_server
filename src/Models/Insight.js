@@ -59,8 +59,13 @@ const createInsightModel = (sequelize, DataTypes) => {
                 },
                 addhome: {
                     type: DataTypes.BOOLEAN,
-                    allowNull: false
-                }
+                    defaulValue: false
+                },
+                access_group: {
+                    type: DataTypes.ENUM,
+                    values: ['basic', 'intermediate', 'advanced'],
+                    allowNull: true
+                },
             },
             DataTypes
         ),

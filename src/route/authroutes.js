@@ -22,7 +22,7 @@ const {
     postReport,
     deleteReport,
     updateReport,
-    getReport
+    // getReport
 } = require("../controllers/report_controller");
 const {
     getOpportunity,
@@ -37,7 +37,7 @@ const {
     getNotification
 } = require("../controllers/notification_controller");
 const {
-    getHighlight,
+    // getHighlight,
     updateHighlight,
     deleteHighlight,
     postHighlight,
@@ -87,7 +87,7 @@ route
 
 route
     .route("/report")
-    .get(getReport)
+    // .get(getReport)
     .put(verifyRole("admin"), updateReport)
     .delete(verifyRole("admin"), deleteReport)
     .post(verifyRole("admin"), postReport);
@@ -108,7 +108,7 @@ route
 
 route
     .route("/highlight")
-    .get(getHighlight)
+    // .get(getHighlight)
     .put(verifyRole("admin"), updateHighlight)
     .delete(verifyRole("admin"), deleteHighlight)
     .post(verifyRole("admin"), postHighlight);

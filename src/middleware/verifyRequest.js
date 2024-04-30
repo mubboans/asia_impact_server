@@ -1,6 +1,7 @@
 const customErrorClass = require("../error/customErrorClass");
 const TryCatch = require("../utils/TryCatchHelper");
 const { validateToken } = require("../utils/jwt");
+const { Op } = require('sequelize')
 
 const checkToken = TryCatch(async (req, res, next) => {
     let token;
@@ -38,22 +39,39 @@ const checkToken = TryCatch(async (req, res, next) => {
 const checkTokenForNews = (req) => {
     const authHeader = req.headers.authorization;
     let token;
+    let query;
     if (authHeader && authHeader.startsWith("Bearer")) {
         token = authHeader.split(" ")[1];
     }
     if (!token) {
-        return false;
+        query = {
+            ...req.query,
+            targetUser: 'basic',
+        }
     }
     else {
         try {
             const head = validateToken(token, process.env.ACCESS_TOKEN_SECRET);
-            if (head.role && head.role == 'admin') {
-                return true;
+            if (head.role && (head.role == 'admin' || head.role == 'editor' || head.role == 'ai_officer')) {
+                query = req?.query || {};
+            }
+            else {
+                query = {
+                    ...req?.query,
+                    targetUser: {
+                        [Op.or]: {
+                            [Op.eq]: head.role,
+                            [Op.like]: `%${head.role}%`
+                        }
+                    }
+                }
             }
         } catch (error) {
-            return false;
+            query = {
+                targetUser: 'basic'
+            }
         }
     }
-
+    return query;
 }
 module.exports = { checkToken, checkTokenForNews }

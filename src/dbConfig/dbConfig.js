@@ -20,6 +20,7 @@ const { createLrDetail, LrDetail } = require('../Models/LRDetail');
 const { createFileStore } = require('../Models/FIleStore');
 const { createSectionData, SectionData } = require('../Models/SectionData');
 const { HighlightInterestNFavourite, createHighlightInterestNFavourite } = require('../Models/HighlightInterestNFavourite');
+const CustomErrorObj = require('../error/CustomErrorObj');
 // const User = require('../Models/Users');
 // const Documents = require('../Models/Document');
 // const { syncModel } = require('../Models');
@@ -131,7 +132,7 @@ const dbConnect = async () => {
         User.hasMany(Notification, { foreignKey: 'sender_id' });
         Notification.belongsTo(User, { foreignKey: 'sender_id' });
 
-        Notification.hasMany(User, { foreignKey: 'notification_id' });
+        Notification.hasMany(UserRelation, { foreignKey: 'notification_id' });
         UserRelation.belongsTo(Notification, { foreignKey: 'notification_id' });
 
 
@@ -139,6 +140,7 @@ const dbConnect = async () => {
 
     } catch (error) {
         console.log(error, 'error ');
+        return new CustomErrorObj(error?.message, 500)
     }
 
 }

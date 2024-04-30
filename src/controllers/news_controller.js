@@ -11,35 +11,32 @@ const { checkTokenForNews } = require('../middleware/verifyRequest');
 
 // })
 const getNews = TryCatch(async (req, res, next) => {
-    let checkToken = checkTokenForNews(req);
-    console.log(checkToken, 'user token data');
-    if (checkToken) {
-        console.log('get all admin data');
-    } else {
-        if (!req?.query?.user) {
-            req.query.targetUser = 'basic'
-        }
-        else {
-            req.query.targetUser = {
-                [Op.or]: {
-                    [Op.eq]: req?.query?.user,
-                    [Op.like]: `%${req?.query?.user}%`
-                }
-            }
+    let query = checkTokenForNews(req);
+    console.log(query, 'user token data');
+    // if (checkToken) {
+    //     console.log('get all admin data');
+    // } else {
+    //     if (!req?.user?.role) {
+    //         req.query.targetUser = 'basic'
+    //     }
+    //     else {
+    //         req.query.targetUser = {
+    //             [Op.or]: {
+    //                 [Op.eq]: req?.user?.role,
+    //                 [Op.like]: `%${req?.user?.role}%`
+    //             }
+    //         }
 
-        }
-        delete req?.query?.user
-    }
-
-
+    //     }
+    //     delete req?.query?.user
+    // }
     let options = {
-        ...req.query,
+        ...query,
         attribute: { exclude: ['description'] }
     }
     if (req.query.id) {
         delete options.attribute;
     }
-
     let GetAllNews = await fnGet(News, options, [], true);
     return returnResponse(res, 200, 'Successfully Get News', GetAllNews)
 }

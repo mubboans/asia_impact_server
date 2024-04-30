@@ -11,7 +11,27 @@ const { Op } = require('sequelize');
 const { SectionData } = require("../Models/SectionData");
 const { SustainGoal } = require("../Models/SustainGoal");
 const { CompanyNSustain } = require("../Models/CompanyNSustain");
+const { checkTokenForNews } = require("../middleware/verifyRequest");
 const getReport = TryCatch(async (req, res, next) => {
+    let query = checkTokenForNews(req);
+    console.log(query, 'user token data');
+    // if (checkToken) {
+    //     console.log('get all admin data');
+    // } else {
+    //     if (!req?.user?.role) {
+    //         req.query.targetUser = 'basic'
+    //     }
+    //     else {
+    //         req.query.targetUser = {
+    //             [Op.or]: {
+    //                 [Op.eq]: req?.user?.role,
+    //                 [Op.like]: `%${req?.user?.role}%`
+    //             }
+    //         }
+
+    //     }
+    //     delete req?.query?.user
+    // }
     let include = [];
     if (req.query.id) {
         include = [{
@@ -52,7 +72,7 @@ const getReport = TryCatch(async (req, res, next) => {
             }
         ]
     }
-    let GetAllReport = await fnGet(Report, req.query || {}, include, false);
+    let GetAllReport = await fnGet(Report, query, include, false);
     // if (req.query.id) {
     //     let GetAllCompanySustain = await fnGet(CompanyNSustain, { companyid: req.query.id }, [
     //         {

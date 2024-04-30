@@ -9,8 +9,11 @@ const { HighlightDetail } = require("../Models/HighlightDetail");
 const { Highlight } = require("../Models/Highlight");
 const { getEmailBody, ShootMail } = require("../utils/sendmail");
 const { HighlightInterestNFavourite } = require("../Models/HighlightInterestNFavourite");
+const { checkTokenForNews } = require("../middleware/verifyRequest");
 
 const getHighlight = TryCatch(async (req, res, next) => {
+    let query = checkTokenForNews(req);
+    console.log(query, 'user token data');
     let include = [];
     if (req.query.id) {
         include = [{
@@ -20,7 +23,7 @@ const getHighlight = TryCatch(async (req, res, next) => {
             as: "highligthdetail"
         }]
     }
-    let GetAllHighlight = await fnGet(Highlight, req.query || {}, include, false);
+    let GetAllHighlight = await fnGet(Highlight, query, include, false);
     return returnResponse(res, 200, 'Successfully Get Highlight', GetAllHighlight)
 }
 )

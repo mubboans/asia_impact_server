@@ -10,6 +10,7 @@ const auth_route = require('./route/authroutes');
 const { dbConnect } = require('./dbConfig/dbConfig');
 const { checkToken } = require('./middleware/verifyRequest');
 const { route_not_found } = require('./helper/responseHelper');
+const TryCatch = require('./utils/TryCatchHelper');
 
 const app = express()
 const port = process.env.PORT || 8001;
@@ -69,7 +70,9 @@ app.use(errorresponse)
 app.use(route_not_found)
 
 
-app.listen(port, async () => {
+app.listen(port, TryCatch(async () => {
   await dbConnect();
   console.log(`Your app listening on port ${port}`)
-})
+}
+)
+)

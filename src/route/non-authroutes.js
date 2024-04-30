@@ -5,6 +5,8 @@ const { Register, Login, ForgotPassword, SendOTP, VerifyOTP, CheckUserAvailable,
 const { getLanguage } = require("../controllers/language_controller");
 const { getNews } = require("../controllers/news_controller");
 const { getInsight } = require("../controllers/insight_controller");
+const { getReport } = require("../controllers/report_controller");
+const { getHighlight } = require("../controllers/highlight_controller");
 const route = express.Router();
 
 route.post('/auth/login', Login);
@@ -17,7 +19,8 @@ route.post('/auth/checkusers', CheckUserAvailable);
 route.get('/auth/language', getLanguage);
 route.post("/auth/refreshtoken", refereshToken);
 route.get('/auth/news', getNews);
-
+route.get("/auth/report", getReport);
+route.get("/auth/highlight", getHighlight)
 route.get('/auth/insight', getInsight);
 
 module.exports = route;
