@@ -140,5 +140,4 @@ module.exports = {
     updateRelation,
     deleteRelation,
     postRelation,
-    getDeletedRelation
 }

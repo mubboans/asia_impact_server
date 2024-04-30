@@ -126,7 +126,7 @@ const deleteUser = TryCatch(async (req, res, next) => {
         next(customErrorClass.BadRequest('id required'))
     }
     // let deleteStatus = await fnDelete(User, req.query, req, "UserRelation _" + req.query.id);
-    let deleteStatus = await fnUpdate(User, { isActive: false, deletionDate: getCurrentFormatedDate() }, req.query, req)
+    let deleteStatus = await fnUpdate(User, { isActive: false, deletionDate: getCurrentFormatedDate(), status: "Deletion Request" }, req.query, req)
     return returnResponse(res, 200, 'Successfully Delete User')
 }
 )
