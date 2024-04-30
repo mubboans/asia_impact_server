@@ -60,6 +60,15 @@ const createNotificationModel = (sequelize, DataTypes) => {
                 company_id: {
                     type: DataTypes.INTEGER,
                     allowNull: true,
+                },
+                notificationtype: {
+                    type: DataTypes.ENUM,
+                    values: ['approval', 'message'], // Add other types if needed
+                    allowNull: true,
+                },
+                status: {
+                    type: DataTypes.STRING,
+                    allowNull: true
                 }
             },
             DataTypes

@@ -51,10 +51,12 @@ const createActiveRequestModel = (sequelize, DataTypes) => {
                     // type of user initiated the request
                 },
                 aiofficermessage: {
-
+                    type: DataTypes.STRING,
+                    allowNull: false,
                 },
                 aiofficerid: {
-
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
                 },
                 lang_id: {
                     type: DataTypes.INTEGER,

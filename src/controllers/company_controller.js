@@ -36,7 +36,8 @@ const getCompany = TryCatch(async (req, res, next) => {
         ]);
         include.push({
             model: SectionData,
-            as: 'sectiondata'
+            as: 'sectiondata',
+            where: { reportid: null },
         },
             {
                 model: CompanyNSustain,

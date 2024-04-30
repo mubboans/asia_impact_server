@@ -44,9 +44,6 @@ const createUserRelationModel = (sequelize, DataTypes) => {
                     type: DataTypes.STRING,
                     allowNull: true
                 },
-
-
-
                 notification_id: {
                     type: DataTypes.INTEGER,
                     allowNull: true
@@ -57,8 +54,12 @@ const createUserRelationModel = (sequelize, DataTypes) => {
                 },
                 requestStatus: {
                     type: DataTypes.ENUM,
-                    values: ["pending", "approved", "rejected"],
+                    values: ["pending", "approved", "rejected", "deleted"],
                     defaultValue: "pending"
+                },
+                aiofficerresponse: {
+                    type: DataTypes.STRING,
+                    allowNull: true
                 }
             },
             DataTypes
