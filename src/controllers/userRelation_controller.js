@@ -60,9 +60,10 @@ const deleteRelation = TryCatch(async (req, res, next) => {
 }
 )
 
-// const getDeletedRelation = TryCatch(async (req, res, next) => { 
-//     let data = await fnGet(UserRelation, query, include, false);
-// })
+const getDeletedRelation = TryCatch(async (req, res, next) => {
+    let deletedRelationData = await fnGet(UserRelation, { deletionDate: !null }, [], false);
+    return returnResponse(res, 200, 'Successfully Delete UserRelation', deletedRelationData);
+})
 
 const postRelation = TryCatch(async (req, res, next) => {
     let body = setUserDetail(req.user, req.body);

@@ -53,6 +53,9 @@ const {
 const verifyRole = require("../middleware/verifyRole");
 const { postLrDetail, updateLrDetail, getLrDetail, deleteLrDetail } = require("../controllers/lr_controller");
 const { getUserDetail, updateUserDetail, deleteUserDetail, postUserDetail, verifyDetail, postuserdetaildocument } = require("../controllers/userdetail_controller");
+const { postSetting, updateSetting, getSetting, deleteSetting } = require("../controllers/setting_controller");
+const { postDeviceDetail, updateDeviceDetail, getDeviceDetail, deleteDeviceDetail } = require("../controllers/device_controller");
+const { postPortfolio, updatePortfolio, getPortfolio, deletePortfolio } = require("../controllers/user_portfolio");
 
 const route = express.Router();
 
@@ -171,5 +174,14 @@ route.route("/interestnfovourite")
     .delete(verifyRole("admin"), deleteHighlightInterestnFovourite)
     .get(verifyRole("admin"), getHighlightInterestnFovourite);
 
-route.patch('/verifyuser', verifyRole("admin", "legalrepresent"), verifyUser)
+route.patch('/verifyuser', verifyRole("admin", "legalrepresent"), verifyUser);
+
+route.route('/setting').post(postSetting).put(updateSetting).get(getSetting).delete(deleteSetting);
+
+route.route('/devicedetail').post(postDeviceDetail).put(updateDeviceDetail).get(getDeviceDetail).delete(deleteDeviceDetail);
+
+route.route('/portfolio').post(postPortfolio).put(updatePortfolio).get(getPortfolio).delete(deletePortfolio);
+
+
+
 module.exports = route;

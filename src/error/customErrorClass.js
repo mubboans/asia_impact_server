@@ -34,5 +34,9 @@ class customErrorClass {
     static AccountDeleted(error) {
         return new customErrorClass(403, "Account Deleted", false, error, 'Failed');
     }
+    static StaticResponseWithAlldata(obj) {
+
+        return new customErrorClass(obj.code, obj.message, obj.success, obj.error, obj.status);
+    }
 }
 module.exports = customErrorClass

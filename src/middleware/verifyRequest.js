@@ -1,8 +1,10 @@
+const { DeviceDetail } = require("../Models/DeviceDetail");
 const customErrorClass = require("../error/customErrorClass");
 const TryCatch = require("../utils/TryCatchHelper");
+const { fnGet } = require("../utils/dbCommonfn");
 const { validateToken } = require("../utils/jwt");
 const { Op } = require('sequelize')
-
+let role = ['admin', 'editor', 'ai_officer'];
 const checkToken = TryCatch(async (req, res, next) => {
     let token;
     const authHeader = req.headers.authorization;
@@ -16,8 +18,6 @@ const checkToken = TryCatch(async (req, res, next) => {
     if (!token) {
         return next(customErrorClass.Unauthorized("Please Provide Token"));
     }
-    // try{ 
-
     try {
         console.log('hit before head');
         const head = validateToken(token, process.env.ACCESS_TOKEN_SECRET);
@@ -26,6 +26,25 @@ const checkToken = TryCatch(async (req, res, next) => {
         if ((head.role || head.email) && head.userId) {
             console.log(req.user);
             next();
+            // let tokenDeviceChecked = await fnGet(DeviceDetail, { token }, [], true);
+            // if (tokenDeviceChecked && tokenDeviceChecked.length > 0) {
+            //     next();
+            // }
+            // else {
+            //     /* This code snippet is checking if the role of the user extracted from the token
+            //     (`req.user.role`) is included in the `role` array which contains the roles 'admin',
+            //     'editor', and 'ai_officer'.We don't check the token from cms admin */
+            //     if (role.includes(head.role)) {
+            //         next()
+            //     }
+            //     return next(customErrorClass.StaticResponseWithAlldata({
+            //         code: 403,
+            //         message: "Token Removed",
+            //         success: false,
+            //         error: "Device Token Remove",
+            //         status: "Failed"
+            //     }));
+            // }
         }
         else {
             return next(customErrorClass.InvalidToken("Token is invalid"));
@@ -52,7 +71,7 @@ const checkTokenForNews = (req) => {
     else {
         try {
             const head = validateToken(token, process.env.ACCESS_TOKEN_SECRET);
-            if (head.role && (head.role == 'admin' || head.role == 'editor' || head.role == 'ai_officer')) {
+            if (role.includes(head.role)) {
                 query = req?.query || {};
             }
             else {

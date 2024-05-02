@@ -21,6 +21,9 @@ const { createFileStore } = require('../Models/FIleStore');
 const { createSectionData, SectionData } = require('../Models/SectionData');
 const { HighlightInterestNFavourite, createHighlightInterestNFavourite } = require('../Models/HighlightInterestNFavourite');
 const CustomErrorObj = require('../error/CustomErrorObj');
+const { Setting, createSettingModel } = require('../Models/Setting');
+const { createDeviceDetailModel } = require('../Models/DeviceDetail');
+const { createPortfolioModel, Portfolio } = require('../Models/Portfolio');
 // const User = require('../Models/Users');
 // const Documents = require('../Models/Document');
 // const { syncModel } = require('../Models');
@@ -70,7 +73,10 @@ const dbConnect = async () => {
         createLrDetail(sequelize, DataTypes);
         createFileStore(sequelize, DataTypes);
         createSectionData(sequelize, DataTypes);
-        createHighlightInterestNFavourite(sequelize, DataTypes)
+        createHighlightInterestNFavourite(sequelize, DataTypes);
+        createSettingModel(sequelize, DataTypes);
+        createDeviceDetailModel(sequelize, DataTypes);
+        createPortfolioModel(sequelize, DataTypes);
 
         User.hasMany(Document, { foreignKey: 'userid', as: 'document' });
         Document.belongsTo(User, { foreignKey: 'userid' });
@@ -135,12 +141,19 @@ const dbConnect = async () => {
         Notification.hasMany(UserRelation, { foreignKey: 'notification_id' });
         UserRelation.belongsTo(Notification, { foreignKey: 'notification_id' });
 
+        User.hasMany(Setting, { foreignKey: 'advisorId', as: 'advisorUser' });
+        Setting.belongsTo(User, { foreignKey: 'advisorId', as: 'advisorUser' });
+
+        Company.hasMany(Portfolio, { foreignKey: 'companyid' });
+        User.hasMany(Portfolio, { foreignKey: 'userid' });
+        Portfolio.belongsTo(Company, { foreignKey: 'companyid' });
+        Portfolio.belongsTo(User, { foreignKey: 'userid' });
 
         await sequelize.sync({ alter: false });
 
     } catch (error) {
         console.log(error, 'error ');
-        return new CustomErrorObj(error?.message, 500)
+        throw new CustomErrorObj(error?.message, 500);
     }
 
 }

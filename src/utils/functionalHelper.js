@@ -109,7 +109,8 @@ async function createRandomCode(modelname, fieldname) {
 }
 
 function setUserIdonQuery(req) {
-    if (req.user.role === 'admin') {
+    let role = ['admin', 'editor', 'ai_officer'];
+    if (role.includes(req.user.role)) {
         return req?.query ? req?.query : {};
     }
     else {
