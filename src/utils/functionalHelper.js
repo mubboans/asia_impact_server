@@ -108,6 +108,11 @@ async function createRandomCode(modelname, fieldname) {
     }
 }
 
+function createRandomCodeWithoutCheck() {
+    let code = crypto.randomBytes(6).toString('hex');
+    // let codecheck = fieldname ? `${fieldname}:${code}` : '';
+    return code;
+}
 function setUserIdonQuery(req) {
     let role = ['admin', 'editor', 'ai_officer'];
     if (role.includes(req.user.role)) {
@@ -136,5 +141,5 @@ function setUserRoleonQuery(req) {
 module.exports = {
     formatDateTime, getCurrentFormatedDate, setUserDetails, setUserDelete, ValidateEmail,
     StringtoDate, createRandomCode, setUserDetailsUpdate,
-    setUserIdonQuery, setUserRoleonQuery
+    setUserIdonQuery, setUserRoleonQuery, createRandomCodeWithoutCheck
 }

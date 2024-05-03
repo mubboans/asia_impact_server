@@ -1,5 +1,6 @@
 const { Company } = require("../Models/Company");
 const { Portfolio } = require("../Models/Portfolio");
+const { User } = require("../Models/Users");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
@@ -13,7 +14,12 @@ const getPortfolio = TryCatch(async (req, res, next) => {
             {
                 model: Company,
                 sourceKey: "companyid",
-            }
+            },
+            {
+                model: User,
+                sourceKey: "userid",
+                attributes: { exclude: ['password'] }
+            },
         ]
     }
     let GetAllPortfolio = await fnGet(Portfolio, req?.query || {}, include, false);

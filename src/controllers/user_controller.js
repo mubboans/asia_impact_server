@@ -8,10 +8,11 @@ const CustomErrorObj = require("../error/CustomErrorObj");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
-const { fnGet, fnUpdate, fnPost } = require("../utils/dbCommonfn");
-const { getCurrentFormatedDate, setUserIdonQuery } = require("../utils/functionalHelper");
-const { Sequelize } = require("sequelize");
+const { fnGet, fnUpdate, fnPost, fnbulkCreate } = require("../utils/dbCommonfn");
+const { getCurrentFormatedDate, setUserIdonQuery, createRandomCodeWithoutCheck } = require("../utils/functionalHelper");
+const { Sequelize, Op } = require("sequelize");
 const bcrypt = require('bcryptjs');
+const { Notification } = require("../Models/Notification");
 let passJoi = Joi.object({
     email: Joi.string().required(),
     password: Joi.string()
@@ -122,11 +123,17 @@ const ChangePassword = TryCatch(async (req, res, next) => {
 })
 
 const deleteUser = TryCatch(async (req, res, next) => {
-    if (!req.query) {
-        next(customErrorClass.BadRequest('id required'))
+    if (!req.query.id || !req.query.deletereason) {
+        next(customErrorClass.BadRequest('Invalid Data'));
     }
     // let deleteStatus = await fnDelete(User, req.query, req, "UserRelation _" + req.query.id);
-    let deleteStatus = await fnUpdate(User, { isActive: false, deletionDate: getCurrentFormatedDate(), status: "Deletion Request" }, req.query, req)
+    let deleteStatus = await fnUpdate(User,
+        {
+            isActive: false,
+            deletionDate: getCurrentFormatedDate(),
+            status: "Deletion Request",
+            deletereason: req.query.deletereason,
+        }, { id: req.query.id }, req)
     return returnResponse(res, 200, 'Successfully Delete User')
 }
 )
@@ -192,6 +199,66 @@ const verifyUser = TryCatch(async (req, res, next) => {
 
 })
 
+const getDeletedUser = TryCatch(async (req, res, next) => {
+    let query = {
+        deletionDate: {
+            [Op.not]: null
+        },
+        deletereason: {
+            [Op.not]: null
+        },
+        status: "Deletion Request"
+    }
+    let data = await fnGet(User, query, [], false);
+    return returnResponse(res, 200, "Successfully get the Deleted User", data)
+})
+
+const deleteUserAdmin = TryCatch(async (req, res, next) => {
+    let query = req.query;
+    if (!query.id) {
+        next(customErrorClass.BadRequest('Id required'))
+    }
+    let userdetail = await fnGet(User, { id: query.id }, [
+        {
+            model: UserDetail,
+            as: 'userdetail',
+            attributes: ['id', 'firstname', 'lastname', 'img'],
+        }
+    ], false);
+    const d = userdetail[0];
+    if (!d) return next(customErrorClass.NotFound('No user found'));
+    console.log(d, 'd check');
+    let urquery = {
+        ...(d.role == 'advisor' && { advisorId: query.id }),
+        ...(d.role == 'individual_investor' && { investorId: query.id }),
+        ...(d.role == 'legalrepresent' && { investorId: query.id }),
+        requestStatus: 'approved'
+    }
+
+    let userrelation = await fnGet(UserRelation, urquery, [], true);
+    let rolecheck = ['individual_investor', 'advisor', 'legalrepresent']
+    if (userrelation && userrelation.length > 0 && rolecheck.includes(d.role)) {
+        let x = userrelation.map((x) => {
+            return {
+                sender_id: req.user.userId,
+                receiver_id: d.role == 'advisor' ? x.investorId : x.advisorId,
+                message: `${d.userdetail[0].firstname} ${d.userdetail[0].lastname} User Account Deleted`,
+                notificationcode: createRandomCodeWithoutCheck(),
+                lang_id: 1,
+                title: "Request for Account Delete Accepted",
+                is_read: false,
+                isNew: true,
+                notificationtype: "message",
+            }
+        })
+        await fnbulkCreate(Notification, x, [], [], req);
+    }
+    await fnUpdate(User, { status: 'Deleted', deletedBy: req.user.userId }, query, req);
+
+    return returnResponse(res, 200, "Successfully Deleted User");
+})
+
+
 function getUserById(req, option) {
     option = {
         ...option,
@@ -218,5 +285,7 @@ module.exports = {
     deleteUser,
     postUser,
     ChangePassword,
-    verifyUser
+    verifyUser,
+    getDeletedUser,
+    deleteUserAdmin
 }

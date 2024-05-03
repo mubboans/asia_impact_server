@@ -16,6 +16,9 @@ const getSetting = TryCatch(async (req, res, next) => {
                 model: User,
                 sourceKey: "advisorId",
                 as: 'advisorUser',
+                attributes: {
+                    exclude: ['password']
+                },
                 include: {
                     model: UserDetail,
                     as: 'userdetail',

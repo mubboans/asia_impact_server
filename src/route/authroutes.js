@@ -2,7 +2,7 @@ const express = require("express");
 const { postNews, updateNews, deleteNews } = require("../controllers/news_controller");
 const { getUserWithRelation, postRelation, updateRelation, deleteRelation } = require("../controllers/userRelation_controller");
 const { postLanguage, updateLanguage, deleteLanguage } = require("../controllers/language_controller");
-const { deleteUser, updateUser, getUser, postUser, ChangePassword, verifyUser, } = require("../controllers/user_controller");
+const { deleteUser, updateUser, getUser, postUser, ChangePassword, verifyUser, deleteUserAdmin, getDeletedUser, } = require("../controllers/user_controller");
 const { getSustainGoal, updateSustainGoal, deleteSustainGoal, postSustainGoal } = require("../controllers/sustain_goal_controller");
 const {
     getDocument,
@@ -68,32 +68,32 @@ route
 
 route
     .route("/language")
-    .post(verifyRole("admin"), postLanguage)
-    .put(verifyRole("admin"), updateLanguage)
-    .delete(verifyRole("admin"), deleteLanguage);
+    .post(verifyRole("admin", "editor", "ai_officer"), postLanguage)
+    .put(verifyRole("admin", "editor", "ai_officer"), updateLanguage)
+    .delete(verifyRole("admin", "editor", "ai_officer"), deleteLanguage);
 
 route.route("/user").put(updateUser).get(getUser);
 
 route
     .route("/sustaingoal")
     .get(getSustainGoal)
-    .put(verifyRole("admin"), updateSustainGoal)
-    .delete(verifyRole("admin"), deleteSustainGoal)
-    .post(verifyRole("admin"), postSustainGoal);
+    .put(verifyRole("admin", "editor", "ai_officer"), updateSustainGoal)
+    .delete(verifyRole("admin", "editor", "ai_officer"), deleteSustainGoal)
+    .post(verifyRole("admin", "editor", "ai_officer"), postSustainGoal);
 
 route
     .route("/company")
     .get(getCompany)
-    .put(verifyRole("admin"), updateCompany)
-    .delete(verifyRole("admin"), deleteCompany)
-    .post(verifyRole("admin"), postCompany);
+    .put(verifyRole("admin", "editor", "ai_officer"), updateCompany)
+    .delete(verifyRole("admin", "editor", "ai_officer"), deleteCompany)
+    .post(verifyRole("admin", "editor", "ai_officer"), postCompany);
 
 route
     .route("/report")
     // .get(getReport)
-    .put(verifyRole("admin"), updateReport)
-    .delete(verifyRole("admin"), deleteReport)
-    .post(verifyRole("admin"), postReport);
+    .put(verifyRole("admin", "editor", "ai_officer"), updateReport)
+    .delete(verifyRole("admin", "editor", "ai_officer"), deleteReport)
+    .post(verifyRole("admin", "editor", "ai_officer"), postReport);
 
 route
     .route("/opportunity")
@@ -105,44 +105,41 @@ route
 route
     .route("/notification")
     .get(getNotification)
-    .put(verifyRole("admin", "investor", "advisor", "legalrepresent"), updateNotification)
-    .delete(verifyRole("admin"), deleteNotification)
-    .post(verifyRole("admin"), postNotification);
+    .put(verifyRole("admin", "editor", "ai_officer", "individual_investor", "advisor", "legalrepresent"), updateNotification)
+    .delete(verifyRole("admin", "editor", "ai_officer"), deleteNotification)
+    .post(verifyRole("admin", "editor", "ai_officer"), postNotification);
 
 route
     .route("/highlight")
     // .get(getHighlight)
-    .put(verifyRole("admin"), updateHighlight)
-    .delete(verifyRole("admin"), deleteHighlight)
-    .post(verifyRole("admin"), postHighlight);
+    .put(verifyRole("admin", "editor", "ai_officer"), updateHighlight)
+    .delete(verifyRole("admin", "editor", "ai_officer"), deleteHighlight)
+    .post(verifyRole("admin", "editor", "ai_officer"), postHighlight);
 // .post("/interestnfovourite", postHighlightInterestnFovourite)
 // .delete("/interestnfovourite", deleteHighlightInterestnFovourite)
 // .get("/interestnfovourite", getHighlightInterestnFovourite)
 
 route
     .route("/insight")
-    .put(verifyRole("admin"), updateInsight)
-    .delete(verifyRole("admin"), deleteInsight)
-    .post(verifyRole("admin"), postInsight);
+    .put(verifyRole("admin", "editor", "ai_officer"), updateInsight)
+    .delete(verifyRole("admin", "editor", "ai_officer"), deleteInsight)
+    .post(verifyRole("admin", "editor", "ai_officer"), postInsight);
 
-route.post("/user/add", verifyRole("admin"), postUser);
-route.delete("/user/del", verifyRole("admin"), deleteUser);
+route.post("/user/add", verifyRole("admin", "editor"), postUser);
+route.delete("/user/del", deleteUser);
 
 route
     .route("/news")
-    .post(verifyRole("admin"), postNews)
-    .put(verifyRole("admin"), updateNews)
-    .delete(verifyRole("admin"), deleteNews);
+    .post(verifyRole("admin", "editor", "ai_officer"), postNews)
+    .put(verifyRole("admin", "editor", "ai_officer"), updateNews)
+    .delete(verifyRole("admin", "editor", "ai_officer"), deleteNews);
 
 route
     .route("/document")
-    .get(verifyRole("admin", "investor", "advisor", "legalrepresent"), getDocument)
-    .put(verifyRole("admin", "investor", "advisor", "legalrepresent"), updateDocument)
-    .post(verifyRole("admin", "investor", "advisor", "legalrepresent"), postDocument)
-    .delete(
-        verifyRole("admin", "investor", "advisor", "basic"),
-        deleteDocument
-    );
+    .get(verifyRole("admin", "editor", "ai_officer", "individual_investor", "advisor", "legalrepresent"), getDocument)
+    .put(verifyRole("admin", "editor", "ai_officer", "individual_investor", "advisor", "legalrepresent"), updateDocument)
+    .post(verifyRole("admin", "editor", "ai_officer", "individual_investor", "advisor", "legalrepresent"), postDocument)
+    .delete(verifyRole("admin", "editor", "ai_officer", "individual_investor", "advisor", "basic"), deleteDocument);
 
 route
     .route("/lrdetail")
@@ -163,7 +160,7 @@ route
 
 route.patch('/verifyDetail', verifyDetail);
 
-route.delete('/sectionentries', verifyRole("admin", "legalrepresent"), deleteDetailEntries);
+route.delete('/sectionentries', verifyRole("admin", "legalrepresent", "editor", "ai_officer"), deleteDetailEntries);
 
 route.post('/userdetaildocument', postuserdetaildocument);
 
@@ -171,16 +168,20 @@ route.patch('/updatepassword', ChangePassword);
 
 route.route("/interestnfovourite")
     .post(postHighlightInterestnFovourite)
-    .delete(verifyRole("admin"), deleteHighlightInterestnFovourite)
+    .delete(verifyRole("admin", "editor", "ai_officer"), deleteHighlightInterestnFovourite)
     .get(getHighlightInterestnFovourite);
 
-route.patch('/verifyuser', verifyRole("admin", "legalrepresent"), verifyUser);
+route.patch('/verifyuser', verifyRole("admin", "legalrepresent", "editor", "ai_officer"), verifyUser);
 
 route.route('/setting').post(postSetting).put(updateSetting).get(getSetting).delete(deleteSetting);
 
 route.route('/devicedetail').post(postDeviceDetail).put(updateDeviceDetail).get(getDeviceDetail).delete(deleteDeviceDetail);
 
 route.route('/portfolio').post(postPortfolio).put(updatePortfolio).get(getPortfolio).delete(deletePortfolio);
+
+
+route.get('/deleteduser', verifyRole("admin", "editor", "ai_officer"), getDeletedUser);
+route.delete('/deleteuser', verifyRole("admin", "editor", "ai_officer"), deleteUserAdmin);
 
 
 

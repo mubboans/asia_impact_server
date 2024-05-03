@@ -16,9 +16,16 @@ const getNotification = TryCatch(async (req, res, next) => {
                 model: User,
                 sourceKey: "sender_id",
                 foreignKey: "id",
+                attributes: {
+                    exclude: ['password']
+                },
                 include: ['userdetail']
             }
         ]
+    let rolecheck = ['individual_investor', 'advisor', 'legalrepresent']
+    if (rolecheck.includes(req.user.role) || req.user.role == 'basic') {
+        req.query['receiver_id'] = req.user.userId;
+    }
 
     let GetAllReport = await fnGet(Notification, req.query || {}, include, true);
     return returnResponse(res, 200, 'Successfully Get Notification', GetAllReport)

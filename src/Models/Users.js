@@ -79,6 +79,10 @@ const createUser = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true
             },
+            deletedBy: {
+                type: DataTypes.INTEGER,
+                allowNull: true
+            },
             lastUsedIp: {
                 type: DataTypes.STRING,
                 allowNull: true,
@@ -88,6 +92,10 @@ const createUser = (sequelize, DataTypes) => {
                 allowNull: true
             },
             rejectionreason: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            deletereason: {
                 type: DataTypes.STRING,
                 allowNull: true,
             }
