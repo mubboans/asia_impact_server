@@ -136,10 +136,10 @@ const deleteHighlightInterestnFovourite = TryCatch(async (req, res, next) => {
 const getHighlightInterestnFovourite = TryCatch(async (req, res, next) => {
     let include = [];
     let query = req.query;
-    if (req.user.type == 'admin') {
-        return query;
-    }
-    else {
+    if (!req.user.type == 'admin') {
+        //      query
+        // }
+        // else {
         query = {
             ...query,
             userid: req.user.userId

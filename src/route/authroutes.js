@@ -170,9 +170,9 @@ route.post('/userdetaildocument', postuserdetaildocument);
 route.patch('/updatepassword', ChangePassword);
 
 route.route("/interestnfovourite")
-    .post(verifyRole("admin"), postHighlightInterestnFovourite)
+    .post(postHighlightInterestnFovourite)
     .delete(verifyRole("admin"), deleteHighlightInterestnFovourite)
-    .get(verifyRole("admin"), getHighlightInterestnFovourite);
+    .get(getHighlightInterestnFovourite);
 
 route.patch('/verifyuser', verifyRole("admin", "legalrepresent"), verifyUser);
 

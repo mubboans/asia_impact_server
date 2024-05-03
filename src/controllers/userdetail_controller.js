@@ -104,7 +104,7 @@ const postuserdetaildocument = TryCatch(async (req, res, next) => {
     const user = { ...body };
     delete user?.password;
     delete user?.document;
-    delete user?.role;
+    // delete user?.role;
     delete user?.status;
     delete user?.access_group;
     delete user?.isVerified;
