@@ -13,7 +13,6 @@ const { checkTokenForNews } = require("../middleware/verifyRequest");
 
 const getHighlight = TryCatch(async (req, res, next) => {
     let query = checkTokenForNews(req);
-    console.log(query, 'user token data');
     let include = [];
     if (req.query.id) {
         include = [{
@@ -22,6 +21,16 @@ const getHighlight = TryCatch(async (req, res, next) => {
             foreignKey: "id",
             as: "highligthdetail"
         }]
+    }
+
+    if (query?.userid) {
+        include.push({
+            model: HighlightInterestNFavourite,
+            sourceKey: "highlightid",
+            foreignKey: "id",
+            where: { userid: query?.userid }
+        })
+        delete query.userid;
     }
     let GetAllHighlight = await fnGet(Highlight, query, include, false);
     return returnResponse(res, 200, 'Successfully Get Highlight', GetAllHighlight)

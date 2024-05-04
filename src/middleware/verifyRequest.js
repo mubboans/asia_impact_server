@@ -82,7 +82,8 @@ const checkTokenForNews = (req) => {
                             [Op.eq]: head.role,
                             [Op.like]: `%${head.role}%`
                         }
-                    }
+                    },
+                    userid: head.userId
                 }
             }
         } catch (error) {
