@@ -184,6 +184,8 @@ const postUser = TryCatch(async (req, res, next) => {
 
 const verifyUser = TryCatch(async (req, res, next) => {
     let body = req.body;
+    body.status = "approved";
+    body.isVerified = true;
     if (body.document) {
         if (Array.isArray(body.document) && body.document.length > 0) {
             for (let i of body.document) {
@@ -192,6 +194,10 @@ const verifyUser = TryCatch(async (req, res, next) => {
         }
         else {
             await fnUpdate(Document, body.document, { id: body.document.id }, req);
+        }
+        if (body?.rejectionreason) {
+            body.status = "declined";
+            body.isVerified = false
         }
         await fnUpdate(User, body, { id: body.id }, req);
         return returnResponse(res, 200, 'Successfully Updated User', {});

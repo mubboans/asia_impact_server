@@ -96,7 +96,7 @@ const postuserdetaildocument = TryCatch(async (req, res, next) => {
         return next(customErrorClass.BadRequest("Id is missing"));
     }
     if (body?.email) {
-        const checkuser = await fnGet(User, { email: body.email }, [], true);
+        const checkuser = await fnGet(User, { email: body.email, }, [], true);
         if (checkuser.length > 0 && req.user.userId !== checkuser[0].id) {
             return next(new CustomErrorObj("Email already belongs to another user", 403));
         }
@@ -122,7 +122,7 @@ const postuserdetaildocument = TryCatch(async (req, res, next) => {
     }
     // Add update promises for User and UserDetail
     promiseArr.push(
-        fnUpdate(User, { ...user, status: "Document Appproval Pending" }, { id: body.userid }, req),
+        fnUpdate(User, { ...user, status: "document appproval pending" }, { id: body.userid }, req),
         fnUpdate(UserDetail, user, { id: body.userdetailid }, req)
     );
 
