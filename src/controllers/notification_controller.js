@@ -1,3 +1,4 @@
+const { ActiveChatRequestHistory } = require("../Models/ActiveChatRequestHistory");
 const { Notification } = require("../Models/Notification");
 const { UserDetail } = require("../Models/UserDetail");
 const { UserRelation } = require("../Models/UserRelation");
@@ -27,8 +28,11 @@ const getNotification = TryCatch(async (req, res, next) => {
         req.query['receiver_id'] = req.user.userId;
     }
 
-    let GetAllReport = await fnGet(Notification, req.query || {}, include, true);
-    return returnResponse(res, 200, 'Successfully Get Notification', GetAllReport)
+    let data = await Promise.all([fnGet(Notification, req.query || {}, include, false), fnGet(ActiveChatRequestHistory, {}, [], false)]);
+    // let GetAllReport = await fnGet(Notification, req.query || {}, include, true);
+    // let Activechatrequesthistory = await fnGet(ActiveChatRequestHistory)
+    let mergedData = [...data[0], ...data[1]];
+    return returnResponse(res, 200, 'Successfully Get Notification', mergedData);
 }
 )
 

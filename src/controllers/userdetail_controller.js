@@ -108,7 +108,7 @@ const postuserdetaildocument = TryCatch(async (req, res, next) => {
     delete user?.status;
     delete user?.access_group;
     delete user?.isVerified;
-
+    delete user?.lrpointofcontact;
     const promiseArr = [];
 
 
@@ -119,6 +119,9 @@ const postuserdetaildocument = TryCatch(async (req, res, next) => {
         else {
             promiseArr.push(fnPost(Document, body.document, [], req));
         }
+    }
+    if (body.lrpointofcontact) {
+        promiseArr.push(fnPost(LrDetail, body.lrpointofcontact, [], req));
     }
     // Add update promises for User and UserDetail
     promiseArr.push(

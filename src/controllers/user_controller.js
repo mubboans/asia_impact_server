@@ -264,6 +264,21 @@ const deleteUserAdmin = TryCatch(async (req, res, next) => {
     return returnResponse(res, 200, "Successfully Deleted User");
 })
 
+const freezeUser = TryCatch(async (req, res, next) => {
+    let body = req?.body;
+    let response = 'UnFreeze'
+    body.status = 'approved'
+    if (!body.isActive) {
+        response = 'Freeze'
+        body.status = 'freeze'
+    }
+    else {
+        body.freezereason = null
+    }
+    await fnUpdate(User, body, { id: body.id }, req);
+    return returnResponse(res, 200, `Successfully ${response} User`, {});
+})
+
 
 function getUserById(req, option) {
     option = {
@@ -293,5 +308,7 @@ module.exports = {
     ChangePassword,
     verifyUser,
     getDeletedUser,
-    deleteUserAdmin
+    deleteUserAdmin,
+    freezeUser,
+
 }

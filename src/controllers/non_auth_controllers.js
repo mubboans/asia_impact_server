@@ -92,8 +92,8 @@ const Login = TryCatch(async (req, res, next) => {
         let hashPass = body.email + body.password;
         // console.log(hashPass, userDetails.password, 'user password');
         if (bcrypt.compareSync(hashPass, userDetails.password)) {
-            if (!userDetails.isActive) return next(customErrorClass.AccountNotActive('It seems your account is inactive'));
-            if (userDetails.deletionDate) return next(customErrorClass.AccountDeleted('It seem your account is deleted'))
+            if (!userDetails.isActive) return next(customErrorClass.AccountNotActive('It seems your account is Freeze'));
+            if (userDetails.deletionDate) return next(customErrorClass.AccountDeleted('It seem your account is deleted'));
             const newPayload = {
                 userId: userDetails.id, email: userDetails.email, role: userDetails.role, type: userDetails.type,
                 lang_id: userDetails.lang_id,
@@ -111,6 +111,7 @@ const Login = TryCatch(async (req, res, next) => {
                     email: userDetails.email,
                     linkDevice: userDetails.linkDevice,
                     status: userDetails.status,
+                    userDetailId: userDetails.userdetail[0]?.id,
                     UserDetails: userDetails.userdetail
                 });
         }
@@ -216,7 +217,10 @@ const Register = TryCatch(async (req, res, next) => {
             rejectionreason: user.rejectionreason,
             linkDevice: user.linkDevice,
             status: user.status,
-            userDetailId: userdetail?.id
+            userDetailId: userdetail?.id,
+            UserDetails: [
+                userdetail
+            ]
         });
     // return returnResponse(res, 200, 'Register Succesfully');
 
@@ -315,6 +319,9 @@ const SendOTP = TryCatch(async (req, res, next) => {
         if (checkUser.length <= 0) {
             throw new CustomErrorObj('User not register', 404)
         }
+        else if (checkUser[0].deletionDate) {
+            throw new CustomErrorObj('User Deleted', 404)
+        }
     }
     fnGet(Otp, query, [], true).then(async (result) => {
         console.log(result, 'result check');
@@ -367,7 +374,7 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
                     as: 'userdetail'
                 }], false);
                 if (!user[0].isActive) {
-                    return next(customErrorClass.AccountNotActive('It seems your account is inactive'));
+                    return next(customErrorClass.AccountNotActive('It seems your account is Freeze'));
                 }
 
                 const newPayload = {
@@ -380,6 +387,7 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
                 return returnResponse(res, 200, 'Otp Verify',
                     {
                         ...tokenData, role: user[0].role, id: user[0].id, email: user[0].email,
+                        userDetailId: user[0].userdetail[0]?.id,
                         linkDevice: user[0].linkDevice, isVerified: user[0].isVerified, status: user[0].status, rejectionreason: user[0].rejectionreason, UserDetail: user[0].userdetail
                     });
             }

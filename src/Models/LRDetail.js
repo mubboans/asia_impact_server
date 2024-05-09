@@ -46,24 +46,26 @@ const createLrDetail = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            ubofirstname: {
+            firstname: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            ubolastname: {
+            lastname: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-
-
-            lrfirstname: {
+            email: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            lrlastname: {
-                type: DataTypes.STRING,
-                allowNull: true
-            },
+            // lrfirstname: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true
+            // },
+            // lrlastname: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true
+            // },
             countrycode: {
                 type: DataTypes.STRING,
                 allowNull: true
@@ -72,30 +74,30 @@ const createLrDetail = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            lrcountry: {
+            // lrcountry: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true
+            // },
+            zipcode: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            lrzipcode: {
+            state: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            lrstate: {
+            city: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            lrcity: {
-                type: DataTypes.STRING,
-                allowNull: true
-            },
-            lrstreet: {
+            street: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
             detailtype: {
                 type: DataTypes.STRING,
                 allowNull: true
-                //Type of detail exp UBO-Detail,LR-Detail or Company-Detail 
+                //Type of detail exp UBO-Detail,LR-Detail or Company-Detail ,Point of contact
             },
             createdDate: {
                 type: DataTypes.STRING,
@@ -117,7 +119,9 @@ const createLrDetail = (sequelize, DataTypes) => {
             lang_id: {
                 type: DataTypes.INTEGER,
                 allowNull: true,
-            }
+            },
+
+
         },
         {
             sequelize,

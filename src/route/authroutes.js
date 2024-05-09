@@ -2,7 +2,7 @@ const express = require("express");
 const { postNews, updateNews, deleteNews } = require("../controllers/news_controller");
 const { getUserWithRelation, postRelation, updateRelation, deleteRelation } = require("../controllers/userRelation_controller");
 const { postLanguage, updateLanguage, deleteLanguage } = require("../controllers/language_controller");
-const { deleteUser, updateUser, getUser, postUser, ChangePassword, verifyUser, deleteUserAdmin, getDeletedUser, } = require("../controllers/user_controller");
+const { deleteUser, updateUser, getUser, postUser, ChangePassword, verifyUser, deleteUserAdmin, getDeletedUser, freezeUser, } = require("../controllers/user_controller");
 const { getSustainGoal, updateSustainGoal, deleteSustainGoal, postSustainGoal } = require("../controllers/sustain_goal_controller");
 const {
     getDocument,
@@ -56,6 +56,10 @@ const { getUserDetail, updateUserDetail, deleteUserDetail, postUserDetail, verif
 const { postSetting, updateSetting, getSetting, deleteSetting } = require("../controllers/setting_controller");
 const { postDeviceDetail, updateDeviceDetail, getDeviceDetail, deleteDeviceDetail } = require("../controllers/device_controller");
 const { postPortfolio, updatePortfolio, getPortfolio, deletePortfolio } = require("../controllers/user_portfolio");
+const { postActiveRequest, updateActiveRequest, getActiveRequest, deleteActiveRequest } = require("../controllers/active_request_controller");
+const { postActiveChatRequest, updateActiveChatRequest, getActiveChatRequest, deleteActiveChatRequest } = require("../controllers/active_chat_request_controller");
+const { postActiveChatRequestHistory, updateActiveChatRequestHistory, getActiveChatRequestHistory, deleteActiveChatRequestHistory } = require("../controllers/active_chat_request_history_controller");
+const { postComplaint, updateComplaint, getComplaint, deleteComplaint } = require("../controllers/complaint_controller");
 
 const route = express.Router();
 
@@ -177,12 +181,27 @@ route.route('/setting').post(postSetting).put(updateSetting).get(getSetting).del
 
 route.route('/devicedetail').post(postDeviceDetail).put(updateDeviceDetail).get(getDeviceDetail).delete(deleteDeviceDetail);
 
-route.route('/portfolio').post(postPortfolio).put(updatePortfolio).get(getPortfolio).delete(deletePortfolio);
-
+route.route('/portfolio')
+    .post(verifyRole("admin", "editor", "ai_officer"), postPortfolio)
+    .put(verifyRole("admin", "editor", "ai_officer"), updatePortfolio)
+    .get(getPortfolio)
+    .delete(verifyRole("admin", "editor", "ai_officer"), deletePortfolio);
 
 route.get('/deleteduser', verifyRole("admin", "editor", "ai_officer"), getDeletedUser);
 route.delete('/deleteuser', verifyRole("admin", "editor", "ai_officer"), deleteUserAdmin);
 
+route.route('/activerequest').post(postActiveRequest).put(updateActiveRequest).get(getActiveRequest).delete(deleteActiveRequest);
 
+route.route('/activechatrequest').post(postActiveChatRequest).put(updateActiveChatRequest).get(getActiveChatRequest).delete(deleteActiveChatRequest);
+
+route.route('/activechatrequesthistory').post(postActiveChatRequestHistory).put(updateActiveChatRequestHistory).get(getActiveChatRequestHistory).delete(deleteActiveChatRequestHistory);
+
+route.patch('/user/freeze', verifyRole("admin", "editor", "ai_officer"), freezeUser);
+
+route.route('/complaint')
+    .post(postComplaint)
+    .put(verifyRole("admin", "editor", "ai_officer"), updateComplaint)
+    .get(verifyRole("admin", "editor", "ai_officer"), getComplaint)
+    .delete(verifyRole("admin", "editor", "ai_officer"), deleteComplaint);
 
 module.exports = route;

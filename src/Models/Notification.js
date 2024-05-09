@@ -61,9 +61,11 @@ const createNotificationModel = (sequelize, DataTypes) => {
                     type: DataTypes.INTEGER,
                     allowNull: true,
                 },
-                notificationtype: {
-                    type: DataTypes.ENUM,
-                    values: ['approval', 'message'], // Add other types if needed
+                type: {
+                    type: DataTypes.STRING,
+                    // values: ['approval', 'message'],
+                    // Add other types if needed
+                    defaultValue: 'message',
                     allowNull: true,
                 },
                 status: {

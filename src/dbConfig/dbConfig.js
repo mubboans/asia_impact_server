@@ -24,6 +24,10 @@ const CustomErrorObj = require('../error/CustomErrorObj');
 const { Setting, createSettingModel } = require('../Models/Setting');
 const { createDeviceDetailModel } = require('../Models/DeviceDetail');
 const { createPortfolioModel, Portfolio } = require('../Models/Portfolio');
+const { createActiveRequestModel, ActiveRequest } = require('../Models/ActiveRequest');
+const { createActiveChatRequestModel, ActiveChatRequest } = require('../Models/ActiveChatRequest');
+const { createActiveChatRequestHistoryModel, ActiveChatRequestHistory } = require('../Models/ActiveChatRequestHistory');
+const { createComplaint } = require('../Models/Complaint');
 // const User = require('../Models/Users');
 // const Documents = require('../Models/Document');
 // const { syncModel } = require('../Models');
@@ -77,6 +81,14 @@ const dbConnect = async () => {
         createSettingModel(sequelize, DataTypes);
         createDeviceDetailModel(sequelize, DataTypes);
         createPortfolioModel(sequelize, DataTypes);
+        createComplaint(sequelize, DataTypes);
+
+        createActiveRequestModel(sequelize, DataTypes);
+        createActiveChatRequestModel(sequelize, DataTypes);
+        createActiveChatRequestHistoryModel(sequelize, DataTypes);
+
+
+
 
         User.hasMany(Document, { foreignKey: 'userid', as: 'document' });
         Document.belongsTo(User, { foreignKey: 'userid' });
@@ -148,6 +160,34 @@ const dbConnect = async () => {
         User.hasMany(Portfolio, { foreignKey: 'userid' });
         Portfolio.belongsTo(Company, { foreignKey: 'companyid' });
         Portfolio.belongsTo(User, { foreignKey: 'userid' });
+
+        Company.hasMany(ActiveRequest, { foreignKey: 'companyid' });
+        ActiveRequest.belongsTo(Company, { foreignKey: 'companyid' });
+
+        ActiveRequest.hasMany(ActiveChatRequest, { foreignKey: 'activerequestid', as: "activechaterequest" });
+        ActiveChatRequest.belongsTo(ActiveRequest, { foreignKey: 'activerequestid', as: "activechaterequest" });
+
+        User.hasMany(ActiveRequest, { foreignKey: "useridAdvisor", as: "AdvisorDetail" });
+        ActiveRequest.belongsTo(User, { foreignKey: "useridAdvisor", as: "AdvisorDetail" })
+        User.hasMany(ActiveRequest, { foreignKey: "useridInvestor", as: "InvestorDetail" });
+        ActiveRequest.belongsTo(User, { foreignKey: "useridInvestor", as: "InvestorDetail" })
+
+
+
+        ActiveChatRequest.hasMany(ActiveChatRequestHistory, { foreignKey: 'activechatrequestid', as: 'activerequestchathistory' });
+        ActiveChatRequestHistory.belongsTo(ActiveChatRequest, { foreignKey: 'activechatrequestid', as: 'activerequestchathistory' });
+
+
+        ActiveChatRequest.hasMany(ActiveChatRequestHistory, { foreignKey: 'activechatrequestid', as: 'activerequestchat' });
+        ActiveChatRequestHistory.belongsTo(ActiveChatRequest, { foreignKey: 'activechatrequestid', as: 'activerequestchat' });
+
+
+        ActiveRequest.hasMany(ActiveChatRequestHistory, { foreignKey: 'activerequestid', as: 'activerequest_chathistory' });
+        ActiveChatRequestHistory.belongsTo(ActiveRequest, { foreignKey: 'activerequestid', as: 'activerequest_chathistory' });
+
+        Company.hasMany(ActiveRequest, { foreignKey: 'companyid' });
+        ActiveChatRequestHistory.belongsTo(ActiveChatRequest, { foreignKey: 'companyid' });
+
 
         await sequelize.sync({ alter: false });
 

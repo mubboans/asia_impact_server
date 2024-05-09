@@ -3,6 +3,7 @@ const moment = require('moment-timezone');
 const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 const crypto = require("crypto");
 const CustomErrorObj = require('../error/CustomErrorObj');
+let role = ['admin', 'editor', 'ai_officer'];
 function ValidateEmail(email) {
     if (emailRegex.test(email)) {
         return true;
@@ -114,7 +115,7 @@ function createRandomCodeWithoutCheck() {
     return code;
 }
 function setUserIdonQuery(req) {
-    let role = ['admin', 'editor', 'ai_officer'];
+
     if (role.includes(req.user.role)) {
         return req?.query ? req?.query : {};
     }
@@ -127,7 +128,7 @@ function setUserIdonQuery(req) {
 
 }
 function setUserRoleonQuery(req) {
-    if (req.user.role == 'admin') {
+    if (role.includes(req.user.role)) {
         return req?.query ? req?.query : {};
     }
     else {
@@ -137,9 +138,16 @@ function setUserRoleonQuery(req) {
         }
     }
 }
-
+function CheckUserRole(req) {
+    if (role.includes(req.user.role)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
 module.exports = {
     formatDateTime, getCurrentFormatedDate, setUserDetails, setUserDelete, ValidateEmail,
     StringtoDate, createRandomCode, setUserDetailsUpdate,
-    setUserIdonQuery, setUserRoleonQuery, createRandomCodeWithoutCheck
+    setUserIdonQuery, setUserRoleonQuery, createRandomCodeWithoutCheck, CheckUserRole
 }

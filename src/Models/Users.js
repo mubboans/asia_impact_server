@@ -38,7 +38,7 @@ const createUser = (sequelize, DataTypes) => {
             },
             status: {
                 type: DataTypes.STRING,
-                defaultValue: 'pending'
+                defaultValue: 'pending' //declined,approved,document,document appproval pending,freeze
             },
             countrycode: {
                 type: DataTypes.STRING,
@@ -96,6 +96,10 @@ const createUser = (sequelize, DataTypes) => {
                 allowNull: true,
             },
             deletereason: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            freezereason: {
                 type: DataTypes.STRING,
                 allowNull: true,
             }
