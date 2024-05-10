@@ -13,6 +13,9 @@ const { getCurrentFormatedDate, setUserIdonQuery, createRandomCodeWithoutCheck }
 const { Sequelize, Op } = require("sequelize");
 const bcrypt = require('bcryptjs');
 const { Notification } = require("../Models/Notification");
+const { Portfolio } = require("../Models/Portfolio");
+const { DeviceDetail } = require("../Models/DeviceDetail");
+const { Complaint } = require("../Models/Complaint");
 let passJoi = Joi.object({
     email: Joi.string().required(),
     password: Joi.string()
@@ -51,7 +54,7 @@ let addUser = Joi.object({
 const getUser = TryCatch(async (req, res, next) => {
     let include = [];
     let query = getUserById(req, req?.query);
-
+    const promiseArray = []
     console.log(query, 'hit user');
     if (req.query.id) {
         if (req.query.limit || req.query.offset) {
@@ -83,9 +86,23 @@ const getUser = TryCatch(async (req, res, next) => {
             foreignKey: "id",
             as: "userdetail"
         })
+        promiseArray.push(fnGet(User, query, include, false),
+            fnGet(Portfolio, { userid: req.query.id }, [], true),
+            fnGet(DeviceDetail, { userid: req.query.id }, [], true),
+            fnGet(Complaint, { userid: req.query.id }, [], false)
+        )
     }
-    let data = await fnGet(User, query, include, false);
-    return returnResponse(res, 200, 'Successfully Get Data ', data)
+
+    // let data = await
+
+    let data = await Promise.all(promiseArray);
+    const structuredData = [
+        { "userdetail": data[0] },
+        { "portfolio": data[1] },
+        { "activedevice": data[2] },
+        { "complaint": data[3] },
+      ];
+    return returnResponse(res, 200, 'Successfully Get Data ', structuredData)
 }
 )
 

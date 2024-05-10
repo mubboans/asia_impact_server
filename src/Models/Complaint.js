@@ -24,6 +24,10 @@ const createComplaint = (sequelize, DataTypes) => {
                     type: DataTypes.STRING,
                     allowNull: true,
                     defaultValue: "pending" // resolve,rejected
+                },
+                userid: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true,  
                 }
             }, DataTypes),
         {

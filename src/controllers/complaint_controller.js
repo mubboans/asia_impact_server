@@ -27,7 +27,7 @@ const deleteComplaint = TryCatch(async (req, res, next) => {
 
 const postComplaint = TryCatch(async (req, res, next) => {
     let body = req.body;
-
+    body.userid = req.user.userId;
     await fnPost(Complaint, body, [], req);
     return returnResponse(res, 201, `Successfully Added Complaint`);
 }
