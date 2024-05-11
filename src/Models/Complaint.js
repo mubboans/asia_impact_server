@@ -27,7 +27,11 @@ const createComplaint = (sequelize, DataTypes) => {
                 },
                 userid: {
                     type: DataTypes.INTEGER,
-                    allowNull: true,  
+                    allowNull: true,
+                },
+                officer_id: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true,
                 }
             }, DataTypes),
         {

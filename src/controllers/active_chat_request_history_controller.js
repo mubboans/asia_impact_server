@@ -38,7 +38,7 @@ const deleteActiveChatRequestHistory = TryCatch(async (req, res, next) => {
 
 const postActiveChatRequestHistory = TryCatch(async (req, res, next) => {
     let body = req.body;
-    if (body.activechatrequest && body.activechatrequestid) {
+    if (body.activechaterequest && body.activechatrequestid) {
         await fnUpdate(ActiveChatRequest, body.activechatrequest, { id: body.activechatrequestid }, req);
     }
     // let deviceCheck = await fnGet(ActiveChatRequestHistory, { userid: body.userid, deviceId: body.deviceId }, [], false);

@@ -172,11 +172,8 @@ const dbConnect = async () => {
         User.hasMany(ActiveRequest, { foreignKey: "useridInvestor", as: "InvestorDetail" });
         ActiveRequest.belongsTo(User, { foreignKey: "useridInvestor", as: "InvestorDetail" })
 
-
-
         ActiveChatRequest.hasMany(ActiveChatRequestHistory, { foreignKey: 'activechatrequestid', as: 'activerequestchathistory' });
         ActiveChatRequestHistory.belongsTo(ActiveChatRequest, { foreignKey: 'activechatrequestid', as: 'activerequestchathistory' });
-
 
         ActiveChatRequest.hasMany(ActiveChatRequestHistory, { foreignKey: 'activechatrequestid', as: 'activerequestchat' });
         ActiveChatRequestHistory.belongsTo(ActiveChatRequest, { foreignKey: 'activechatrequestid', as: 'activerequestchat' });
@@ -188,6 +185,8 @@ const dbConnect = async () => {
         Company.hasMany(ActiveRequest, { foreignKey: 'companyid' });
         ActiveChatRequestHistory.belongsTo(ActiveChatRequest, { foreignKey: 'companyid' });
 
+        User.hasMany(ActiveChatRequestHistory, { foreignKey: 'sender_id' });
+        ActiveChatRequestHistory.belongsTo(User, { foreignKey: 'sender_id' });
 
         await sequelize.sync({ alter: false });
 

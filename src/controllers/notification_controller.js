@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { ActiveChatRequestHistory } = require("../Models/ActiveChatRequestHistory");
 const { Notification } = require("../Models/Notification");
 const { UserDetail } = require("../Models/UserDetail");
@@ -9,30 +10,66 @@ const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
 const { createRandomCode } = require("../utils/functionalHelper");
+const { ActiveChatRequest } = require("../Models/ActiveChatRequest");
 
 const getNotification = TryCatch(async (req, res, next) => {
+    let query = req.query;
     let include =
         [
             {
                 model: User,
                 sourceKey: "sender_id",
                 foreignKey: "id",
+                // as: 'sender_detail',
                 attributes: {
                     exclude: ['password']
                 },
                 include: ['userdetail']
+            },
+
+            {
+                model: ActiveChatRequest,
+                foreignKey: 'activechatrequestid', // This should be the foreign key in ActiveChatRequestHistory
+                as: 'activerequestchat',
             }
+
         ]
+
+    const promiseArr = [];
+
     let rolecheck = ['individual_investor', 'advisor', 'legalrepresent']
-    if (rolecheck.includes(req.user.role) || req.user.role == 'basic') {
-        req.query['receiver_id'] = req.user.userId;
+    if (rolecheck.includes(req.user.role)) // || req.user.role == 'basic'
+    {
+        query = {
+            [Op.or]: [
+                { sender_id: req.user.userId },
+                { receiver_id: req.user.userId },
+
+            ]
+        }
+
     }
 
-    let data = await Promise.all([fnGet(Notification, req.query || {}, include, false), fnGet(ActiveChatRequestHistory, {}, [], false)]);
+    if (query?.type == 'activechatrequesthistory') {
+        promiseArr.push(fnGet(ActiveChatRequestHistory, query, include, false))
+    }
+    else if (query?.type == 'notification') {
+        promiseArr.push(fnGet(Notification, query, [include[0]], false))
+    }
+    else {
+        promiseArr.push(fnGet(Notification, query, [include[0]], false), fnGet(ActiveChatRequestHistory, query, include, false))
+    }
+    let data = await Promise.all(promiseArr);
+    const structuredData = [
+        {
+            "notification": data[0],
+            "activechatrequesthistory": data[1]
+        }
+    ]
     // let GetAllReport = await fnGet(Notification, req.query || {}, include, true);
     // let Activechatrequesthistory = await fnGet(ActiveChatRequestHistory)
-    let mergedData = [...data[0], ...data[1]];
-    return returnResponse(res, 200, 'Successfully Get Notification', mergedData);
+    // let mergedData = [...data[0], ...data[1]];
+    return returnResponse(res, 200, 'Successfully Get Notification', structuredData);
 }
 )
 
