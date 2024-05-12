@@ -14,6 +14,7 @@ const { CompanyNSustain } = require("../Models/CompanyNSustain");
 const { checkTokenForNews } = require("../middleware/verifyRequest");
 const getReport = TryCatch(async (req, res, next) => {
     let query = checkTokenForNews(req);
+    delete query?.userid;
     console.log(query, 'user token data');
     // if (checkToken) {
     //     console.log('get all admin data');

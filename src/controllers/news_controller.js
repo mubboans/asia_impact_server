@@ -13,6 +13,7 @@ const { checkTokenForNews } = require('../middleware/verifyRequest');
 const getNews = TryCatch(async (req, res, next) => {
     let query = checkTokenForNews(req);
     console.log(query, 'user token data');
+    delete query?.userid;
     // if (checkToken) {
     //     console.log('get all admin data');
     // } else {

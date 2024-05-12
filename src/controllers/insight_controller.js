@@ -30,6 +30,7 @@ const getInsight = TryCatch(async (req, res, next) => {
     //     }
     //     delete req?.query?.user
     // }
+    delete query?.userid;
     let options = {
         ...query,
         attribute: { exclude: ['description'] }
