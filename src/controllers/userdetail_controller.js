@@ -125,7 +125,7 @@ const postuserdetaildocument = TryCatch(async (req, res, next) => {
     }
     // Add update promises for User and UserDetail
     promiseArr.push(
-        fnUpdate(User, { ...user, status: "document appproval pending" }, { id: body.userid }, req),
+        fnUpdate(User, { ...user, status: "document appproval pending", access_group: "intermediate" }, { id: body.userid }, req),
         fnUpdate(UserDetail, user, { id: body.userdetailid }, req)
     );
 

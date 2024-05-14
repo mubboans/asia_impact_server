@@ -58,7 +58,8 @@ const createUser = (sequelize, DataTypes) => {
             access_group: {
                 type: DataTypes.ENUM,
                 values: ['basic', 'intermediate', 'advanced'],
-                allowNull: true
+                allowNull: true,
+                defaultValue: 'basic'
             },
             isActive: {
                 type: DataTypes.BOOLEAN,

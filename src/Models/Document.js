@@ -108,6 +108,10 @@ const createDocument = (sequelize, DataTypes) => {
                 provience: {
                     type: DataTypes.STRING,
                     allowNull: true,
+                },
+                region: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
                 }
             }, DataTypes),
         {
