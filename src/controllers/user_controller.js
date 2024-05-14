@@ -56,6 +56,7 @@ const getUser = TryCatch(async (req, res, next) => {
     let query = getUserById(req, req?.query);
     const promiseArray = []
     console.log(query, 'hit user');
+    promiseArray.push(fnGet(User, { ...query, deletionDate: null }, include, false));
     if (req.query.id) {
         if (req.query.limit || req.query.offset) {
             next(customErrorClass.BadRequest("Invalid query with Id"))
@@ -86,7 +87,7 @@ const getUser = TryCatch(async (req, res, next) => {
             foreignKey: "id",
             as: "userdetail"
         })
-        promiseArray.push(fnGet(User, { ...query, deletionDate: null }, include, false),
+        promiseArray.push(
             fnGet(Portfolio, { userid: req.query.id }, [], true),
             fnGet(DeviceDetail, { userid: req.query.id }, [], true),
             fnGet(Complaint, { userid: req.query.id }, [], false)
