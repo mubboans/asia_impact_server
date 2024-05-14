@@ -138,7 +138,7 @@ const getUser = TryCatch(async (req, res, next) => {
         )
 
     }
-    let data = await fnGet(User, { ...query, deletionDate: null }, include, false)
+    let { data, config } = await fnGet(User, { ...query, deletionDate: null }, include, false)
 
     // let data = await Promise.all(promiseArray);
 
@@ -148,7 +148,7 @@ const getUser = TryCatch(async (req, res, next) => {
     //     { "activedevice": data[2] },
     //     { "complaint": data[3] },
     // ];
-    return returnResponse(res, 200, 'Successfully Get Data ', data)
+    return returnResponse(res, 200, 'Successfully Get Data ', data, config)
 }
 )
 
@@ -160,8 +160,8 @@ const updateUser = TryCatch(async (req, res, next) => {
     delete body?.access_group;
     delete body?.isVerified;
     if (body?.email) {
-        const checkuser = await fnGet(User, { email: body.email }, [], true);
-        if (checkuser.length > 0 && req.user.userId !== checkuser[0].id) {
+        const { data } = await fnGet(User, { email: body.email }, [], true);
+        if (data.length > 0 && req.user.userId !== data[0].id) {
             return next(new CustomErrorObj("Email already belongs to another user", 403));
         }
     }
@@ -278,8 +278,8 @@ const getDeletedUser = TryCatch(async (req, res, next) => {
         },
         status: "Deletion Request"
     }
-    let data = await fnGet(User, query, [], false);
-    return returnResponse(res, 200, "Successfully get the Deleted User", data)
+    let { data, config } = await fnGet(User, query, [], false);
+    return returnResponse(res, 200, "Successfully get the Deleted User", data, config)
 })
 
 const deleteUserAdmin = TryCatch(async (req, res, next) => {
@@ -287,14 +287,14 @@ const deleteUserAdmin = TryCatch(async (req, res, next) => {
     if (!query.id) {
         next(customErrorClass.BadRequest('Id required'))
     }
-    let userdetail = await fnGet(User, { id: query.id }, [
+    let { data } = await fnGet(User, { id: query.id }, [
         {
             model: UserDetail,
             as: 'userdetail',
             attributes: ['id', 'firstname', 'lastname', 'img'],
         }
     ], false);
-    const d = userdetail[0];
+    const d = data[0];
     if (!d) return next(customErrorClass.NotFound('No user found'));
     console.log(d, 'd check');
     let urquery = {
@@ -304,7 +304,8 @@ const deleteUserAdmin = TryCatch(async (req, res, next) => {
         requestStatus: 'approved'
     }
 
-    let userrelation = await fnGet(UserRelation, urquery, [], true);
+    let { data: userrelation } = await fnGet(UserRelation, urquery, [], true);
+
     let rolecheck = ['individual_investor', 'advisor', 'legalrepresent']
     if (userrelation && userrelation.length > 0 && rolecheck.includes(d.role)) {
         let x = userrelation.map((x) => {

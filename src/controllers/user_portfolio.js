@@ -22,8 +22,8 @@ const getPortfolio = TryCatch(async (req, res, next) => {
             },
         ]
     }
-    let GetAllPortfolio = await fnGet(Portfolio, req?.query || {}, include, false);
-    return returnResponse(res, 200, 'Successfully Get Portfolio', GetAllPortfolio);
+    let { data: GetAllPortfolio, config } = await fnGet(Portfolio, req?.query || {}, include, false);
+    return returnResponse(res, 200, 'Successfully Get Portfolio', GetAllPortfolio, config);
 }
 )
 

@@ -38,8 +38,8 @@ const getNews = TryCatch(async (req, res, next) => {
     if (req.query.id) {
         delete options.attribute;
     }
-    let GetAllNews = await fnGet(News, options, [], true);
-    return returnResponse(res, 200, 'Successfully Get News', GetAllNews)
+    let { data, config } = await fnGet(News, options, [], true);
+    return returnResponse(res, 200, 'Successfully Get News', data, config)
 }
 )
 

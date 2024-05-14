@@ -9,14 +9,17 @@ const { setUserIdonQuery } = require("../utils/functionalHelper");
 const getActiveChatRequestHistory = TryCatch(async (req, res, next) => {
     // let query = setUserIdonQuery(req)
 
-    let GetAllActiveChatRequestHistory = await fnGet(ActiveChatRequestHistory, req?.query || {}, [
+    let { data, config } = await fnGet(ActiveChatRequestHistory, req?.query || {}, [
         {
             model: ActiveChatRequest,
             foreignKey: 'activechatrequestid', // This should be the foreign key in ActiveChatRequestHistory
             as: 'activerequestchat',
         }
     ], false);
-    return returnResponse(res, 200, 'Successfully Get ActiveChatRequestHistory', GetAllActiveChatRequestHistory);
+    // return returnResponse(res, 200, 'Successfully Get ActiveChatRequestHistory', GetAllActiveChatRequestHistory);
+
+    // let { data, config } = await fnGet(News, options, [], true);
+    return returnResponse(res, 200, 'Successfully Get News', data, config)
 }
 )
 

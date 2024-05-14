@@ -7,7 +7,6 @@ const { ModuleHistory } = require("../Models/TrackModuleHistory");
 const fnGet = async (modelname, query = {}, include = [], raw = false) => {
     try {
         let options;
-
         raw ? raw = true : raw = false;
         let pageno;
         if (query.limit && query.offset) {
@@ -16,7 +15,7 @@ const fnGet = async (modelname, query = {}, include = [], raw = false) => {
                 ...options,
                 limit: Number(query.limit),
                 offset: (pageno - 1) * query.limit,
-                logging: console.log
+                // logging: console.log
             }
             delete query.limit;
             delete query.offset;
@@ -39,18 +38,21 @@ const fnGet = async (modelname, query = {}, include = [], raw = false) => {
         }
         console.log(options, 'check option', options.limit && options.offset);
         if (options.limit) {
+
             let { rows, count } = await modelname.findAndCountAll(options);
             return {
-                totalPage: Math.ceil(count / options.limit),
-                totalRecords: count,
-                currentPage: pageno,
-                currentLimit: options.limit,
+                config: {
+                    totalPage: Math.ceil(count / options.limit),
+                    totalRecords: count,
+                    currentPage: pageno,
+                    currentLimit: options.limit
+                },
                 data: rows
             }
         }
         else {
             let data = await modelname.findAll(options);
-            return data;
+            return { config: {}, data };
         }
     } catch (error) {
         console.log(error, 'error check');

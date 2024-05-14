@@ -33,8 +33,8 @@ const getUserWithRelation = TryCatch(async (req, res, next) => {
     ];
 
     console.log(query, 'hit user');
-    let data = await fnGet(UserRelation, query, include, false);
-    return returnResponse(res, 200, 'Successfully Get Data ', data)
+    let { data, config } = await fnGet(UserRelation, query, include, false);
+    return returnResponse(res, 200, 'Successfully Get Data ', data, config)
 }
 )
 
@@ -68,7 +68,7 @@ const getDeletedRelation = TryCatch(async (req, res, next) => {
 const postRelation = TryCatch(async (req, res, next) => {
     let body = setUserDetail(req.user, req.body);
     if (body.notification) {
-        let UserDetail = await fnGet(User, { email: body.notification.email }, [], true);
+        let { data: UserDetail } = await fnGet(User, { email: body.notification.email }, [], true);
         if (UserDetail && UserDetail.length > 0) {
             let notificationcode = await createRandomCode(Notification, 'notificationcode');
             let obj = {

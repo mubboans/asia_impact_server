@@ -19,8 +19,8 @@ const getUserDetail = TryCatch(async (req, res, next) => {
         }
         )
     }
-    let data = await fnGet(UserDetail, query, include, false);
-    return returnResponse(res, 200, 'Successfully Get Data ', data)
+    let { data, config } = await fnGet(UserDetail, query, include, false);
+    return returnResponse(res, 200, 'Successfully Get Data ', data, config)
 }
 )
 
@@ -96,7 +96,7 @@ const postuserdetaildocument = TryCatch(async (req, res, next) => {
         return next(customErrorClass.BadRequest("Id is missing"));
     }
     if (body?.email) {
-        const checkuser = await fnGet(User, { email: body.email, }, [], true);
+        const { data: checkuser } = await fnGet(User, { email: body.email, }, [], true);
         if (checkuser.length > 0 && req.user.userId !== checkuser[0].id) {
             return next(new CustomErrorObj("Email already belongs to another user", 403));
         }
@@ -137,7 +137,7 @@ const postuserdetaildocument = TryCatch(async (req, res, next) => {
 
 const verifyDetail = TryCatch(async (req, res, next) => {
     let body = req.body;
-    let checkDetailwithOtp = await fnGet(Otp, { ...body, type: 'verification', status: 'verify' }, [], false);
+    let { data: checkDetailwithOtp } = await fnGet(Otp, { ...body, type: 'verification', status: 'verify' }, [], false);
     if (checkDetailwithOtp && checkDetailwithOtp.length > 0) {
         await fnUpdate(User, { isVerified: true }, body, req);
         return returnResponse(res, 200, "Detail updated successfully", {});

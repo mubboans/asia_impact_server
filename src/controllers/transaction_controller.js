@@ -27,8 +27,8 @@ const getTransaction = TryCatch(async (req, res, next) => {
             },
         ]
     }
-    let GetAllTransaction = await fnGet(Transaction, req?.query || {}, include, false);
-    return returnResponse(res, 200, 'Successfully Get Transaction', GetAllTransaction);
+    let { data, config } = await fnGet(Transaction, req?.query || {}, include, false);
+    return returnResponse(res, 200, 'Successfully Get Transaction', data, config);
 }
 )
 

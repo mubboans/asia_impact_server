@@ -23,13 +23,13 @@ const getActiveRequest = TryCatch(async (req, res, next) => {
                 useridInvestor: query.investorid,
                 useridAdvisor: request.user.userId
             }
-            let settingCheck = await fnGet(Setting,
+            let { data, config } = await fnGet(Setting,
                 {
                     advisorId: req.user.userId,
                     userid: query?.investorid,
                     expressInterest: true
                 }, [], true);
-            if (!(settingCheck && settingCheck.length > 0)) {
+            if (!(data && data.length > 0)) {
                 return next(customErrorClass.NotFound("Your Account permission not found"));
             }
 
@@ -72,9 +72,8 @@ const getActiveRequest = TryCatch(async (req, res, next) => {
             },
         )
     }
-    let GetAllActiveRequest = await fnGet(ActiveRequest, query || {}, include, false);
-    return returnResponse(res, 200, 'Successfully Get ActiveRequest', GetAllActiveRequest);
-
+    let { data, config } = await fnGet(ActiveRequest, query || {}, include, false);
+    return returnResponse(res, 200, 'Successfully Get ActiveRequest', data, config);
 }
 )
 
@@ -98,8 +97,8 @@ const postActiveRequest = TryCatch(async (req, res, next) => {
     let body = req.body;
     if (body.userid !== req.user.userId) return next(customErrorClass.BadRequest("Userid not Match"));
     if (req.user.role == 'advisor') {
-        let settingCheck = await fnGet(Setting, { advisorId: body.userid, userid: body.investorid, expressInterest: true }, [], true);
-        if (!(settingCheck && settingCheck.length > 0)) {
+        let { data, config } = await fnGet(Setting, { advisorId: body.userid, userid: body.investorid, expressInterest: true }, [], true);
+        if (!(data && data.length > 0)) {
             return next(customErrorClass.NotFound("Your Account permission not found"));
         }
 
@@ -108,7 +107,7 @@ const postActiveRequest = TryCatch(async (req, res, next) => {
         if (body.investorid) return next(customErrorClass.BadRequest("Investor Not Allowed"))
     }
 
-    const portfolio = await fnGet(Portfolio, { companyid: req.body.companyid }, [], false);
+    const { data } = await fnGet(Portfolio, { companyid: req.body.companyid }, [], false);
     let activeObj = await fnPost(ActiveRequest, {
         useridAdvisor: body.investorid ? body.userid : null,
         companyid: body.companyid,
@@ -116,46 +115,9 @@ const postActiveRequest = TryCatch(async (req, res, next) => {
         interestmessage: body.interestmessage,
         requestinitiatedby: body.investorid ? "advisor" : "investor"
     }, [], req);
-    let data = portfolio.map(
-        // element => {
-        // });
+    let datas = data.map(
         (x) => {
-            // let activeObj = await fnPost(ActiveRequest, {
-            //     useridAdvisor: body.investorid ? body.userid : null,
-            //     companyid: body.companyid,
-            //     useridInvestor: body.investorid ? body.investorid : body.userid,
-            //     interestmessage: body.interestmessage,
-            //     requestinitiatedby: body.investorid ? "advisor" : "investor"
-            // }, [], req);
-            // await fnPost(ActiveChatRequest, {
-            //     activerequestid: activeObj?.id,
-            //     companyid: body.companyid,
-            //     message: body.interestmessage,
-            //     status: body.status,
-            //     sender_id: body.investorid ? body.investorid : body.userid,
-            //     receiver_id: x.userid,
-            //     activerequestchathistory: {
-            //         activerequestid: activeObj?.id,
-            //         companyid: body.companyid,
-            //         sender_id: body.investorid ? body.investorid : body.userid,
-            //         receiver_id: x.userid,
-            //         message: body.interestmessage,
-            //     }
-            // }, {
-            //     include: [
-            //         {
-            //             model: ActiveChatRequestHistory,
-            //             as: 'activerequestchathistory'
-            //         }
-            //     ]
-            // }, req);
             return {
-                // useridAdvisor: body.investorid ? body.userid : null,
-                // companyid: body.companyid,
-                // useridInvestor: body.investorid ? body.investorid : body.userid,
-                // interestmessage: body.interestmessage,
-                // requestinitiatedby: body.investorid ? "advisor" : "investor",
-                // activechaterequest: {
                 activerequestid: activeObj?.id,
                 companyid: body.companyid,
                 message: body.interestmessage,
@@ -172,7 +134,7 @@ const postActiveRequest = TryCatch(async (req, res, next) => {
                 // }
             }
         })
-    await fnbulkCreate(ActiveChatRequest, data, [], {
+    await fnbulkCreate(ActiveChatRequest, datas, [], {
         include: [
             {
                 model: ActiveChatRequestHistory,
@@ -180,7 +142,7 @@ const postActiveRequest = TryCatch(async (req, res, next) => {
             }
         ]
     }, req);
-    return returnResponse(res, 201, `Successfully Added ActiveRequest with ${portfolio.length} ActiveChatRequest and ActiveChatRequestHistory`);
+    return returnResponse(res, 201, `Successfully Added ActiveRequest with ${data.length} ActiveChatRequest and ActiveChatRequestHistory`);
 }
 )
 

@@ -1,4 +1,5 @@
 const { DeviceDetail } = require("../Models/DeviceDetail");
+const CustomErrorObj = require("../error/CustomErrorObj");
 const customErrorClass = require("../error/customErrorClass");
 const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet } = require("../utils/dbCommonfn");
@@ -71,25 +72,33 @@ const checkTokenForNews = (req) => {
     else {
         try {
             const head = validateToken(token, process.env.ACCESS_TOKEN_SECRET);
-            if (role.includes(head.role)) {
-                query = req?.query || {};
-            }
-            else {
-                query = {
-                    ...req?.query,
-                    targetUser: {
-                        [Op.or]: {
-                            [Op.eq]: head.role,
-                            [Op.like]: `%${head.role}%`
-                        }
-                    },
-                    userid: head.userId
+            console.log(head, 'head check');
+            if ((head.role || head.email) && head.userId) {
+                if (role.includes(head.role)) {
+                    query = req?.query || {};
+                }
+                else {
+                    query = {
+                        ...req?.query,
+                        targetUser: {
+                            [Op.or]: {
+                                [Op.eq]: head.role,
+                                [Op.like]: `%${head.role}%`
+                            }
+                        },
+                        userid: head.userId
+                    }
                 }
             }
-        } catch (error) {
+            else {
+                return next(customErrorClass.InvalidToken("Token is invalid pass"));
+            }
+        }
+        catch (error) {
             query = {
                 targetUser: 'basic'
             }
+            throw new CustomErrorObj(error?.message == 'invalid signature' ? 'Invalid Token' : error?.message, 403);
         }
     }
     return query;
