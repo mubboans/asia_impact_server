@@ -1,92 +1,63 @@
-const { Report } = require("../Models/Report");
-// const { CompanyNSustain } = require("../Models/CompanyNSustain");
-// const { SustainGoal } = require("../Models/SustainGoal");
+const { Company } = require("../Models/Company");
+const { Transaction } = require("../Models/Transaction");
+const { User } = require("../Models/Users");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
-const { createRandomCode } = require("../utils/functionalHelper");
-const { Company } = require("../Models/Company");
+const { setUserIdonQuery } = require("../utils/functionalHelper");
 
-const getReport = TryCatch(async (req, res, next) => {
-    let include = [];
-    if (req.query.id) {
-        include = [{
-            model: Company,
-            sourceKey: "companyid",
-            foreignKey: "id",
-        }]
+const getTransaction = TryCatch(async (req, res, next) => {
+    let include = []
+    if (req?.query?.id) {
+        include = [
+            {
+                model: Company,
+                sourceKey: "company_id",
+            },
+            {
+                model: User, as: 'Buyer_Detail', sourceKey: "buyer_id", attributes: {
+                    exclude: ['password']
+                }, include: ['userdetail']
+            },
+            {
+                model: User, as: 'Seller_Detail', sourceKey: 'seller_id', attributes: {
+                    exclude: ['password']
+                }, include: ['userdetail']
+            },
+        ]
     }
-    let GetAllReport = await fnGet(Report, req.query || {}, include);
-    // if (req.query.id) {
-    //     let GetAllCompanySustain = await fnGet(CompanyNSustain, { companyid: req.query.id }, [
-    //         {
-    //             model: SustainGoal,
-    //             sourceKey: "sustaingoalid",
-    //             foreignKey: "id",
-    //             order: [
-    //                 [SustainGoal, 'id', 'DESC']
-    //             ]
-    //         }
-    //     ]);
-
-    //     GetAllCompany[0].sustaingoaldata = GetAllCompanySustain
-    // }
-    return returnResponse(res, 200, 'Successfully Get Report', GetAllReport)
+    let GetAllTransaction = await fnGet(Transaction, req?.query || {}, include, false);
+    return returnResponse(res, 200, 'Successfully Get Transaction', GetAllTransaction);
 }
 )
 
-const updateReport = TryCatch(async (req, res, next) => {
-    let updateStatus = await fnUpdate(Report, req.body, { id: req.body.id }, req)
+const updateTransaction = TryCatch(async (req, res, next) => {
+    let updateStatus = await fnUpdate(Transaction, req.body, { id: req.body.id }, req)
     console.log(updateStatus, 'updateStatus');
-    // await fnbulkCreate(CompanyNSustain, req.body.sustainarr, ['companyid', 'sustaingoalid', 'lastUsedIp', 'updatedBy'], req) // to bulk update the field to be update on db
-    return returnResponse(res, 200, 'Successfully Update Report')
-
+    return returnResponse(res, 200, 'Successfully Update Transaction')
 }
 )
 
-const deleteReport = TryCatch(async (req, res, next) => {
+const deleteTransaction = TryCatch(async (req, res, next) => {
     if (!req.query.id) {
         next(customErrorClass.BadRequest('id required'))
     }
-    await fnDelete(Report, req.query, req, "Report_" + req.query.id)
-    return returnResponse(res, 200, 'Successfully Delete Report')
+    await fnDelete(Transaction, req.query, req, "Transaction" + req.query.id)
+    return returnResponse(res, 200, 'Successfully Delete Transaction')
 }
 )
 
-const postReport = TryCatch(async (req, res, next) => {
-    let reportcode = await createRandomCode(Report);
-    let body = req.body;
-    if (body.isNew) {
-        if (body.reportcode) {
-            return next(customErrorClass.BadRequest('Code is not allowed on new data'))
-        }
-        body = {
-            ...body,
-            reportcode
-        }
-    }
-    else {
-        if (!body.reportcode) {
-            return next(customErrorClass.BadRequest('Report Code Require'))
-        }
-    }
-
-    let cmp = await fnPost(Report, body, [], req);
-
-    // let sustainarr = req.body.sustainarr.map((x) => {
-    //     return {
-    //         companyid: cmp.id, sustaingoalid: x
-    //     }
-    // })
-    // await fnbulkCreate(CompanyNSustain, sustainarr, req);
-    return returnResponse(res, 201, 'Successfully Added Report');
+const postTransaction = TryCatch(async (req, res, next) => {
+    await fnPost(Transaction, req.body, [], req);
+    return returnResponse(res, 201, `Successfully Added Transaction`);
 }
 )
+
 
 module.exports = {
-    getReport,
-    updateReport,
-    deleteReport,
-    postReport
+    getTransaction,
+    updateTransaction,
+    deleteTransaction,
+    postTransaction
 }

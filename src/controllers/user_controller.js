@@ -86,7 +86,7 @@ const getUser = TryCatch(async (req, res, next) => {
             foreignKey: "id",
             as: "userdetail"
         })
-        promiseArray.push(fnGet(User, query, include, false),
+        promiseArray.push(fnGet(User, { ...query, deletionDate: null }, include, false),
             fnGet(Portfolio, { userid: req.query.id }, [], true),
             fnGet(DeviceDetail, { userid: req.query.id }, [], true),
             fnGet(Complaint, { userid: req.query.id }, [], false)
@@ -101,7 +101,7 @@ const getUser = TryCatch(async (req, res, next) => {
         { "portfolio": data[1] },
         { "activedevice": data[2] },
         { "complaint": data[3] },
-      ];
+    ];
     return returnResponse(res, 200, 'Successfully Get Data ', structuredData)
 }
 )
@@ -298,10 +298,10 @@ const freezeUser = TryCatch(async (req, res, next) => {
 
 
 function getUserById(req, option) {
-    option = {
-        ...option,
-        deletionDate: null
-    }
+    // option = {
+    //     ...option,
+    //     // deletionDate: null
+    // }
     if (req.user.role == 'admin') {
         return option;
     }

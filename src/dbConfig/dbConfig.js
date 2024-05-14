@@ -28,6 +28,7 @@ const { createActiveRequestModel, ActiveRequest } = require('../Models/ActiveReq
 const { createActiveChatRequestModel, ActiveChatRequest } = require('../Models/ActiveChatRequest');
 const { createActiveChatRequestHistoryModel, ActiveChatRequestHistory } = require('../Models/ActiveChatRequestHistory');
 const { createComplaint } = require('../Models/Complaint');
+const { createTransaction, Transaction } = require('../Models/Transaction');
 // const User = require('../Models/Users');
 // const Documents = require('../Models/Document');
 // const { syncModel } = require('../Models');
@@ -86,7 +87,7 @@ const dbConnect = async () => {
         createActiveRequestModel(sequelize, DataTypes);
         createActiveChatRequestModel(sequelize, DataTypes);
         createActiveChatRequestHistoryModel(sequelize, DataTypes);
-
+        createTransaction(sequelize, DataTypes);
 
 
 
@@ -161,6 +162,9 @@ const dbConnect = async () => {
         Portfolio.belongsTo(Company, { foreignKey: 'companyid' });
         Portfolio.belongsTo(User, { foreignKey: 'userid' });
 
+
+
+
         Company.hasMany(ActiveRequest, { foreignKey: 'companyid' });
         ActiveRequest.belongsTo(Company, { foreignKey: 'companyid' });
 
@@ -187,6 +191,16 @@ const dbConnect = async () => {
 
         User.hasMany(ActiveChatRequestHistory, { foreignKey: 'sender_id' });
         ActiveChatRequestHistory.belongsTo(User, { foreignKey: 'sender_id' });
+
+
+        Company.hasMany(Transaction, { foreignKey: 'company_id' });
+        Transaction.belongsTo(Company, { foreignKey: 'company_id' });
+
+        User.hasMany(Transaction, { foreignKey: 'buyer_id', as: 'Buyer_Detail' });
+        Transaction.belongsTo(User, { foreignKey: 'buyer_id', as: 'Buyer_Detail' });
+        User.hasMany(Transaction, { foreignKey: 'seller_id', as: 'Seller_Detail' });
+        Transaction.belongsTo(User, { foreignKey: 'seller_id', as: 'Seller_Detail' });
+
 
         await sequelize.sync({ alter: false });
 

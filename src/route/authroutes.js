@@ -60,6 +60,7 @@ const { postActiveRequest, updateActiveRequest, getActiveRequest, deleteActiveRe
 const { postActiveChatRequest, updateActiveChatRequest, getActiveChatRequest, deleteActiveChatRequest } = require("../controllers/active_chat_request_controller");
 const { postActiveChatRequestHistory, updateActiveChatRequestHistory, getActiveChatRequestHistory, deleteActiveChatRequestHistory } = require("../controllers/active_chat_request_history_controller");
 const { postComplaint, updateComplaint, getComplaint, deleteComplaint } = require("../controllers/complaint_controller");
+const { postTransaction, updateTransaction, getTransaction, deleteTransaction } = require("../controllers/transaction_controller");
 
 const route = express.Router();
 
@@ -203,5 +204,13 @@ route.route('/complaint')
     .put(verifyRole("admin", "editor", "ai_officer"), updateComplaint)
     .get(verifyRole("admin", "editor", "ai_officer"), getComplaint)
     .delete(verifyRole("admin", "editor", "ai_officer"), deleteComplaint);
+
+route.route('/transaction')
+    .post(verifyRole("admin", "editor", "ai_officer"), postTransaction)
+    .put(verifyRole("admin", "editor", "ai_officer"), updateTransaction)
+    .get(verifyRole("admin", "editor", "ai_officer"), getTransaction)
+    .delete(verifyRole("admin", "editor", "ai_officer"), deleteTransaction);
+
+
 
 module.exports = route;
