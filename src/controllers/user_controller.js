@@ -97,8 +97,9 @@ const getUser = TryCatch(async (req, res, next) => {
     // let data = await
 
     let data = await Promise.all(promiseArray);
+
     const structuredData = [
-        { "userdetail": data[0] },
+        { "users": data[0] },
         { "portfolio": data[1] },
         { "activedevice": data[2] },
         { "complaint": data[3] },
