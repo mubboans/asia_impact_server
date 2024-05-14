@@ -57,8 +57,8 @@ const getActiveChatRequest = TryCatch(async (req, res, next) => {
         })
 
     }
-    let GetAllActiveChatRequest = await fnGet(ActiveChatRequest, query, include, false);
-    return returnResponse(res, 200, 'Successfully Get ActiveChatRequest', GetAllActiveChatRequest);
+    let { data: GetAllActiveChatRequest, config } = await fnGet(ActiveChatRequest, query, include, false);
+    return returnResponse(res, 200, 'Successfully Get ActiveChatRequest', GetAllActiveChatRequest, config);
 }
 )
 

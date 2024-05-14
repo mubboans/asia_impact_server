@@ -7,8 +7,8 @@ const { setUserIdonQuery } = require("../utils/functionalHelper");
 
 const getDeviceDetail = TryCatch(async (req, res, next) => {
     let query = setUserIdonQuery(req)
-    let GetAllDeviceDetail = await fnGet(DeviceDetail, query, [], false);
-    return returnResponse(res, 200, 'Successfully Get DeviceDetail', GetAllDeviceDetail);
+    let { data: GetAllDeviceDetail, config } = await fnGet(DeviceDetail, query, [], false);
+    return returnResponse(res, 200, 'Successfully Get DeviceDetail', GetAllDeviceDetail, config);
 }
 )
 

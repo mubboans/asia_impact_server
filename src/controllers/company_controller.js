@@ -55,7 +55,7 @@ const getCompany = TryCatch(async (req, res, next) => {
 
 
     }
-    let GetAllCompany = await fnGet(Company, req.query || {}, include, false);
+    let { data: GetAllCompany, config } = await fnGet(Company, req.query || {}, include, false);
     if (GetAllCompanySustain.length > 0 && GetAllCompanySustain.length !== 0) {
         // let GetAllCompanySustain = await fnGet(CompanyNSustain, { companyid: req.query.id }, [
         //     {
@@ -72,7 +72,7 @@ const getCompany = TryCatch(async (req, res, next) => {
         GetAllCompany[0].dataValues.sustainarr = GetAllCompanySustain;
 
     }
-    return returnResponse(res, 200, 'Successfully Get Company', GetAllCompany)
+    return returnResponse(res, 200, 'Successfully Get Company', GetAllCompany, config)
 }
 )
 

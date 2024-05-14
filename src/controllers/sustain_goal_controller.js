@@ -10,8 +10,8 @@ const { SustainGoal } = require("../Models/SustainGoal");
 // })
 const getSustainGoal = TryCatch(async (req, res, next) => {
     console.log(req.user, 'user token data');
-    let GetAllSustainGoal = await fnGet(SustainGoal, req.query || {});
-    return returnResponse(res, 200, 'Successfully Get Data', GetAllSustainGoal)
+    let { data: GetAllSustainGoal, config } = await fnGet(SustainGoal, req.query || {});
+    return returnResponse(res, 200, 'Successfully Get Data', GetAllSustainGoal, config)
 }
 )
 

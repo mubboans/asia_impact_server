@@ -10,8 +10,8 @@ const FileUpload = require("../utils/uploadFile");
 
 const getDocument = TryCatch(async (req, res, next) => {
     let query = setUserIdonQuery(req)
-    let GetAllDocument = await fnGet(Document, query, [], false);
-    return returnResponse(res, 200, 'Successfully Get Document', GetAllDocument)
+    let { data: GetAllDocument, config } = await fnGet(Document, query, [], false);
+    return returnResponse(res, 200, 'Successfully Get Document', GetAllDocument, config)
 }
 )
 

@@ -79,7 +79,7 @@ const Login = TryCatch(async (req, res, next) => {
         console.log(error);
         next(customErrorClass.BadRequest(error));
     }
-    let userCheck = await fnGet(User, { email: body.email }, [
+    let { data: userCheck } = await fnGet(User, { email: body.email }, [
         {
             model: UserDetail,
             as: "userdetail"
@@ -231,7 +231,7 @@ async function checkUserverification(body) {
     // return new Promise(async (resolve, reject) => {
     try {
         // let d = await fnGet(Otp, { email: body.email, contact: body.contact, status: 'verify' }, [], true)
-        let d = await fnGet(Otp, { email: body.email, status: 'verify', }, [], true)
+        let { data: d } = await fnGet(Otp, { email: body.email, status: 'verify', }, [], true)
         console.log(d, 'otp check user');
         if (d.length > 0) {
             // if (d[0].isUsed == 1) throw new CustomErrorObj('Otp already in use')
@@ -315,7 +315,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
         }
     }
     if (body.type == 'login' || body.type == 'forgot-password') {
-        let checkUser = await fnGet(User, { email: body.email }, [], true)
+        let { data: checkUser } = await fnGet(User, { email: body.email }, [], true)
         if (checkUser.length <= 0) {
             throw new CustomErrorObj('User not register', 404)
         }
@@ -325,7 +325,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
     }
     fnGet(Otp, query, [], true).then(async (result) => {
         console.log(result, 'result check');
-        if (result.length > 0) {
+        if (result.data.length > 0) {
             // if (result[0].type !== body.type) {
             //     fnPost(Otp, modelobj);
             // }
@@ -356,7 +356,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
 const VerifyOTP = TryCatch(async (req, res, next) => {
     let body = req.body;
     if (!body.type || !body.otp) throw new CustomErrorObj("Invalid otp body", 400)
-    let otpData = await fnGet(Otp, { email: body.email, type: body.type }, [], true);
+    let { data: otpData } = await fnGet(Otp, { email: body.email, type: body.type }, [], true);
     if (otpData && otpData.length > 0) {
         console.log(otpData, 'otpData');
         let data = otpData[0];
@@ -369,7 +369,7 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
         }
         if (StringtoDate(data.validto) >= currentDate && data.status == 'active') {
             if (data.type == 'login') {
-                let user = await fnGet(User, { email: data.email }, [{
+                let { data: user } = await fnGet(User, { email: data.email }, [{
                     model: UserDetail,
                     as: 'userdetail'
                 }], false);
@@ -411,7 +411,7 @@ const CheckUserAvailable = TryCatch(async (req, res, next) => {
     if (!req.body.email) {
         throw new CustomErrorObj("Email Required", 400)
     }
-    const user = await fnGet(User, { email: req.body.email }, [], true);
+    const { data: user } = await fnGet(User, { email: req.body.email }, [], true);
     console.log(user, 'check user');
     if (user.length > 0 && user) {
         let userobj = user[0];
@@ -445,7 +445,7 @@ const refereshToken = TryCatch(async (req, res, next) => {
 
 
 const ForgotPassword = TryCatch(async (req, res, next) => {
-    let otpData = await fnGet(Otp, { type: 'forgot-password', email: req.body.email, status: "verify" }, [], true);
+    let { data: otpData } = await fnGet(Otp, { type: 'forgot-password', email: req.body.email, status: "verify" }, [], true);
     console.log(otpData, 'otpData');
     if (otpData && otpData.length > 0) {
         let data = otpData[0];

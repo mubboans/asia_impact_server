@@ -62,8 +62,8 @@ const getNotification = TryCatch(async (req, res, next) => {
     let data = await Promise.all(promiseArr);
     const structuredData = [
         {
-            "notification": data[0],
-            "activechatrequesthistory": data[1]
+            "notification": data[0].data,
+            "activechatrequesthistory": data[1].data
         }
     ]
     // let GetAllReport = await fnGet(Notification, req.query || {}, include, true);

@@ -32,8 +32,8 @@ const getHighlight = TryCatch(async (req, res, next) => {
         })
         delete query.userid;
     }
-    let GetAllHighlight = await fnGet(Highlight, query, include, false);
-    return returnResponse(res, 200, 'Successfully Get Highlight', GetAllHighlight)
+    let { data: GetAllHighlight, config } = await fnGet(Highlight, query, include, false);
+    return returnResponse(res, 200, 'Successfully Get Highlight', GetAllHighlight, config)
 }
 )
 

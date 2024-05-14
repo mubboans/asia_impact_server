@@ -27,8 +27,8 @@ const getSetting = TryCatch(async (req, res, next) => {
             }
         ]
     }
-    let GetAllSetting = await fnGet(Setting, query, inlcude, false);
-    return returnResponse(res, 200, 'Successfully Get Setting', GetAllSetting);
+    let { data: GetAllSetting, config } = await fnGet(Setting, query, inlcude, false);
+    return returnResponse(res, 200, 'Successfully Get Setting', GetAllSetting, config);
 }
 )
 

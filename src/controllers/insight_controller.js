@@ -38,8 +38,8 @@ const getInsight = TryCatch(async (req, res, next) => {
     if (req.query.id) {
         delete options.attribute;
     }
-    let GetAllInsight = await fnGet(Insight, options, [], true);
-    return returnResponse(res, 200, 'Successfully Get Insight', GetAllInsight)
+    let { data: GetAllInsight, config } = await fnGet(Insight, options, [], true);
+    return returnResponse(res, 200, 'Successfully Get Insight', GetAllInsight, config)
 }
 )
 

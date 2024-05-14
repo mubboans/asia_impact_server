@@ -5,8 +5,8 @@ const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
 
 const getComplaint = TryCatch(async (req, res, next) => {
-    let GetAllComplaint = await fnGet(Complaint, req.query || {}, [], false);
-    return returnResponse(res, 200, 'Successfully Get Complaint', GetAllComplaint);
+    let { data: GetAllComplaint, config } = await fnGet(Complaint, req.query || {}, [], false);
+    return returnResponse(res, 200, 'Successfully Get Complaint', GetAllComplaint, config);
 }
 )
 
