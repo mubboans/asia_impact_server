@@ -28,6 +28,12 @@ const createComplaint = (sequelize, DataTypes) => {
                 userid: {
                     type: DataTypes.INTEGER,
                     allowNull: true,
+                    foreignKey: true,
+                    onDelete: "cascade",
+                    references: {
+                        model: "User",
+                        key: "id",
+                    },
                 },
                 officer_id: {
                     type: DataTypes.INTEGER,

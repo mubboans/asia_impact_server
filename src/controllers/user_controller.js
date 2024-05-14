@@ -54,9 +54,45 @@ let addUser = Joi.object({
 const getUser = TryCatch(async (req, res, next) => {
     let include = [];
     let query = getUserById(req, req?.query);
-    const promiseArray = []
-    console.log(query, 'hit user');
-    promiseArray.push(fnGet(User, { ...query, deletionDate: null }, include, false));
+    // console.log(query, 'hit user');
+    // const promiseArray = []
+    // promiseArray.push(fnGet(User, { ...query, deletionDate: null }, include, false));
+    // if (req.query.id) {
+    // if (req.query.limit || req.query.offset) {
+    //     next(customErrorClass.BadRequest("Invalid query with Id"))
+    // }
+    // include.push({
+    //     model: UserDetail,
+    //     include: [
+    //         {
+    //             model: LrDetail,
+    //             sourceKey: "userdetailid",
+    //             foreignKey: "id",
+    //             as: "userlrdetail",
+    //             include: {
+    //                 model: Document,
+    //                 sourceKey: "lrdetailid",
+    //                 foreignKey: "id",
+    //                 as: 'document'
+    //             }
+    //         },
+    //         {
+    //             model: Document,
+    //             sourceKey: "userdetailid",
+    //             foreignKey: "id",
+    //             as: 'document'
+    //         }
+    //     ],
+    //     sourceKey: "userid",
+    //     foreignKey: "id",
+    //     as: "userdetail"
+    // })
+    //     promiseArray.push(
+    //         fnGet(Portfolio, { userid: req.query.id }, [], true),
+    //         fnGet(DeviceDetail, { userid: req.query.id }, [], true),
+    //         fnGet(Complaint, { userid: req.query.id }, [], false)
+    //     )
+    // }
     if (req.query.id) {
         if (req.query.limit || req.query.offset) {
             next(customErrorClass.BadRequest("Invalid query with Id"))
@@ -86,25 +122,33 @@ const getUser = TryCatch(async (req, res, next) => {
             sourceKey: "userid",
             foreignKey: "id",
             as: "userdetail"
-        })
-        promiseArray.push(
-            fnGet(Portfolio, { userid: req.query.id }, [], true),
-            fnGet(DeviceDetail, { userid: req.query.id }, [], true),
-            fnGet(Complaint, { userid: req.query.id }, [], false)
+        },
+            {
+                model: Portfolio,
+                sourceKey: "userid",
+            },
+            {
+                model: DeviceDetail,
+                sourceKey: "userid",
+            },
+            {
+                model: Complaint,
+                sourceKey: "userid",
+            }
         )
+
     }
+    let data = await fnGet(User, { ...query, deletionDate: null }, include, false)
 
-    // let data = await
+    // let data = await Promise.all(promiseArray);
 
-    let data = await Promise.all(promiseArray);
-
-    const structuredData = [
-        { "users": data[0] },
-        { "portfolio": data[1] },
-        { "activedevice": data[2] },
-        { "complaint": data[3] },
-    ];
-    return returnResponse(res, 200, 'Successfully Get Data ', structuredData)
+    // const structuredData = [
+    //     { "users": data[0] },
+    //     { "portfolio": data[1] },
+    //     { "activedevice": data[2] },
+    //     { "complaint": data[3] },
+    // ];
+    return returnResponse(res, 200, 'Successfully Get Data ', data)
 }
 )
 

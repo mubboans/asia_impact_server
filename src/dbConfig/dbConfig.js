@@ -22,12 +22,12 @@ const { createSectionData, SectionData } = require('../Models/SectionData');
 const { HighlightInterestNFavourite, createHighlightInterestNFavourite } = require('../Models/HighlightInterestNFavourite');
 const CustomErrorObj = require('../error/CustomErrorObj');
 const { Setting, createSettingModel } = require('../Models/Setting');
-const { createDeviceDetailModel } = require('../Models/DeviceDetail');
+const { createDeviceDetailModel, DeviceDetail } = require('../Models/DeviceDetail');
 const { createPortfolioModel, Portfolio } = require('../Models/Portfolio');
 const { createActiveRequestModel, ActiveRequest } = require('../Models/ActiveRequest');
 const { createActiveChatRequestModel, ActiveChatRequest } = require('../Models/ActiveChatRequest');
 const { createActiveChatRequestHistoryModel, ActiveChatRequestHistory } = require('../Models/ActiveChatRequestHistory');
-const { createComplaint } = require('../Models/Complaint');
+const { createComplaint, Complaint } = require('../Models/Complaint');
 const { createTransaction, Transaction } = require('../Models/Transaction');
 // const User = require('../Models/Users');
 // const Documents = require('../Models/Document');
@@ -162,7 +162,11 @@ const dbConnect = async () => {
         Portfolio.belongsTo(Company, { foreignKey: 'companyid' });
         Portfolio.belongsTo(User, { foreignKey: 'userid' });
 
+        User.hasMany(DeviceDetail, { foreignKey: 'userid' });
+        DeviceDetail.belongsTo(User, { foreignKey: 'userid' });
 
+        User.hasMany(Complaint, { foreignKey: 'userid' });
+        Complaint.belongsTo(User, { foreignKey: 'userid' });
 
 
         Company.hasMany(ActiveRequest, { foreignKey: 'companyid' });
@@ -200,6 +204,7 @@ const dbConnect = async () => {
         Transaction.belongsTo(User, { foreignKey: 'buyer_id', as: 'Buyer_Detail' });
         User.hasMany(Transaction, { foreignKey: 'seller_id', as: 'Seller_Detail' });
         Transaction.belongsTo(User, { foreignKey: 'seller_id', as: 'Seller_Detail' });
+
 
 
         await sequelize.sync({ alter: false });
