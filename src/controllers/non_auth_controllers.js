@@ -112,7 +112,7 @@ const Login = TryCatch(async (req, res, next) => {
                     linkDevice: userDetails.linkDevice,
                     status: userDetails.status,
                     userDetailId: userDetails.userdetail[0]?.id,
-                    UserDetails: userDetails.userdetail
+                    userdetail: userDetails.userdetail
                 });
         }
         else {
@@ -218,7 +218,7 @@ const Register = TryCatch(async (req, res, next) => {
             linkDevice: user.linkDevice,
             status: user.status,
             userDetailId: userdetail?.id,
-            UserDetails: [
+            userdetail: [
                 userdetail
             ]
         });
@@ -388,7 +388,7 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
                     {
                         ...tokenData, role: user[0].role, id: user[0].id, email: user[0].email,
                         userDetailId: user[0].userdetail[0]?.id,
-                        linkDevice: user[0].linkDevice, isVerified: user[0].isVerified, status: user[0].status, rejectionreason: user[0].rejectionreason, UserDetail: user[0].userdetail
+                        linkDevice: user[0].linkDevice, isVerified: user[0].isVerified, status: user[0].status, rejectionreason: user[0].rejectionreason, userdetail: user[0].userdetail
                     });
             }
             else {
