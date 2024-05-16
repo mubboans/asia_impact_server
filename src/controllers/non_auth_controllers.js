@@ -16,6 +16,7 @@ const { Otp } = require("../Models/Otp");
 const { Sequelize } = require("sequelize");
 const sendsms = require("../utils/sendsms");
 const { UserDetail } = require("../Models/UserDetail");
+const loginReponse = require("../helper/loginResponse");
 
 const registerJoi = Joi.object({
     firstname: Joi.string().optional(),
@@ -103,17 +104,19 @@ const Login = TryCatch(async (req, res, next) => {
             };
             let data = attachedToken(newPayload)
             return returnResponse(res, 200, 'Login Succesfully',
-                {
-                    ...data, role: userDetails.role,
-                    id: userDetails.id,
-                    isVerified: userDetails.isVerified,
-                    rejectionreason: userDetails.rejectionreason,
-                    email: userDetails.email,
-                    linkDevice: userDetails.linkDevice,
-                    status: userDetails.status,
-                    userDetailId: userDetails.userdetail[0]?.id,
-                    userdetail: userDetails.userdetail
-                });
+                // {
+                //     ...data, role: userDetails.role,
+                //     id: userDetails.id,
+                //     isVerified: userDetails.isVerified,
+                //     rejectionreason: userDetails.rejectionreason,
+                //     email: userDetails.email,
+                //     linkDevice: userDetails.linkDevice,
+                //     status: userDetails.status,
+                //     userDetailId: userDetails.userdetail[0]?.id,
+                //     userdetail: userDetails.userdetail
+                // }
+                loginReponse(userDetails, data)
+            );
         }
         else {
             console.log('incorrect password');
@@ -208,20 +211,22 @@ const Register = TryCatch(async (req, res, next) => {
     await ShootMail({ html: emailbody, recieveremail: body.email, subject: "Successfully Register" });
     // await Otp.update({ isUsed: 1 }, { where: { email: body.email } });
     return returnResponse(res, 201, 'Successfully Register',
-        {
-            ...data,
-            role: body.role,
-            id: user.id,
-            email: user.email,
-            isVerified: user.isVerified,
-            rejectionreason: user.rejectionreason,
-            linkDevice: user.linkDevice,
-            status: user.status,
-            userDetailId: userdetail?.id,
-            userdetail: [
-                userdetail
-            ]
-        });
+        // {
+        //     ...data,
+        //     role: body.role,
+        //     id: user.id,
+        //     email: user.email,
+        //     isVerified: user.isVerified,
+        //     rejectionreason: user.rejectionreason,
+        //     linkDevice: user.linkDevice,
+        //     status: user.status,
+        //     userDetailId: userdetail?.id,
+        //     userdetail: [
+        //         userdetail
+        //     ]
+        // }
+        loginReponse(user, data)
+    );
     // return returnResponse(res, 200, 'Register Succesfully');
 
 
@@ -385,11 +390,7 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
                 let tokenData = attachedToken(newPayload);
                 await fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss"), isUsed: 1 }, { id: data.id });
                 return returnResponse(res, 200, 'Otp Verify',
-                    {
-                        ...tokenData, role: user[0].role, id: user[0].id, email: user[0].email,
-                        userDetailId: user[0].userdetail[0]?.id,
-                        linkDevice: user[0].linkDevice, isVerified: user[0].isVerified, status: user[0].status, rejectionreason: user[0].rejectionreason, userdetail: user[0].userdetail
-                    });
+                    loginReponse(user[0], tokenData));
             }
             else {
                 await fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss"), isUsed: 1 }, { id: data.id });

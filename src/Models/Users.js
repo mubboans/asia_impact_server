@@ -103,6 +103,10 @@ const createUser = (sequelize, DataTypes) => {
             freezereason: {
                 type: DataTypes.STRING,
                 allowNull: true,
+            },
+            pin: {
+                type: DataTypes.STRING,
+                allowNull: true,
             }
         },
         {

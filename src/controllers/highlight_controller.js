@@ -14,6 +14,7 @@ const { checkTokenForNews } = require("../middleware/verifyRequest");
 const getHighlight = TryCatch(async (req, res, next) => {
     let query = checkTokenForNews(req);
     let include = [];
+    let userdetailwithhighlight = false, usersid;
     if (req.query.id) {
         include = [{
             model: HighlightDetail,
@@ -28,11 +29,31 @@ const getHighlight = TryCatch(async (req, res, next) => {
             model: HighlightInterestNFavourite,
             sourceKey: "highlightid",
             foreignKey: "id",
-            where: { userid: query?.userid }
+            // where: { userid: query?.userid }
         })
+        userdetailwithhighlight = true;
+        usersid = query.userid;
         delete query.userid;
     }
     let { data: GetAllHighlight, config } = await fnGet(Highlight, query, include, false);
+    if (userdetailwithhighlight && GetAllHighlight) {
+        let highlightData = [];
+        let HighlightInterestNFavouritearr = [];
+        GetAllHighlight = GetAllHighlight.map(highlight => {
+            if (highlight.HighlightInterestNFavourites.length > 0) {
+                console.log(highlight.HighlightInterestNFavourites.length, 'HighlightInterestNFavourites length check');
+                const HighlightInterestNFavouritearr = highlight.HighlightInterestNFavourites.filter(item => item.userid === usersid);
+                // highlight.HighlightInterestNFavourites = HighlightInterestNFavouritearr.dataValues;
+                // console.log(HighlightInterestNFavouritearr, 'HighlightInterestNFavourite check');
+                highlightData.push({ ...highlight.dataValues, HighlightInterestNFavourites: HighlightInterestNFavouritearr.map(x => { return { ...x.dataValues } }) })
+            }
+            else {
+                highlightData.push(highlight)
+            }
+            // return highlight;
+        });
+        GetAllHighlight = highlightData;
+    }
     return returnResponse(res, 200, 'Successfully Get Highlight', GetAllHighlight, config)
 }
 )

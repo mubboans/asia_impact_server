@@ -75,18 +75,62 @@ const checkTokenForNews = (req) => {
             console.log(head, 'head check');
             if ((head.role || head.email) && head.userId) {
                 if (role.includes(head.role)) {
-                    query = req?.query || {};
+                    query = { ...req?.query, ...(req?.query?.addhome == '1' && { addhome: true }) } || {};
                 }
                 else {
                     query = {
                         ...req?.query,
-                        targetUser: {
-                            [Op.or]: {
-                                [Op.eq]: head.role,
-                                [Op.like]: `%${head.role}%`
+                        // targetUser: {
+                        [Op.or]: [
+                            {
+                                targetUser: {
+                                    [Op.eq]: head.role
+                                }
+                            },
+                            {
+                                targetUser: {
+                                    [Op.like]: `%${head.role}%`
+                                }
+                            },
+                            {
+                                targetUser: {
+                                    [Op.like]: 'basic,%'
+                                }
+                            },
+                            {
+                                targetUser: {
+                                    [Op.like]: '%,basic'
+                                }
+                            },
+                            {
+                                targetUser: {
+                                    [Op.eq]: 'basic'
+                                }
+                            },
+                            {
+                                targetUser: {
+                                    [Op.eq]: 'individual_investor'
+                                }
+                            },
+                            {
+                                targetUser: {
+                                    [Op.like]: 'individual_investor,%'
+                                }
+                            },
+                            {
+                                targetUser: {
+                                    [Op.like]: '%,individual_investor'
+                                }
                             }
-                        },
-                        userid: head.userId
+                        ],
+                        // [Op.in]: [
+                        //     // { targetUser: { [Op.eq]: head.role } },
+                        //     { targetUser: { [Op.like]: `%${head.role}%` } },
+                        //     { targetUser: { [Op.eq]: 'basic' } }
+                        // ],
+                        // },
+                        userid: head.userId,
+                        ...(req?.query?.addhome == '1' && { addhome: true })
                     }
                 }
             }
