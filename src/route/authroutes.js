@@ -52,7 +52,7 @@ const {
 } = require("../controllers/insight_controller");
 const verifyRole = require("../middleware/verifyRole");
 const { postLrDetail, updateLrDetail, getLrDetail, deleteLrDetail } = require("../controllers/lr_controller");
-const { getUserDetail, updateUserDetail, deleteUserDetail, postUserDetail, verifyDetail, postuserdetaildocument } = require("../controllers/userdetail_controller");
+const { getUserDetail, updateUserDetail, deleteUserDetail, postUserDetail, verifyDetail, postuserdetaildocument, updateuserdetaildocument } = require("../controllers/userdetail_controller");
 const { postSetting, updateSetting, getSetting, deleteSetting } = require("../controllers/setting_controller");
 const { postDeviceDetail, updateDeviceDetail, getDeviceDetail, deleteDeviceDetail } = require("../controllers/device_controller");
 const { postPortfolio, updatePortfolio, getPortfolio, deletePortfolio } = require("../controllers/user_portfolio");
@@ -168,7 +168,7 @@ route.patch('/verifyDetail', verifyDetail);
 
 route.delete('/sectionentries', verifyRole("admin", "legalrepresent", "editor", "ai_officer"), deleteDetailEntries);
 
-route.post('/userdetaildocument', postuserdetaildocument);
+route.route('/userdetaildocument').post(postuserdetaildocument).put(updateuserdetaildocument);
 
 route.patch('/updatepassword', ChangePassword);
 

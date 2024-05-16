@@ -114,7 +114,12 @@ const deleteReport = TryCatch(async (req, res, next) => {
 const postReport = TryCatch(async (req, res, next) => {
     let reportcode = await createRandomCode(Report, 'reportcode');
     let body = req.body;
-
+    if (body.sectiondata && body.sectiondata.length > 0) {
+        for (let index = 0; index < body.sectiondata.length; index++) {
+            const element = body.sectiondata[index];
+            if (!element.companyid) return next(customErrorClass.BadRequest('company id required'))
+        }
+    }
     if (body.isNew) {
         if (body.reportcode) {
             return next(customErrorClass.BadRequest('Code is not allowed on new data'))

@@ -19,8 +19,44 @@ const getLrDetail = TryCatch(async (req, res, next) => {
 )
 
 const updateLrDetail = TryCatch(async (req, res, next) => {
-    let updateStatus = await fnUpdate(LrDetail, req.body, { id: req.body.id }, req)
-    console.log(updateStatus, 'updateStatus');
+    let body = req?.body;
+    let promiseArr = []
+    if (Array.isArray(body) && body.length > 0) {
+        for (let i = 0; i < body.length; i++) {
+            const element = body[i];
+            if (!element.id) return next(customErrorClass.BadRequest("Invalid LR-Detail Object"));
+            promiseArr.push(fnUpdate(LrDetail, element, { id: element.id }, req));
+            if (element?.document && element.document.length > 0) {
+                for (let index = 0; index < element?.document.length; index++) {
+                    const docelement = element.document[index];
+                    if (!docelement.id) return next(customErrorClass.BadRequest("Invalid Document Object"));
+                    promiseArr.push(fnUpdate(Document, docelement, { id: docelement.id }, req));
+                }
+            }
+        }
+    }
+    else {
+        promiseArr.push(fnUpdate(LrDetail, body, { id: body.id }, req));
+        if (Array.isArray(body?.document) && body?.document?.length > 0) {
+            for (let index = 0; index < body?.document.length; index++) {
+                const element = body?.document[index];
+                if (!element.id) return next(customErrorClass.BadRequest("Document Id Required"))
+                promiseArr.push(fnUpdate(Document, element, { id: element.id }, req));
+            }
+        }
+        else if (body?.document?.id) {
+            // if(body?.document.length = 0){
+
+            //     // if (!body?.document.id) return next(customErrorClass.BadRequest("Document Id Required"))
+            //     // promiseArr.push(fnUpdate(Document, body?.document, { id: body?.document.id }, req))
+            // }
+            // else{
+            // if (!body?.document.id) return next(customErrorClass.BadRequest("Document Id Required"))
+            promiseArr.push(fnUpdate(Document, body?.document, { id: body?.document.id }, req))
+            // }
+        }
+    }
+    await Promise.all(promiseArr);
     return returnResponse(res, 200, 'Successfully Update Data')
 }
 )

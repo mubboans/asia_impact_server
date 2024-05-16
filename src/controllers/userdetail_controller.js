@@ -147,11 +147,58 @@ const verifyDetail = TryCatch(async (req, res, next) => {
     }
 })
 
+const updateuserdetaildocument = TryCatch(async (req, res, next) => {
+    let body = req.body;
+    if (body?.email) {
+        const { data: checkuser } = await fnGet(User, { email: body.email, }, [], true);
+        if (checkuser.length > 0 && req.user.userId !== checkuser[0].id) {
+            return next(new CustomErrorObj("Email already belongs to another user", 403));
+        }
+    }
+    const user = { ...body };
+    delete user?.password;
+    delete user?.document;
+    // delete user?.role;
+    delete user?.status;
+    delete user?.access_group;
+    delete user?.isVerified;
+    delete user?.lrpointofcontact;
+    const promiseArr = [];
+
+    if (body.document) {
+        if (Array.isArray(body.document) && body.document.length > 0) {
+            for (let index = 0; index < body.document.length; index++) {
+                const element = body.document[index];
+                promiseArr.push(fnUpdate(Document, element, { id: element.id }, req));
+            }
+        }
+        else {
+            promiseArr.push(fnUpdate(Document, body.document, { id: body.document.id }, req));
+        }
+    }
+    if (body.lrpointofcontact) {
+        promiseArr.push(fnUpdate(LrDetail, body.lrpointofcontact, { id: body.lrpointofcontact.id }, req));
+    }
+    // Add update promises for User and UserDetail
+    promiseArr.push(
+        fnUpdate(User, { ...user, status: "document appproval pending", access_group: "intermediate" }, { id: body.userid }, req),
+        fnUpdate(UserDetail, user, { id: body.userdetailid }, req)
+    );
+
+    // Execute all promises in parallel
+    await Promise.all(promiseArr);
+
+    return returnResponse(res, 200, 'User details updated and document updated successfully');
+
+})
+
+
 module.exports = {
     getUserDetail,
     updateUserDetail,
     deleteUserDetail,
     postUserDetail,
     verifyDetail,
-    postuserdetaildocument
+    postuserdetaildocument,
+    updateuserdetaildocument
 }
