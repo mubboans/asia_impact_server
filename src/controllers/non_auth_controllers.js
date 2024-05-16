@@ -171,7 +171,7 @@ const Register = TryCatch(async (req, res, next) => {
     // else {
     pstdata = { ...body, isActive: true }
     // }
-    let user = await fnPost(User, pstdata, [], req)
+    let user = await fnPost(User, pstdata, ['userdetail'], req)
     console.log(user.dataValues, 'user.dataValues');
 
 
@@ -207,6 +207,8 @@ const Register = TryCatch(async (req, res, next) => {
         }
     }
 
+    user.userdetail = [userdetail]
+    // user[0].userdetail = userdetail
     let emailbody = getEmailBody(email);
     await ShootMail({ html: emailbody, recieveremail: body.email, subject: "Successfully Register" });
     // await Otp.update({ isUsed: 1 }, { where: { email: body.email } });
