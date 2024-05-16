@@ -174,7 +174,7 @@ route.patch('/updatepassword', ChangePassword);
 
 route.route("/interestnfovourite")
     .post(postHighlightInterestnFovourite)
-    .delete(verifyRole("admin", "editor", "ai_officer"), deleteHighlightInterestnFovourite)
+    .delete(deleteHighlightInterestnFovourite)
     .get(getHighlightInterestnFovourite);
 
 route.patch('/verifyuser', verifyRole("admin", "legalrepresent", "editor", "ai_officer"), verifyUser);
