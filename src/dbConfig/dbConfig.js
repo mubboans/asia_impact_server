@@ -156,6 +156,9 @@ const dbConnect = async () => {
 
         User.hasMany(Setting, { foreignKey: 'advisorId', as: 'advisorUser' });
         Setting.belongsTo(User, { foreignKey: 'advisorId', as: 'advisorUser' });
+        User.hasMany(Setting, { foreignKey: 'investorid', as: 'investorUser' });
+        Setting.belongsTo(User, { foreignKey: 'investorid', as: 'investorUser' });
+
 
         Company.hasMany(Portfolio, { foreignKey: 'companyid' });
         User.hasMany(Portfolio, { foreignKey: 'userid' });

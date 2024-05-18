@@ -138,8 +138,16 @@ const getUser = TryCatch(async (req, res, next) => {
         )
 
     }
-    let { data, config } = await fnGet(User, { ...query, deletionDate: null }, include, false)
 
+    let { data, config } = await fnGet(User, { ...query, deletionDate: null }, include, false)
+    if (data[0]?.role == 'advisor') {
+        let { data: relationcheck } = await fnGet(UserRelation, { requestStatus: ['pending', 'approved'], advisorId: data[0].id })
+        if (relationcheck.length > 0 && relationcheck) {
+            data[0].dataValues.addedClient = true;
+        } else {
+            data[0].dataValues.addedClient = false;
+        }
+    }
     // let data = await Promise.all(promiseArray);
 
     // const structuredData = [

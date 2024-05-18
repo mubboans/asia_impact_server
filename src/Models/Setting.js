@@ -19,9 +19,13 @@ const createSettingModel = (sequelize, DataTypes) => {
                         key: 'id',
                     },
                 },
-                userid: {
+                investorid: {
                     type: DataTypes.INTEGER,
                     allowNull: false,
+                    references: {
+                        model: 'User',
+                        key: 'id',
+                    },
                 },
                 viewChat: {
                     type: DataTypes.BOOLEAN,

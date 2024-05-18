@@ -1,6 +1,6 @@
 const express = require("express");
 const { postNews, updateNews, deleteNews } = require("../controllers/news_controller");
-const { getUserWithRelation, postRelation, updateRelation, deleteRelation } = require("../controllers/userRelation_controller");
+const { getUserWithRelation, postRelation, updateRelation, deleteRelation, checkUserwithEmail } = require("../controllers/userRelation_controller");
 const { postLanguage, updateLanguage, deleteLanguage } = require("../controllers/language_controller");
 const { deleteUser, updateUser, getUser, postUser, ChangePassword, verifyUser, deleteUserAdmin, getDeletedUser, freezeUser, } = require("../controllers/user_controller");
 const { getSustainGoal, updateSustainGoal, deleteSustainGoal, postSustainGoal } = require("../controllers/sustain_goal_controller");
@@ -213,5 +213,7 @@ route.route('/transaction')
     .delete(verifyRole("admin", "editor", "ai_officer"), deleteTransaction);
 
 route.route('/pin').post(checkPin).patch(set_update_Pin);
+
+route.post('/verifyuseremail', checkUserwithEmail)
 
 module.exports = route;

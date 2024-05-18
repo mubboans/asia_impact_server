@@ -122,7 +122,7 @@ function setUserIdonQuery(req) {
     else {
         return {
             ...req.query,
-            userid: req.user.userId,
+            // userid: req.user.userId,
         }
     }
 

@@ -9,24 +9,33 @@ const { setUserIdonQuery } = require("../utils/functionalHelper");
 
 const getSetting = TryCatch(async (req, res, next) => {
     let query = setUserIdonQuery(req)
-    let inlcude = []
-    if (query?.id) {
-        inlcude = [
-            {
-                model: User,
-                sourceKey: "advisorId",
-                as: 'advisorUser',
-                attributes: {
-                    exclude: ['password']
-                },
-                include: {
-                    model: UserDetail,
-                    as: 'userdetail',
-                    attributes: ['id', 'firstname', 'lastname', 'img'],
-                }
+    let inlcude = [
+        {
+            model: User,
+            sourceKey: "advisorId",
+            as: 'advisorUser',
+            attributes: ['id', 'email', 'status', 'type', 'role', 'access_group', 'isActive'],
+            include: {
+                model: UserDetail,
+                as: 'userdetail',
+                attributes: ['id', 'firstname', 'lastname', 'img'],
             }
-        ]
-    }
+        },
+        {
+            model: User,
+            sourceKey: "investorid",
+            as: 'investorUser',
+            // attributes: {
+            //     exclude: ['password']
+            // },
+            attributes: ['id', 'email', 'status', 'type', 'role', 'access_group', 'isActive'],
+            include: {
+                model: UserDetail,
+                as: 'userdetail',
+                attributes: ['id', 'firstname', 'lastname', 'img'],
+            }
+        }
+    ]
     let { data: GetAllSetting, config } = await fnGet(Setting, query, inlcude, false);
     return returnResponse(res, 200, 'Successfully Get Setting', GetAllSetting, config);
 }

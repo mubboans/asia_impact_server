@@ -160,7 +160,7 @@ const deleteHighlightInterestnFovourite = TryCatch(async (req, res, next) => {
         next(customErrorClass.BadRequest('id required'))
     }
     await fnDelete(HighlightInterestNFavourite, req.query, req, "Highlight_" + req.query.id);
-    return returnResponse(res, 200, 'Successfully Delete Highlight');
+    return returnResponse(res, 200, 'Successfully Delete Record');
 })
 
 const getHighlightInterestnFovourite = TryCatch(async (req, res, next) => {
@@ -185,7 +185,7 @@ const getHighlightInterestnFovourite = TryCatch(async (req, res, next) => {
         ]
     }
     let GetHighlightInterestnFovourite = await fnGet(HighlightInterestNFavourite, req.query || {}, include, false);
-    return returnResponse(res, 200, 'Successfully Get Highlight', GetHighlightInterestnFovourite)
+    return returnResponse(res, 200, 'Successfully Get Record', GetHighlightInterestnFovourite)
 })
 
 

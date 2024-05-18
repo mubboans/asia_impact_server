@@ -7,6 +7,7 @@ const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
 const { Op } = require("sequelize");
 const { createRandomCode, getCurrentFormatedDate } = require("../utils/functionalHelper");
+const { UserDetail } = require("../Models/UserDetail");
 const getUserWithRelation = TryCatch(async (req, res, next) => {
     console.log('hit user 8');
     let d = setUserId(req);
@@ -18,13 +19,21 @@ const getUserWithRelation = TryCatch(async (req, res, next) => {
     }
     let include = [
         {
-            model: User, as: 'advisor', attributes: {
-                exclude: ['password']
+            model: User, as: 'advisor',
+            attributes: ['id', 'email', 'status', 'type', 'role', 'access_group', 'isActive'],
+            include: {
+                model: UserDetail,
+                as: 'userdetail',
+                attributes: ['id', 'firstname', 'lastname', 'img'],
             }
         },
         {
-            model: User, as: 'investor', attributes: {
-                exclude: ['password']
+            model: User, as: 'investor',
+            attributes: ['id', 'email', 'status', 'type', 'role', 'access_group', 'isActive'],
+            include: {
+                model: UserDetail,
+                as: 'userdetail',
+                attributes: ['id', 'firstname', 'lastname', 'img'],
             }
         },
         {
@@ -67,6 +76,7 @@ const getDeletedRelation = TryCatch(async (req, res, next) => {
 
 const postRelation = TryCatch(async (req, res, next) => {
     let body = setUserDetail(req.user, req.body);
+
     if (body.notification) {
         let { data: UserDetail } = await fnGet(User, { email: body.notification.email }, [], true);
         if (UserDetail && UserDetail.length > 0) {
@@ -87,6 +97,23 @@ const postRelation = TryCatch(async (req, res, next) => {
     }
     // await Promise.all(promiseArr);
     return returnResponse(res, 201, 'Successfully added userRelation and send notifications');
+}
+)
+
+const checkUserwithEmail = TryCatch(async (req, res, next) => {
+    let { email } = req.body;
+    let { data: userCheck } = await fnGet(User, { email, deletionDate: null }, [], true);
+    if (userCheck.length > 0 && userCheck) {
+        return returnResponse(res, 200, "User detail found", {
+            role: userCheck[0].role,
+            access_group: userCheck[0].access_group,
+            type: userCheck[0].type,
+            isActive: userCheck[0].isActive,
+        })
+    }
+    else {
+        return returnResponse(res, 200, "User detail Not found", {})
+    }
 }
 )
 function setUserId(req) {
@@ -141,4 +168,5 @@ module.exports = {
     updateRelation,
     deleteRelation,
     postRelation,
+    checkUserwithEmail
 }

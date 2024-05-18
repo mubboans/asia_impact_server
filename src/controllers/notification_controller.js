@@ -75,7 +75,7 @@ const getNotification = TryCatch(async (req, res, next) => {
 
 const updateNotification = TryCatch(async (req, res, next) => {
     if (req.body?.userrelation) {
-        await fnUpdate(UserRelation, { requestStatus: req.body?.userrelation?.requestStatus }, { notification_id: req.body.id }, req);
+        await fnUpdate(UserRelation, { requestStatus: req.body?.userrelation?.requestStatus, isRead: true }, { notification_id: req.body.id }, req);
     }
     await fnUpdate(Notification, req.body, { id: req.body.id }, req)
     return returnResponse(res, 200, 'Successfully Update Notification')
