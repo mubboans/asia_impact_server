@@ -75,28 +75,115 @@ const getDeletedRelation = TryCatch(async (req, res, next) => {
 })
 
 const postRelation = TryCatch(async (req, res, next) => {
-    let body = setUserDetail(req.user, req.body);
-
-    if (body.notification) {
-        let { data: UserDetail } = await fnGet(User, { email: body.notification.email }, [], true);
-        if (UserDetail && UserDetail.length > 0) {
-            let notificationcode = await createRandomCode(Notification, 'notificationcode');
-            let obj = {
-                ...body.notification,
-                sender_id: req.user.userId, // current user id
-                receiver_id: UserDetail[0].id, // user to recieve the notification
-                notificationcode,
-                isNew: true
+    // let body = setUserDetail(req.user, req.body);
+    let body = req.body;
+    let recordInserted = 0, recordSkiped = 0;
+    let promiseArr = []
+    let notificationcode = await createRandomCode(Notification, 'notificationcode');
+    if (Array.isArray(body) && body.length > 0) {
+        for (let index = 0; index < body.length; index++) {
+            const element = body[index];
+            let { data: UserDetailCheck } = await fnGet(User, { email: element.email }, [], true);
+            if (!(UserDetailCheck.length > 0 && UserDetailCheck)) {
+                recordSkiped++;
             }
-            let notifi = await fnPost(Notification, obj, [], req);
-            await fnPost(UserRelation, { ...body, notification_id: notifi?.id, req }, [], req);
-        }
-        else {
-            return next(customErrorClass.BadRequest("No User Found with detail"));
+            else {
+                recordInserted++;
+                let obj = {};
+                // let notificationcode = await createRandomCode(Notification, 'notificationcode');
+                let notifyrecord = await fnPost(Notification, {
+                    sender_id: req.user.userId, // current user id
+                    receiver_id: UserDetailCheck[0].id, // user to recieve the notification
+                    notificationcode,
+                    isNew: true,
+                    "message": process.env.NOTIFICATION_RELATION_MSSG || "Users has requested to add relation your account.",
+                    "title": process.env.NOTIFICATION_RELATION_TITLE || "Approval Pending",
+                    "lang_id": 1,
+                    "severity": process.env.NOTIFICATION_RELATION_SEVERITY || "error",
+                    "notificationtype": "approval", // values:['approval', 'message'],
+                    "redirectlink": null
+                }, [], req);
+                if (element.relationshipType == 0) {
+                    obj = {
+                        advisorId: req.user.userId,
+                        investorId: UserDetailCheck[0].id,
+                        relationshipType: element.relationshipType,
+                        notification_id: notifyrecord?.id,
+                        requesterId: req.user.userId,
+                    }
+                }
+                else {
+                    obj = {
+                        investorId: req.user.userId,
+                        advisorId: UserDetailCheck[0].id,
+                        relationshipType: element.relationshipType,
+                        notification_id: notifyrecord?.id,
+                        requesterId: req.user.userId,
+                    }
+                }
+                promiseArr.push(fnPost(UserRelation, obj, [], req));
+            }
         }
     }
+    else {
+        let { data: userCheck } = await fnGet(User, { email: body.email }, [], true);
+        if (userCheck && userCheck.length > 0) {
+            recordInserted++;
+            let notifi = await fnPost(Notification, {
+                sender_id: req.user.userId, // current user id
+                receiver_id: userCheck[0].id, // user to recieve the notification
+                notificationcode,
+                isNew: true,
+                "message": process.env.NOTIFICATION_RELATION_MSSG || "Users has requested to add relation your account.",
+                "title": process.env.NOTIFICATION_RELATION_TITLE || "Approval Pending",
+                "lang_id": 1,
+                "severity": process.env.NOTIFICATION_RELATION_SEVERITY || "error",
+                "notificationtype": "approval", // values:['approval', 'message'],
+                "redirectlink": null
+            }, [], req);
+            let obj;
+            if (body.relationshipType == 0) {
+                obj = {
+                    advisorId: req.user.userId,
+                    investorId: userCheck[0].id,
+                    relationshipType: body.relationshipType,
+                    notification_id: notifi?.id,
+                    requesterId: req.user.userId,
+                }
+            }
+            else {
+                obj = {
+                    investorId: req.user.userId,
+                    advisorId: userCheck[0].id,
+                    relationshipType: body.relationshipType,
+                    notification_id: notifi?.id,
+                    requesterId: req.user.userId,
+                }
+            }
+            promiseArr.push(fnPost(UserRelation, obj, [], req))
+        }
+    }
+    // if (body.notification) {
+    //     let { data: UserDetail } = await fnGet(User, { email: body.notification.email }, [], true);
+    //     if (UserDetail && UserDetail.length > 0) {
+    //         let notificationcode = await createRandomCode(Notification, 'notificationcode');
+    //         let obj = {
+    //             ...body.notification,
+    //             sender_id: req.user.userId, // current user id
+    //             receiver_id: UserDetail[0].id, // user to recieve the notification
+    //             notificationcode,
+    //             isNew: true
+    //         }
+    //         let notifi = await fnPost(Notification, obj, [], req);
+    //         await fnPost(UserRelation, { ...body, notification_id: notifi?.id, req }, [], req);
+    //     }
+    //     else {
+    //         return next(customErrorClass.BadRequest("No User Found with detail"));
+    //     }
+    // }
     // await Promise.all(promiseArr);
-    return returnResponse(res, 201, 'Successfully added userRelation and send notifications');
+    await Promise.all(promiseArr);
+    return returnResponse(res, 201, `Successfully insert ${recordInserted} and skiped ${recordSkiped} in  userRelation and send notifications`);
 }
 )
 

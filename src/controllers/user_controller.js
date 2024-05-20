@@ -52,7 +52,14 @@ let addUser = Joi.object({
     }),
 })
 const getUser = TryCatch(async (req, res, next) => {
-    let include = [];
+    let include = [
+        {
+            model: UserDetail,
+            sourceKey: "userid",
+            as: "userdetail",
+            attributes: ["id", 'firstname', "lastname"]
+        }
+    ];
     let query = getUserById(req, req?.query);
     // console.log(query, 'hit user');
     // const promiseArray = []
@@ -97,7 +104,7 @@ const getUser = TryCatch(async (req, res, next) => {
         if (req.query.limit || req.query.offset) {
             next(customErrorClass.BadRequest("Invalid query with Id"))
         }
-        include.push({
+        include = [{
             model: UserDetail,
             include: [
                 {
@@ -123,19 +130,19 @@ const getUser = TryCatch(async (req, res, next) => {
             foreignKey: "id",
             as: "userdetail"
         },
-            {
-                model: Portfolio,
-                sourceKey: "userid",
-            },
-            {
-                model: DeviceDetail,
-                sourceKey: "userid",
-            },
-            {
-                model: Complaint,
-                sourceKey: "userid",
-            }
-        )
+        {
+            model: Portfolio,
+            sourceKey: "userid",
+        },
+        {
+            model: DeviceDetail,
+            sourceKey: "userid",
+        },
+        {
+            model: Complaint,
+            sourceKey: "userid",
+        }
+        ]
 
     }
 
