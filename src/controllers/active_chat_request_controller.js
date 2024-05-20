@@ -23,7 +23,7 @@ const getActiveChatRequest = TryCatch(async (req, res, next) => {
                 ],
 
             }
-            let settingCheck = await fnGet(Setting,
+            let { data: settingCheck } = await fnGet(Setting,
                 {
                     advisorId: req.user.userId,
                     userid: query?.investorid,
@@ -80,7 +80,7 @@ const deleteActiveChatRequest = TryCatch(async (req, res, next) => {
 
 const postActiveChatRequest = TryCatch(async (req, res, next) => {
     let body = req.body;
-    let deviceCheck = await fnGet(ActiveChatRequest, { userid: body.userid, deviceId: body.deviceId }, [], false);
+    let { data: deviceCheck } = await fnGet(ActiveChatRequest, { userid: body.userid, deviceId: body.deviceId }, [], false);
     let responseMessage = 'Added';
     if (deviceCheck && deviceCheck.length > 0) {
         await fnUpdate(ActiveChatRequest, body, { userid: body.userid, deviceId: body.deviceId }, req);

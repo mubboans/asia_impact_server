@@ -29,6 +29,9 @@ const { createActiveChatRequestModel, ActiveChatRequest } = require('../Models/A
 const { createActiveChatRequestHistoryModel, ActiveChatRequestHistory } = require('../Models/ActiveChatRequestHistory');
 const { createComplaint, Complaint } = require('../Models/Complaint');
 const { createTransaction, Transaction } = require('../Models/Transaction');
+const { createCountryModel, Country } = require('../Models/Country');
+const { createRegionModel, Region } = require('../Models/Region');
+const { createCityModel, City } = require('../Models/City');
 // const User = require('../Models/Users');
 // const Documents = require('../Models/Document');
 // const { syncModel } = require('../Models');
@@ -89,7 +92,9 @@ const dbConnect = async () => {
         createActiveChatRequestHistoryModel(sequelize, DataTypes);
         createTransaction(sequelize, DataTypes);
 
-
+        createCountryModel(sequelize, DataTypes);
+        createRegionModel(sequelize, DataTypes);
+        createCityModel(sequelize, DataTypes);
 
         User.hasMany(Document, { foreignKey: 'userid', as: 'document' });
         Document.belongsTo(User, { foreignKey: 'userid' });
@@ -208,6 +213,10 @@ const dbConnect = async () => {
         User.hasMany(Transaction, { foreignKey: 'seller_id', as: 'Seller_Detail' });
         Transaction.belongsTo(User, { foreignKey: 'seller_id', as: 'Seller_Detail' });
 
+        Country.hasMany(Region, { foreignKey: "countryid", as: "region" });
+        Region.belongsTo(Country, { foreignKey: "countryid", as: "region" });
+        Region.hasMany(City, { foreignKey: "regionid", as: "city" });
+        City.belongsTo(Region, { foreignKey: "regionid", as: "city" });
 
 
         await sequelize.sync({ alter: false });

@@ -62,6 +62,7 @@ const { postActiveChatRequestHistory, updateActiveChatRequestHistory, getActiveC
 const { postComplaint, updateComplaint, getComplaint, deleteComplaint } = require("../controllers/complaint_controller");
 const { postTransaction, updateTransaction, getTransaction, deleteTransaction } = require("../controllers/transaction_controller");
 const { set_update_Pin, checkPin } = require("../controllers/pin_controller");
+const { postCountry, updateCountry, getCountry, deleteCountry } = require("../controllers/country_controller");
 
 const route = express.Router();
 
@@ -214,6 +215,12 @@ route.route('/transaction')
 
 route.route('/pin').post(checkPin).patch(set_update_Pin);
 
-route.post('/verifyuseremail', checkUserwithEmail)
+route.post('/verifyuseremail', checkUserwithEmail);
+
+route.route('/country')
+    .post(verifyRole("admin", "editor", "ai_officer"), postCountry)
+    .put(verifyRole("admin", "editor", "ai_officer"), updateCountry)
+    .get(verifyRole("admin", "editor", "ai_officer"), getCountry)
+    .delete(verifyRole("admin", "editor", "ai_officer"), deleteCountry);
 
 module.exports = route;
