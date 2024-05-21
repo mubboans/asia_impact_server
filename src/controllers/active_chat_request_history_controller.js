@@ -57,9 +57,11 @@ const postActiveChatRequestHistory = TryCatch(async (req, res, next) => {
         let { data: settingCheck } = await fnGet(Setting,
             {
                 advisorId: req.user.userId,
-                investorid: query?.investorid,
-                viewChat: true
+                investorid: body?.investorid,
+                participateinChat: true
             }, [], true);
+        if (!(settingCheck && settingCheck.length > 0)) return next(customErrorClass.BadRequest('Setting not found'))
+        req.body = { ...req.body, sender_id: body.investorid };
     }
     await fnPost(ActiveChatRequestHistory, req.body, [], req);
 
