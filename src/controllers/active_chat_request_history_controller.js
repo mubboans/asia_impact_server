@@ -1,5 +1,6 @@
 const { ActiveChatRequest } = require("../Models/ActiveChatRequest");
 const { ActiveChatRequestHistory } = require("../Models/ActiveChatRequestHistory");
+const { Setting } = require("../Models/Setting");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
@@ -52,6 +53,14 @@ const postActiveChatRequestHistory = TryCatch(async (req, res, next) => {
     // }
     // else {
     //     responseMessage = 'Added';
+    if (body?.investorid) {
+        let { data: settingCheck } = await fnGet(Setting,
+            {
+                advisorId: req.user.userId,
+                investorid: query?.investorid,
+                viewChat: true
+            }, [], true);
+    }
     await fnPost(ActiveChatRequestHistory, req.body, [], req);
 
     // }

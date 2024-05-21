@@ -26,7 +26,7 @@ const getActiveRequest = TryCatch(async (req, res, next) => {
             let { data, config } = await fnGet(Setting,
                 {
                     advisorId: req.user.userId,
-                    userid: query?.investorid,
+                    investorid: query?.investorid,
                     expressInterest: true
                 }, [], true);
             if (!(data && data.length > 0)) {
@@ -97,7 +97,7 @@ const postActiveRequest = TryCatch(async (req, res, next) => {
     let body = req.body;
     if (body.userid !== req.user.userId) return next(customErrorClass.BadRequest("Userid not Match"));
     if (req.user.role == 'advisor') {
-        let { data, config } = await fnGet(Setting, { advisorId: body.userid, userid: body.investorid, expressInterest: true }, [], true);
+        let { data, config } = await fnGet(Setting, { advisorId: body.userid, investorid: body.investorid, expressInterest: true }, [], true);
         if (!(data && data.length > 0)) {
             return next(customErrorClass.NotFound("Your Account permission not found"));
         }

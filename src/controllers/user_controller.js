@@ -57,7 +57,17 @@ const getUser = TryCatch(async (req, res, next) => {
             model: UserDetail,
             sourceKey: "userid",
             as: "userdetail",
-            attributes: ["id", 'firstname', "lastname"]
+            attributes: ["id", 'firstname', "lastname"],
+            include: [
+                {
+                    model: LrDetail,
+                    sourceKey: "userdetailid",
+                    foreignKey: "id",
+                    as: "userlrdetail",
+                    where: { "detailtype": "company" },
+                    attributes: ["id", "companyname", 'firstname', "lastname", "detailtype", "email"],
+                }
+            ]
         }
     ];
     let query = getUserById(req, req?.query);
@@ -72,10 +82,10 @@ const getUser = TryCatch(async (req, res, next) => {
     //     model: UserDetail,
     //     include: [
     //         {
-    //             model: LrDetail,
-    //             sourceKey: "userdetailid",
-    //             foreignKey: "id",
-    //             as: "userlrdetail",
+    // model: LrDetail,
+    // sourceKey: "userdetailid",
+    // foreignKey: "id",
+    // as: "userlrdetail",
     //             include: {
     //                 model: Document,
     //                 sourceKey: "lrdetailid",

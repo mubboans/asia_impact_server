@@ -14,7 +14,7 @@ const getActiveChatRequest = TryCatch(async (req, res, next) => {
     let query = req.query;
     if (!rolecheck) {
         if (req.user.role == 'advisor') {
-            if (!query.investorid) return next(customErrorClass.BadRequest("Invalid Advisor Request"))
+            if (!query.investorid) return next(customErrorClass.BadRequest("Invalid Advisor Request Please Pass Investor Id"))
             query = {
                 ...query,
                 [Op.or]: [
@@ -26,8 +26,8 @@ const getActiveChatRequest = TryCatch(async (req, res, next) => {
             let { data: settingCheck } = await fnGet(Setting,
                 {
                     advisorId: req.user.userId,
-                    userid: query?.investorid,
-                    expressInterest: true
+                    investorid: query?.investorid,
+                    viewChat: true
                 }, [], true);
             if (!(settingCheck && settingCheck.length > 0)) {
                 return next(customErrorClass.NotFound("Your Account permission not found"));
