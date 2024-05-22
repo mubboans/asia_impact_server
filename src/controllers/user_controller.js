@@ -58,58 +58,20 @@ const getUser = TryCatch(async (req, res, next) => {
             sourceKey: "userid",
             as: "userdetail",
             attributes: ["id", 'firstname', "lastname"],
-            include: [
-                {
-                    model: LrDetail,
-                    sourceKey: "userdetailid",
-                    foreignKey: "id",
-                    as: "userlrdetail",
-                    where: { "detailtype": "company" },
-                    attributes: ["id", "companyname", 'firstname', "lastname", "detailtype", "email"],
-                }
-            ]
+            // include: [
+            //     {
+            //         model: LrDetail,
+            //         sourceKey: "userdetailid",
+            //         foreignKey: "id",
+            //         as: "userlrdetail",
+            // where: { "detailtype": "company" },
+            //         attributes: ["id", "companyname", 'firstname', "lastname", "detailtype", "email"],
+            //     }
+            // ]
         }
     ];
     let query = getUserById(req, req?.query);
-    // console.log(query, 'hit user');
-    // const promiseArray = []
-    // promiseArray.push(fnGet(User, { ...query, deletionDate: null }, include, false));
-    // if (req.query.id) {
-    // if (req.query.limit || req.query.offset) {
-    //     next(customErrorClass.BadRequest("Invalid query with Id"))
-    // }
-    // include.push({
-    //     model: UserDetail,
-    //     include: [
-    //         {
-    // model: LrDetail,
-    // sourceKey: "userdetailid",
-    // foreignKey: "id",
-    // as: "userlrdetail",
-    //             include: {
-    //                 model: Document,
-    //                 sourceKey: "lrdetailid",
-    //                 foreignKey: "id",
-    //                 as: 'document'
-    //             }
-    //         },
-    //         {
-    //             model: Document,
-    //             sourceKey: "userdetailid",
-    //             foreignKey: "id",
-    //             as: 'document'
-    //         }
-    //     ],
-    //     sourceKey: "userid",
-    //     foreignKey: "id",
-    //     as: "userdetail"
-    // })
-    //     promiseArray.push(
-    //         fnGet(Portfolio, { userid: req.query.id }, [], true),
-    //         fnGet(DeviceDetail, { userid: req.query.id }, [], true),
-    //         fnGet(Complaint, { userid: req.query.id }, [], false)
-    //     )
-    // }
+
     if (req.query.id) {
         if (req.query.limit || req.query.offset) {
             next(customErrorClass.BadRequest("Invalid query with Id"))
@@ -156,15 +118,37 @@ const getUser = TryCatch(async (req, res, next) => {
 
     }
 
+
     let { data, config } = await fnGet(User, { ...query, deletionDate: null }, include, false)
-    if (data[0]?.role == 'advisor') {
-        let { data: relationcheck } = await fnGet(UserRelation, { requestStatus: ['pending', 'approved'], advisorId: data[0].id })
-        if (relationcheck.length > 0 && relationcheck) {
-            data[0].dataValues.addedClient = true;
-        } else {
-            data[0].dataValues.addedClient = false;
+    if (!req.query.id) {
+        for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+            if (element.role == 'advisor') {
+                let { data: relationcheck } = await fnGet(UserRelation, { requestStatus: ['pending', 'approved'], advisorId: data[index].id })
+                if (relationcheck.length > 0 && relationcheck) {
+                    data[index].dataValues.addedClient = true;
+                } else {
+                    data[index].dataValues.addedClient = false;
+                }
+            }
+            else if (element.role == 'legalrepresent') {
+                let { data: lrdetail } = await fnGet(LrDetail, { "detailtype": "company", userid: data[index].id }, [], true);
+                data[index].dataValues.userdetail[0].dataValues.userlrdetail = lrdetail;
+            }
         }
     }
+    // if (data[0]?.role == 'advisor') {
+    //     let { data: relationcheck } = await fnGet(UserRelation, { requestStatus: ['pending', 'approved'], advisorId: data[0].id })
+    //     if (relationcheck.length > 0 && relationcheck) {
+    //         data[0].dataValues.addedClient = true;
+    //     } else {
+    //         data[0].dataValues.addedClient = false;
+    //     }
+    // }
+    // else if (data[0]?.role == 'legalrepresent' && !req.query.id) {
+    //     let { data: lrdetail } = await fnGet(LrDetail, { "detailtype": "company", userid: data[0].id }, [], true);
+    //     data[0].userdetail[0].userlrdetail = lrdetail;
+    // }
     // let data = await Promise.all(promiseArray);
 
     // const structuredData = [
