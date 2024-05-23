@@ -319,7 +319,7 @@ const deleteUserAdmin = TryCatch(async (req, res, next) => {
     if (userrelation && userrelation.length > 0 && rolecheck.includes(d.role)) {
         let x = userrelation.map((x) => {
             return {
-                sender_id: req.user.userId,
+                sender_id: d.id,
                 receiver_id: d.role == 'advisor' ? x.investorId : x.advisorId,
                 message: `${d.userdetail[0].firstname} ${d.userdetail[0].lastname} User Account Deleted`,
                 notificationcode: createRandomCodeWithoutCheck(),

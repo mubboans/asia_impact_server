@@ -60,6 +60,12 @@ const createNotificationModel = (sequelize, DataTypes) => {
                 company_id: {
                     type: DataTypes.INTEGER,
                     allowNull: true,
+                    foreignKey: true,
+                    onDelete: "cascade",
+                    references: {
+                        model: "Company",
+                        key: "id",
+                    },
                 },
                 type: {
                     type: DataTypes.STRING,
