@@ -14,7 +14,7 @@ const { StringtoDate } = require("../utils/functionalHelper");
 const moment = require("moment");
 const { Otp } = require("../Models/Otp");
 const { Sequelize } = require("sequelize");
-const sendsms = require("../utils/sendsms");
+const { sendSms, verifySms } = require("../utils/sendsms");
 const { UserDetail } = require("../Models/UserDetail");
 const loginReponse = require("../helper/loginResponse");
 
@@ -62,7 +62,14 @@ const loginJoi = Joi.object({
     password: Joi.string().required(),
 })
 const OTPJoi = Joi.object({
-    email: Joi.string().email().required(),
+    email: Joi.string().when('sendby', {
+        is: 'mail',
+        then: Joi.string().required().messages({
+            'any.required': 'Contact is required when send method is "sms"'
+        }),
+        otherwise: Joi.string().optional()
+    }),
+    //  Joi.string().email().required(),
     contact: Joi.string().when('sendby', {
         is: 'sms',
         then: Joi.string().required().messages({
@@ -288,7 +295,9 @@ const SendOTP = TryCatch(async (req, res, next) => {
     }
 
     if (body.sendby == 'sms' && !body.contact) {
-        return next(customErrorClass.BadRequest('Invalid Body'))
+
+        return next(customErrorClass.BadRequest('Invalid Body'));
+
     }
     let query;
     let emailbody;
@@ -320,6 +329,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
             contact: body.contact,
             type: body.type
         }
+        delete modelobj.otp;
     }
     if (body.type == 'login' || body.type == 'forgot-password') {
         let { data: checkUser } = await fnGet(User, { email: body.email }, [], true)
@@ -344,7 +354,7 @@ const SendOTP = TryCatch(async (req, res, next) => {
         }
         else {
             console.log('no record found');
-            fnPost(Otp, modelobj);
+            fnPost(Otp, modelobj, [], req);
             // return returnResponse(res, 200, "Successfully send otp")
         }
     }).catch((err) => {
@@ -355,15 +365,32 @@ const SendOTP = TryCatch(async (req, res, next) => {
         await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
     }
     else {
-        await sendsms(body.contact, modelobj.otp);
+        let d = await sendSms(body.contact);
+        console.log(d, 'twillo response');
     }
     return returnResponse(res, 201, "Successfully send otp")
 }
 )
 const VerifyOTP = TryCatch(async (req, res, next) => {
     let body = req.body;
+    let queryobj;
     if (!body.type || !body.otp) throw new CustomErrorObj("Invalid otp body", 400)
-    let { data: otpData } = await fnGet(Otp, { email: body.email, type: body.type }, [], true);
+    if (body?.contact) {
+        let responseVer = await verifySms(body.contact, body.otp)
+        console.log(res, 'check log');
+        if (responseVer.valid == false || responseVer.status == "pending") throw new CustomErrorObj("Invalid Request", 400)
+        queryobj = {
+            contact: body.contact,
+            type: body.type
+        }
+    }
+    else {
+        queryobj = {
+            email: body.email, type: body.type
+        }
+    }
+    // let queryobj = body.email ? {email:body.email,type: body.type} ? {contact}
+    let { data: otpData } = await fnGet(Otp, queryobj, [], true);
     if (otpData && otpData.length > 0) {
         console.log(otpData, 'otpData');
         let data = otpData[0];
@@ -371,7 +398,7 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
         console.log(StringtoDate(data.validto), currentDate, 'date check with format');
         console.log(StringtoDate(data.validto) >= currentDate, 'condition');
         if (data.isUsed == 1) throw new CustomErrorObj("Session Already Used", 403)
-        if (data.otp !== body.otp) {
+        if (data.otp !== body.otp && !body.contact) {
             return next(customErrorClass.BadRequest("Invalid OTP"))
         }
         if (StringtoDate(data.validto) >= currentDate && data.status == 'active') {
@@ -390,12 +417,12 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
                     }
                 };
                 let tokenData = attachedToken(newPayload);
-                await fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss"), isUsed: 1 }, { id: data.id });
+                await fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss"), isUsed: 1, otp: body.otp }, { id: data.id });
                 return returnResponse(res, 200, 'Otp Verify',
                     loginReponse(user[0], tokenData));
             }
             else {
-                await fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss"), isUsed: 1 }, { id: data.id });
+                await fnUpdate(Otp, { status: 'verify', verifyon: moment().format("YYYY-MM-DD HH:mm:ss"), isUsed: 1, otp: body.otp }, { id: data.id });
                 return returnResponse(res, 200, "Otp Verify")
             }
         }
