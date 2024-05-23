@@ -29,19 +29,19 @@ const createSettingModel = (sequelize, DataTypes) => {
                 },
                 viewChat: {
                     type: DataTypes.BOOLEAN,
-                    defaultValue: false,
+                    defaultValue: true,
                 },
                 participateinChat: {
                     type: DataTypes.BOOLEAN,
-                    defaultValue: false,
+                    defaultValue: true,
                 },
                 expressInterest: {
                     type: DataTypes.BOOLEAN,
-                    defaultValue: false,
+                    defaultValue: true,
                 },
                 viewPortfolio: {
                     type: DataTypes.BOOLEAN,
-                    defaultValue: false,
+                    defaultValue: true,
                 }
             },
             DataTypes

@@ -123,17 +123,31 @@ const getUser = TryCatch(async (req, res, next) => {
     if (!req.query.id) {
         for (let index = 0; index < data.length; index++) {
             const element = data[index];
-            if (element.role == 'advisor') {
-                let { data: relationcheck } = await fnGet(UserRelation, { requestStatus: ['pending', 'approved'], advisorId: data[index].id })
-                if (relationcheck.length > 0 && relationcheck) {
-                    data[index].dataValues.addedClient = true;
-                } else {
-                    data[index].dataValues.addedClient = false;
-                }
-            }
-            else if (element.role == 'legalrepresent') {
-                let { data: lrdetail } = await fnGet(LrDetail, { "detailtype": "company", userid: data[index].id }, [], true);
+            if (element.role == 'legalrepresent') {
+                let { data: lrdetail } = await fnGet(LrDetail, { "detailtype": "company", userid: data[index].id, attribute: ['id', 'companyname'] }, [], true);
                 data[index].dataValues.userdetail[0].dataValues.userlrdetail = lrdetail;
+            }
+            // if (element.role == 'advisor') {
+            //     let { data: relationcheck } = await fnGet(UserRelation, { requestStatus: ['pending', 'approved'], advisorId: data[index].id })
+            //     if (relationcheck.length > 0 && relationcheck) {
+            //         data[index].dataValues.addedClient = true;
+            //     } else {
+            //         data[index].dataValues.addedClient = false;
+            //     }
+            // }
+            // else if (element.role == 'legalrepresent') {
+            //     let { data: lrdetail } = await fnGet(LrDetail, { "detailtype": "company", userid: data[index].id, attribute: ['id', 'companyname'] }, [], true);
+            //     data[index].dataValues.userdetail[0].dataValues.userlrdetail = lrdetail;
+            // }
+        }
+    }
+    else {
+        if (data[0]?.role == 'advisor') {
+            let { data: relationcheck } = await fnGet(UserRelation, { requestStatus: ['pending', 'approved'], advisorId: data[0].id })
+            if (relationcheck.length > 0 && relationcheck) {
+                data[0].dataValues.addedClient = true;
+            } else {
+                data[0].dataValues.addedClient = false;
             }
         }
     }
