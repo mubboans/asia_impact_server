@@ -120,12 +120,33 @@ function setUserIdonQuery(req) {
         return req?.query ? req?.query : {};
     }
     else {
+
         return {
             ...req.query,
             // userid: req.user.userId,
         }
     }
 
+}
+function setUserIdonQuerysetting(req) {
+    if (role.includes(req.user.role)) {
+        return req?.query ? req?.query : {};
+    }
+    else {
+        if (req.user.role == 'individual_investor' || req.user.role == 'legalrepresent') {
+            req.query = {
+                ...req.query,
+                investorId: req.user.userId
+            }
+        }
+        else if (req.user.role == 'advisor') {
+            req.query = {
+                ...req.query,
+                advisorId: req.user.userId
+            }
+        }
+        return req.query;
+    }
 }
 function setUserRoleonQuery(req) {
     if (role.includes(req.user.role)) {
@@ -149,5 +170,5 @@ function CheckUserRole(req) {
 module.exports = {
     formatDateTime, getCurrentFormatedDate, setUserDetails, setUserDelete, ValidateEmail,
     StringtoDate, createRandomCode, setUserDetailsUpdate,
-    setUserIdonQuery, setUserRoleonQuery, createRandomCodeWithoutCheck, CheckUserRole
+    setUserIdonQuery, setUserRoleonQuery, createRandomCodeWithoutCheck, CheckUserRole, setUserIdonQuerysetting
 }

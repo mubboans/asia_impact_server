@@ -5,10 +5,10 @@ const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
-const { setUserIdonQuery } = require("../utils/functionalHelper");
+const { setUserIdonQuerysetting } = require("../utils/functionalHelper");
 
 const getSetting = TryCatch(async (req, res, next) => {
-    let query = setUserIdonQuery(req)
+    let query = setUserIdonQuerysetting(req)
     let inlcude = [
         {
             model: User,
@@ -36,6 +36,7 @@ const getSetting = TryCatch(async (req, res, next) => {
             }
         }
     ]
+
     let { data: GetAllSetting, config } = await fnGet(Setting, query, inlcude, false);
     return returnResponse(res, 200, 'Successfully Get Setting', GetAllSetting, config);
 }

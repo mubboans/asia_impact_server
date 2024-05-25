@@ -142,14 +142,27 @@ const getUser = TryCatch(async (req, res, next) => {
         }
     }
     else {
-        if (data[0]?.role == 'advisor') {
-            let { data: relationcheck } = await fnGet(UserRelation, { requestStatus: ['pending', 'approved'], advisorId: data[0].id })
+        if (data[0]?.role && data[0].role == 'advisor' || data[0]?.role == 'legalrepresent' || data[0]?.role == 'individual_investor') {
+            let count = await Notification.count({ where: { receiver_id: data[0].id, is_read: false } })
+            console.log(count, 'countcheck');
+            let query_obj = {
+                requestStatus: ['pending', 'approved']
+            };
+            if (data[0]?.role == 'advisor') {
+                query_obj.advisorId = data[0].id;
+            }
+            else if (data[0]?.role == 'legalrepresent' || data[0]?.role == 'individual_investor') {
+                query_obj.investorId = data[0].id;
+            }
+            let { data: relationcheck } = await fnGet(UserRelation, query_obj, [], true)
             if (relationcheck.length > 0 && relationcheck) {
                 data[0].dataValues.addedClient = true;
             } else {
                 data[0].dataValues.addedClient = false;
             }
+            data[0].dataValues.notify_count = count;
         }
+
     }
     // if (data[0]?.role == 'advisor') {
     //     let { data: relationcheck } = await fnGet(UserRelation, { requestStatus: ['pending', 'approved'], advisorId: data[0].id })

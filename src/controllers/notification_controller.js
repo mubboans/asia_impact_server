@@ -51,21 +51,26 @@ const getNotification = TryCatch(async (req, res, next) => {
     }
 
     if (query?.type == 'activechatrequesthistory') {
+        delete query.type;
         promiseArr.push(fnGet(ActiveChatRequestHistory, query, include, false))
     }
     else if (query?.type == 'notification') {
+        delete query.type;
         promiseArr.push(fnGet(Notification, query, [include[0]], false))
     }
     else {
         promiseArr.push(fnGet(Notification, query, [include[0]], false), fnGet(ActiveChatRequestHistory, query, include, false))
     }
     let data = await Promise.all(promiseArr);
-    const structuredData = [
-        {
-            "notification": data[0].data,
-            "activechatrequesthistory": data[1].data
-        }
-    ]
+    const structuredData = data[0]?.data.concat(data[1]?.data);
+    // [
+    //     // {
+    //     //     "notification": data[0].data,
+    //     //     "activechatrequesthistory": data[1].data
+    //     // }
+
+    //     ...data[1]?.data
+    // ]
     // let GetAllReport = await fnGet(Notification, req.query || {}, include, true);
     // let Activechatrequesthistory = await fnGet(ActiveChatRequestHistory)
     // let mergedData = [...data[0], ...data[1]];

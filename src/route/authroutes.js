@@ -220,7 +220,7 @@ route.post('/verifyuseremail', checkUserwithEmail);
 route.route('/country')
     .post(verifyRole("admin", "editor", "ai_officer"), postCountry)
     .put(verifyRole("admin", "editor", "ai_officer"), updateCountry)
-    .get(verifyRole("admin", "editor", "ai_officer"), getCountry)
+    .get(getCountry)
     .delete(verifyRole("admin", "editor", "ai_officer"), deleteCountry);
 
 module.exports = route;

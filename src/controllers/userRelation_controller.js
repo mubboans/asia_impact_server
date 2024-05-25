@@ -101,7 +101,8 @@ const postRelation = TryCatch(async (req, res, next) => {
                     "lang_id": 1,
                     "severity": process.env.NOTIFICATION_RELATION_SEVERITY || "error",
                     "notificationtype": "approval", // values:['approval', 'message'],
-                    "redirectlink": null
+                    "redirectlink": null,
+                    "type": "approval"
                 }, [], req);
                 if (element.relationshipType == 0) {
                     obj = {

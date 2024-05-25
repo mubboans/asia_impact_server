@@ -19,7 +19,7 @@ const createSettingModel = (sequelize, DataTypes) => {
                         key: 'id',
                     },
                 },
-                investorid: {
+                investorId: {
                     type: DataTypes.INTEGER,
                     allowNull: false,
                     references: {
