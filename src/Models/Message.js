@@ -8,16 +8,15 @@ const createMessageModel = (sequelize, DataTypes) => {
     Message.init(
         //pass only needed field with datatype
         {
-            conversationid: {
+            conversation_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: {
                     model: 'Conversation',
                     key: 'id',
                 },
-
             },
-            fromUserId: {
+            sender_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: {
@@ -25,21 +24,25 @@ const createMessageModel = (sequelize, DataTypes) => {
                     key: 'id',
                 },
             },
-            toUserId: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                references: {
-                    model: 'User',
-                    key: 'id',
-                },
-            },
+            // toUserId: {
+            //     type: DataTypes.INTEGER,
+            //     allowNull: false,
+            //     references: {
+            //         model: 'User',
+            //         key: 'id',
+            //     },
+            // },
             message: {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
             timestamp: {
                 type: DataTypes.STRING,
-                allowNull: false,
+                allowNull: true,
+            },
+            status: {
+                type: DataTypes.STRING,
+                allowNull: true,
             }
         },
         {

@@ -8,7 +8,7 @@ const createParticipateModel = (sequelize, DataTypes) => {
     Participate.init(
         //pass only needed field with datatype
         {
-            conversationid: {
+            conversation_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: {
@@ -17,7 +17,7 @@ const createParticipateModel = (sequelize, DataTypes) => {
                 },
 
             },
-            fromUserId: {
+            user_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: {
@@ -25,14 +25,11 @@ const createParticipateModel = (sequelize, DataTypes) => {
                     key: 'id',
                 },
             },
-            toUserId: {
+            last_read_timestamp: {
                 type: DataTypes.INTEGER,
-                allowNull: false,
-                references: {
-                    model: 'User',
-                    key: 'id',
-                },
+                allowNull: true,
             }
+
         },
         {
             sequelize,

@@ -32,6 +32,9 @@ const { createTransaction, Transaction } = require('../Models/Transaction');
 const { createCountryModel, Country } = require('../Models/Country');
 const { createRegionModel, Region } = require('../Models/Region');
 const { createCityModel, City } = require('../Models/City');
+const { createConversationModel, Conversation } = require('../Models/Conversation');
+const { createParticipateModel, Participate } = require('../Models/Participant');
+const { createMessageModel, Message } = require('../Models/Message');
 // const User = require('../Models/Users');
 // const Documents = require('../Models/Document');
 // const { syncModel } = require('../Models');
@@ -95,6 +98,10 @@ const dbConnect = async () => {
         createCountryModel(sequelize, DataTypes);
         createRegionModel(sequelize, DataTypes);
         createCityModel(sequelize, DataTypes);
+
+        createConversationModel(sequelize, DataTypes);
+        createParticipateModel(sequelize, DataTypes);
+        createMessageModel(sequelize, DataTypes);
 
         User.hasMany(Document, { foreignKey: 'userid', as: 'document' });
         Document.belongsTo(User, { foreignKey: 'userid' });
@@ -218,6 +225,10 @@ const dbConnect = async () => {
         Region.hasMany(City, { foreignKey: "regionid", as: "city" });
         City.belongsTo(Region, { foreignKey: "regionid", as: "city" });
 
+        Conversation.hasMany(Participate, { foreignKey: "conversation_id", as: 'participate' });
+        Participate.belongsTo(Conversation, { foreignKey: "conversation_id", as: 'participate' });
+        Conversation.hasMany(Message, { foreignKey: "conversation_id", as: 'messages' });
+        Message.belongsTo(Conversation, { foreignKey: "conversation_id", as: 'messages' });
 
         await sequelize.sync({ alter: false });
 

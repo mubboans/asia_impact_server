@@ -11,7 +11,8 @@ const { dbConnect } = require('./dbConfig/dbConfig');
 const { checkToken } = require('./middleware/verifyRequest');
 const { route_not_found } = require('./helper/responseHelper');
 const TryCatch = require('./utils/TryCatchHelper');
-
+const createSocket = require('./controllers/socket_controller');
+const path = require("path");
 const app = express()
 const port = process.env.PORT || 8001;
 
@@ -34,7 +35,10 @@ morgan.token('reqid', (req) => req.user ? req.user.id : 'N/A');
 morgan.token("err", function (req, res) { return req.error; });
 // Create a custom token for user IP address
 
-
+app.use(express.static(path.resolve("./public")));
+app.get("/socket", (req, res) => {
+  return res.sendFile(__dirname + "/public/index.html");
+});
 const jsonFormat = (tokens, req, res) => {
   return JSON.stringify({
     "remote-address": tokens["remote-addr"](req, res),
@@ -65,14 +69,22 @@ app.get('/life-check', (req, res) => {
   res.status(200).send('working fine 👍');
 })
 
+
+
 app.use(errorresponse)
 
 app.use(route_not_found)
 
-
-app.listen(port, TryCatch(async () => {
+const { io, server } = createSocket(app);
+server.listen(port, async () => {
+  // console.log(`Server is running on port ${port}`);
   await dbConnect();
   console.log(`Your app listening on port ${port}`)
-}
-)
-)
+});
+createSocket(app);
+// app.listen(port, TryCatch(async () => {
+//   await dbConnect();
+//   console.log(`Your app listening on port ${port}`)
+// }
+// )
+// )

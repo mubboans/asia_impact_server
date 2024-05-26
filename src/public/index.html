@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1 id="head"></h1>
+    <input type="text" id="message" placeholder="Enter Message" />
+    <div id="messages"></div>
+    <input type="text" id="room-message" placeholder="Enter room" />
+    <div id="roomname"></div>
+    <button onclick="myFunction()">Send</button>
+    <button onclick="myFunction2()"> get my mssg </button>
+</body>
+<script src="./socket.io/socket.io.js"></script>
+<script>
+    let email = "vogafij204@otemdi.com", id = 22;
+    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIyLCJlbWFpbCI6InZvZ2FmaWoyMDRAb3RlbWRpLmNvbSIsInJvbGUiOiJhZG1pbiIsInR5cGUiOiJhZG1pbiIsImxhbmdfaWQiOm51bGwsInVzZXJkZXRhaWwiOnt9LCJpYXQiOjE3MTY2Mzg5NTcsImV4cCI6MTcxNjY0NjE1N30.oRR0yiD6LrnSP87XRvB3oTBaEv-xH9gTt1egKGUw1s0"
+    let room = Math.floor(Math.random() * 90) + 10;
+    const socket = io({
+        query: { email, id },
+        extraHeaders: {
+            authorization: `Bearer ${token}`
+        }
+    })
+
+    socket.on('message_history', (x) => {
+        console.log(x, 'response of messages');
+    })
+    socket.on('join', (x) => {
+        console.log(x, 'join hit from socket');
+        head.innerHTML = x;
+    })
+
+    const head = document.getElementById("head");
+    const roomnamed = document.getElementById("roomname");
+    roomnamed.innerHTML = room;
+    const messageInput = document.getElementById("message");
+    const roommessageInput = document.getElementById("room-message");
+    socket.on("receive_chat_message", (message) => {
+        console.log(message, 'recieve message event');
+        const p = document.createElement("p");
+        p.innerText = message.message;
+        allMessages.appendChild(p);
+    });
+
+    const allMessages = document.getElementById("messages");
+
+    function myFunction() {
+        const message = messageInput.value;
+        const email = roommessageInput.value
+        console.log(message);
+        let chatobj = {
+            fromUserId: room,
+            toUserId: roommessageInput.value,
+            message,
+            timestamp: new Date().get
+        }
+        socket.emit("send_chat_message", { sender_id: 1, receiver_id: 22, message, email });
+    }
+    function myFunction2() {
+        socket.emit("get_message", { id, email });
+    }
+</script>
+
+</html>

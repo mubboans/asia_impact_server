@@ -18,7 +18,7 @@ const createConversationModel = (sequelize, DataTypes) => {
             },
             enddate: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: true
             }
         },
         {
