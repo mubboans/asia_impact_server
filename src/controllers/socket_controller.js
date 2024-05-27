@@ -46,7 +46,7 @@ const createSocket = (app) => {
         socket.broadcast.emit("join", `${email} has joined the server`);
 
         socket.on("send_chat_message", async (obj) => {
-
+            let messageArr = []
             const { sender_id, receiver_id, message, email, conversation_id } = obj;
             if (!conversation_id) {
                 await fnPost(Conversation, {
@@ -68,15 +68,20 @@ const createSocket = (app) => {
                 },)
             }
             else {
-                await fnPost(Message, {
+                messageArr.push({
                     sender_id,
                     message,
                     conversation_id,
                     timestamp: getCurrentFormatedDate(),
                     status: 'send'
                 })
+                // await fnPost(Message,)
+
             }
             console.log(obj, 'chat message hit');
+            if (messageArr.length >= 10) {
+                await fnbulkMessagePost(messageArr)
+            }
             // await fnbulkMessagePost(obj);
             socket.broadcast.to(email).emit("receive_chat_message", {
                 sender_id,
@@ -119,7 +124,7 @@ const createSocket = (app) => {
             })
             console.log(messages, 'messages');
 
-            socket.broadcast.to(email).emit('message_history', messages)
+            io.to(email).emit('message_history', messages)
         })
         socket.on('disconnect', () => {
             console.log('A client disconnected.', socket.id);
@@ -135,14 +140,14 @@ const fnbulkMessageUpdate = TryCatch(async (arr) => {
     await fnbulkCreate(Message, arr, ['status'], [], req);
 }
 )
-const fnbulkMessagePost = TryCatch((arr) => {
-
+const fnbulkMessagePost = TryCatch(async (arr) => {
+    await fnbulkCreate(Message, arr, [], [], req);
 }
 )
-const fnbulkMessageDelete = TryCatch((arr) => {
+// const fnbulkMessageDelete = TryCatch((arr) => {
 
-}
-)
+// }
+// )
 
 
 module.exports = createSocket;
