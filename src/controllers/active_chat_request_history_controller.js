@@ -1,6 +1,8 @@
 const { ActiveChatRequest } = require("../Models/ActiveChatRequest");
 const { ActiveChatRequestHistory } = require("../Models/ActiveChatRequestHistory");
 const { Setting } = require("../Models/Setting");
+const { UserDetail } = require("../Models/UserDetail");
+const { User } = require("../Models/Users");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
 const TryCatch = require("../utils/TryCatchHelper");
@@ -27,6 +29,12 @@ const getActiveChatRequestHistory = TryCatch(async (req, res, next) => {
 const updateActiveChatRequestHistory = TryCatch(async (req, res, next) => {
     let updateStatus = await fnUpdate(ActiveChatRequestHistory, req.body, { id: req.body.id }, req)
     console.log(updateStatus, 'updateStatus');
+    if (body.activechatrequest && body.activechatrequest) {
+        await fnUpdate(ActiveChatRequest, body.activechatrequest, { id: body.activechatrequestid }, req);
+        if (body.activechatrequest.notification) {
+            await fnPost(ActiveChatRequestHistory, body.activechatrequest.notification, [], req);
+        }
+    }
     return returnResponse(res, 200, 'Successfully Update ActiveChatRequestHistory')
 }
 )
@@ -42,9 +50,7 @@ const deleteActiveChatRequestHistory = TryCatch(async (req, res, next) => {
 
 const postActiveChatRequestHistory = TryCatch(async (req, res, next) => {
     let body = req.body;
-    if (body.activechaterequest && body.activechatrequestid) {
-        await fnUpdate(ActiveChatRequest, body.activechatrequest, { id: body.activechatrequestid }, req);
-    }
+
     // let deviceCheck = await fnGet(ActiveChatRequestHistory, { userid: body.userid, deviceId: body.deviceId }, [], false);
     // let responseMessage = 'Added';
     // if (deviceCheck && deviceCheck.length > 0) {
@@ -63,7 +69,30 @@ const postActiveChatRequestHistory = TryCatch(async (req, res, next) => {
         if (!(settingCheck && settingCheck.length > 0)) return next(customErrorClass.BadRequest('Setting not found'))
         req.body = { ...req.body, sender_id: body.investorid };
     }
-    await fnPost(ActiveChatRequestHistory, req.body, [], req);
+    await fnPost(ActiveChatRequestHistory, req.body, [
+        {
+            model: User,
+            sourceKey: "sender_id",
+            attributes: ['id', 'email', 'status', 'type', 'role', 'access_group', 'isActive'],
+            include: {
+                model: UserDetail,
+                as: 'userdetail',
+                attributes: ['id', 'firstname', 'lastname', 'img'],
+            },
+            as: 'SenderDetail'
+        },
+        {
+            model: User,
+            sourceKey: "receiver_id",
+            attributes: ['id', 'email', 'status', 'type', 'role', 'access_group', 'isActive'],
+            include: {
+                model: UserDetail,
+                as: 'userdetail',
+                attributes: ['id', 'firstname', 'lastname', 'img'],
+            },
+            as: 'ReceiverDetail'
+        }
+    ], req);
 
     // }
     return returnResponse(res, 201, `Successfully Added ActiveChatRequestHistory`);

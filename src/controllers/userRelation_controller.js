@@ -8,6 +8,7 @@ const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
 const { Op } = require("sequelize");
 const { createRandomCode, getCurrentFormatedDate } = require("../utils/functionalHelper");
 const { UserDetail } = require("../Models/UserDetail");
+const { Setting } = require("../Models/Setting");
 const getUserWithRelation = TryCatch(async (req, res, next) => {
     console.log('hit user 8');
     let d = setUserId(req);
@@ -63,8 +64,13 @@ const deleteRelation = TryCatch(async (req, res, next) => {
     if (!req.query.id) {
         next(customErrorClass.BadRequest('id required'))
     }
+    let { advisorId, investorId } = req.query
+    if (!advisorId || !investorId) {
+        next(customErrorClass.BadRequest('Investor/Advisor Detail Required'))
+    }
     // let deleteStatus = await fnDelete(UserRelation, req.query, req, "UserRelation _" + req.query.id)
     let deleteStatus = await fnUpdate(UserRelation, { requestStatus: 'deleted', deletionDate: getCurrentFormatedDate(), deletedBy: req?.user?.userId }, req.query, "UserRelation _" + req.query.id)
+    await fnDelete(Setting, { advisorId, investorId }, req, "Setting_" + req.user.userId)
     return returnResponse(res, 200, 'Successfully Delete UserRelation')
 }
 )
@@ -102,7 +108,8 @@ const postRelation = TryCatch(async (req, res, next) => {
                     "severity": process.env.NOTIFICATION_RELATION_SEVERITY || "error",
                     "notificationtype": "approval", // values:['approval', 'message'],
                     "redirectlink": null,
-                    "type": "approval"
+                    "type": "approval",
+                    is_read: false,
                 }, [], req);
                 if (element.relationshipType == 0) {
                     obj = {

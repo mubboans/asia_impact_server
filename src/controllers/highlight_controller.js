@@ -10,6 +10,8 @@ const { Highlight } = require("../Models/Highlight");
 const { getEmailBody, ShootMail } = require("../utils/sendmail");
 const { HighlightInterestNFavourite } = require("../Models/HighlightInterestNFavourite");
 const { checkTokenForNews } = require("../middleware/verifyRequest");
+const { User } = require("../Models/Users");
+const { UserDetail } = require("../Models/UserDetail");
 
 const getHighlight = TryCatch(async (req, res, next) => {
     let query = checkTokenForNews(req);
@@ -38,7 +40,6 @@ const getHighlight = TryCatch(async (req, res, next) => {
     let { data: GetAllHighlight, config } = await fnGet(Highlight, query, include, false);
     if (userdetailwithhighlight && GetAllHighlight) {
         let highlightData = [];
-        let HighlightInterestNFavouritearr = [];
         GetAllHighlight = GetAllHighlight.map(highlight => {
             if (highlight.HighlightInterestNFavourites.length > 0) {
                 console.log(highlight.HighlightInterestNFavourites.length, 'HighlightInterestNFavourites length check');
@@ -164,7 +165,23 @@ const deleteHighlightInterestnFovourite = TryCatch(async (req, res, next) => {
 })
 
 const getHighlightInterestnFovourite = TryCatch(async (req, res, next) => {
-    let include = [];
+    let include = [
+        {
+            model: Highlight,
+            sourceKey: "highlightid",
+            attributes: ['id', 'eventType', 'name', 'subtype', 'imageUrl', 'provience', 'country', 'venue', 'eventdate'],
+        },
+        {
+            model: User,
+            as: "UserDetail",
+            attributes: ['id', 'email', 'status', 'type', 'role', 'access_group', 'isActive'],
+            include: {
+                model: UserDetail,
+                as: 'userdetail',
+                attributes: ['id', 'firstname', 'lastname', 'img'],
+            },
+        }
+    ];
     let query = req.query;
     if (!req.user.type == 'admin') {
         //      query
@@ -175,16 +192,16 @@ const getHighlightInterestnFovourite = TryCatch(async (req, res, next) => {
             userid: req.user.userId
         }
     }
-    if (query.id) {
-        include = [
-            {
-                model: Highlight,
-                sourceKey: "highlightid",
-                foreignKey: "id",
-            }
-        ]
-    }
-    let GetHighlightInterestnFovourite = await fnGet(HighlightInterestNFavourite, req.query || {}, include, false);
+    // if (query.id) {
+    //     include = [
+    //         {
+    //             model: Highlight,
+    //             sourceKey: "highlightid",
+    //             foreignKey: "id",
+    //         }
+    //     ]
+    // }
+    let { data: GetHighlightInterestnFovourite } = await fnGet(HighlightInterestNFavourite, req.query || {}, include, false);
     return returnResponse(res, 200, 'Successfully Get Record', GetHighlightInterestnFovourite)
 })
 

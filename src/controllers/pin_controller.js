@@ -35,7 +35,9 @@ const checkPin = TryCatch(async (req, res, next) => {
         return next(customErrorClass.BadRequest("Pin Not Match"))
     }
     const newPayload = {
-        userId: d.id, email: d.email, role: d.role, type: d.type, d, lang_id: d.lang_id, userdetail: {
+        userId: d.id,
+        access_group: d.access_group,
+        email: d.email, role: d.role, type: d.type, d, lang_id: d.lang_id, userdetail: {
             userdetailid: d.userdetail[0]?.id
         }
     };

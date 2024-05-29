@@ -1,6 +1,11 @@
+const { ActiveRequest } = require("../Models/ActiveRequest");
 const { Company } = require("../Models/Company");
+const { CompanyNSustain } = require("../Models/CompanyNSustain");
 const { Portfolio } = require("../Models/Portfolio");
+const { Report } = require("../Models/Report");
+const { SectionData } = require("../Models/SectionData");
 const { Setting } = require("../Models/Setting");
+const { SustainGoal } = require("../Models/SustainGoal");
 const { User } = require("../Models/Users");
 const customErrorClass = require("../error/customErrorClass");
 const { returnResponse } = require("../helper/responseHelper");
@@ -13,11 +18,11 @@ const getPortfolio = TryCatch(async (req, res, next) => {
         {
             model: Company,
             sourceKey: "companyid",
-            attributes: ['id', 'name', 'companylogo', 'country'],
+            attributes: ['id', 'name', 'companylogo', 'country', 'activerequest'],
         }
     ]
     if (req?.query?.id) {
-        include.push(
+        include = [
             // {
             //     model: Company,
             //     sourceKey: "companyid",
@@ -27,7 +32,49 @@ const getPortfolio = TryCatch(async (req, res, next) => {
                 sourceKey: "userid",
                 attributes: ['id', 'email', 'status', 'type', 'role', 'access_group', 'isActive'],
             },
-        )
+            {
+                model: Company,
+                sourceKey: "companyid",
+                foreignKey: "id",
+                include: [
+                    {
+                        model: SectionData,
+                        as: 'sectiondata',
+                        where: { reportid: null },
+                    },
+                    {
+                        model: CompanyNSustain,
+                        as: "sustainarr",
+                        include: {
+                            model: SustainGoal,
+                            sourceKey: "sustaingoalid",
+                            foreignKey: "id",
+                            order: [
+                                [SustainGoal, 'id', 'DESC']
+                            ]
+                        }
+                    },
+                    {
+
+                        model: Report,
+                        sourceKey: "companyid",
+                        // include: [
+                        //     {
+                        //         model: SectionData,
+                        //         as: 'sectiondata'
+                        //     }
+                        // ]
+
+                    },
+                    {
+
+                        model: ActiveRequest,
+                        sourceKey: "companyid",
+                    }
+                ]
+            },
+
+        ]
     }
     if (req?.query?.investorid) {
         let { data } = await fnGet(Setting, { viewPortfolio: true, advisorId: req.user.userId, investorid: req?.query?.investorid }, [], false);

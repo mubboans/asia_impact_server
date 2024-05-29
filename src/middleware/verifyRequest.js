@@ -123,6 +123,7 @@ const checkTokenForNews = (req) => {
                                 }
                             }
                         ],
+                        // access_group: head.access_group,
                         // [Op.in]: [
                         //     // { targetUser: { [Op.eq]: head.role } },
                         //     { targetUser: { [Op.like]: `%${head.role}%` } },

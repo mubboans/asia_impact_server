@@ -105,6 +105,7 @@ const Login = TryCatch(async (req, res, next) => {
             const newPayload = {
                 userId: userDetails.id, email: userDetails.email, role: userDetails.role, type: userDetails.type,
                 lang_id: userDetails.lang_id,
+                access_group: userDetails.email,
                 userdetail: {
                     userdetailid: userDetails.userdetail[0]?.id
                 }
@@ -185,6 +186,7 @@ const Register = TryCatch(async (req, res, next) => {
     let userdetail = await fnPost(UserDetail, { userid: user.id }, [], req);
     const newPayload = {
         userId: user.id, email: user.email, role: body.role, type: user.type, lang_id: user.lang_id,
+        access_group: user.email,
         userdetail: {
             // userdetailid: user?.userdetail ? user?.userdetail[0]?.id : null
             userdetailid: userdetail?.id
@@ -295,7 +297,6 @@ const SendOTP = TryCatch(async (req, res, next) => {
     }
 
     if (body.sendby == 'sms' && !body.contact) {
-
         return next(customErrorClass.BadRequest('Invalid Body'));
 
     }
@@ -341,8 +342,11 @@ const SendOTP = TryCatch(async (req, res, next) => {
         }
     }
     fnGet(Otp, query, [], true).then(async (result) => {
-        console.log(result, 'result check');
+        console.log(result.data[0], 'result check');
         if (result.data.length > 0) {
+            if (result.data[0].status == 'verify') {
+                throw new CustomErrorObj('Number Already verified', 400)
+            }
             // if (result[0].type !== body.type) {
             //     fnPost(Otp, modelobj);
             // }
@@ -357,18 +361,19 @@ const SendOTP = TryCatch(async (req, res, next) => {
             fnPost(Otp, modelobj, [], req);
             // return returnResponse(res, 200, "Successfully send otp")
         }
+        if (body.sendby == 'email') {
+            await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
+        }
+        else if (body.sendby == 'sms') {
+            let d = await sendSms(body.contact);
+            console.log(d, 'twillo response');
+        }
+        return returnResponse(res, 201, "Successfully send otp")
     }).catch((err) => {
         console.log(err, 'err');
-        return next(customErrorClass.InternalServerError("Internal Server Error"))
+        return next(customErrorClass.InternalServerError(err?.message || 'Internal server error'))
     });
-    if (body.sendby == 'email') {
-        await ShootMail({ html: emailbody, recieveremail: body.email, subject: "One time password (OTP) for verification" });
-    }
-    else {
-        let d = await sendSms(body.contact);
-        console.log(d, 'twillo response');
-    }
-    return returnResponse(res, 201, "Successfully send otp")
+
 }
 )
 const VerifyOTP = TryCatch(async (req, res, next) => {
@@ -412,7 +417,8 @@ const VerifyOTP = TryCatch(async (req, res, next) => {
                 }
 
                 const newPayload = {
-                    userId: user[0].id, email: user[0].email, role: user[0].role, type: user[0].type, user, lang_id: user[0].lang_id, userdetail: {
+                    userId: user[0].id, email: user[0].email, role: user[0].role, type: user[0].type, user,
+                    access_group: user[0].access_group, lang_id: user[0].lang_id, userdetail: {
                         userdetailid: user[0].userdetail[0]?.id
                     }
                 };

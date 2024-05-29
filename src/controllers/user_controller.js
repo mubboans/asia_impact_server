@@ -57,17 +57,8 @@ const getUser = TryCatch(async (req, res, next) => {
             model: UserDetail,
             sourceKey: "userid",
             as: "userdetail",
-            attributes: ["id", 'firstname', "lastname"],
-            // include: [
-            //     {
-            //         model: LrDetail,
-            //         sourceKey: "userdetailid",
-            //         foreignKey: "id",
-            //         as: "userlrdetail",
-            // where: { "detailtype": "company" },
-            //         attributes: ["id", "companyname", 'firstname', "lastname", "detailtype", "email"],
-            //     }
-            // ]
+            attributes: ["id", 'firstname', "lastname", "residencecountry", "country"],
+
         }
     ];
     let query = getUserById(req, req?.query);
@@ -155,6 +146,8 @@ const getUser = TryCatch(async (req, res, next) => {
                 query_obj.investorId = data[0].id;
             }
             let { data: relationcheck } = await fnGet(UserRelation, query_obj, [], true)
+            let approvedRelation = relationcheck.filter(x => x.requestStatus == 'approved');
+            data[0].dataValues.UserRelations = approvedRelation
             if (relationcheck.length > 0 && relationcheck) {
                 data[0].dataValues.addedClient = true;
             } else {

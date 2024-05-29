@@ -3,7 +3,7 @@ const { Server } = require('socket.io');
 const http = require('http');
 const { checkToken } = require('../middleware/verifyRequest');
 const { Conversation } = require('../Models/Conversation');
-const { fnGet, fnbulkCreate, fnPost } = require('../utils/dbCommonfn');
+const { fnGet, fnbulkCreate, fnPost, fnUpdate } = require('../utils/dbCommonfn');
 const { Participate } = require('../Models/Participant');
 const { Message } = require('../Models/Message');
 const { Op, Sequelize } = require('sequelize');
@@ -33,6 +33,10 @@ const createSocket = (app) => {
     });
 
     io.on('connection', (socket) => {
+        let messageBuffer = [];
+        const BUFFER_LIMIT = 100;
+        const POST_INTERVAL = 60000;
+
         const { email, id } = socket.handshake.query;
         if (!email || !id) {
             return ({
@@ -46,10 +50,10 @@ const createSocket = (app) => {
         socket.broadcast.emit("join", `${email} has joined the server`);
 
         socket.on("send_chat_message", async (obj) => {
-            let messageArr = []
+            // let messageArr = []
             const { sender_id, receiver_id, message, email, conversation_id } = obj;
-            if (!conversation_id) {
-                await fnPost(Conversation, {
+            if (!conversation_id && sender_id && receiver_id && message) {
+                messageBuffer.push(fnPost(Conversation, {
                     startdate: getCurrentFormatedDate(),
                     isEnded: false,
                     participate: [
@@ -65,23 +69,38 @@ const createSocket = (app) => {
                         timestamp: getCurrentFormatedDate(),
                         status: 'send'
                     }
-                },)
+                }, {
+                    include: [
+                        { model: Participate, as: 'participate' },
+                        { model: Message, as: 'messages' }
+                    ]
+                })
+                )
             }
             else {
-                messageArr.push({
-                    sender_id,
-                    message,
-                    conversation_id,
-                    timestamp: getCurrentFormatedDate(),
-                    status: 'send'
-                })
-                // await fnPost(Message,)
-
+                messageBuffer.push(
+                    fnPost(Message, {
+                        sender_id,
+                        message,
+                        conversation_id,
+                        timestamp: getCurrentFormatedDate(),
+                        status: 'send'
+                    }, []
+                    ))
+                // await fnPost(Message,{
+                //     sender_id,
+                //     message,
+                //     conversation_id,
+                //     timestamp: getCurrentFormatedDate(),
+                //     status: 'send'
+                // },[],req)
             }
             console.log(obj, 'chat message hit');
-            if (messageArr.length >= 10) {
-                await fnbulkMessagePost(messageArr)
+            if (messageBuffer.length >= BUFFER_LIMIT) {
+                await fnbulkMessagePost(messageBuffer)
+                messageBuffer = []
             }
+            createonInterval();
             // await fnbulkMessagePost(obj);
             socket.broadcast.to(email).emit("receive_chat_message", {
                 sender_id,
@@ -95,40 +114,71 @@ const createSocket = (app) => {
 
         socket.on('action_message', async (obj) => {
             let { action, id } = obj;
-            let message_arr = [];
-            if (action == 'update') {
-                message_arr.push({
-                    id, status: "read"
-                })
-                await fnbulkMessageUpdate(message_arr);
+            console.log('enter on action_message');
+            if (id && action) {
+                if (action == 'update') {
+                    messageBuffer.push(fnUpdate(Message, {
+                        id, status: "read"
+                    }, { id })
+                    )
+                    // await fnbulkMessageUpdate(message_arr);
+                }
+                else if (action == 'delete') {
+                    messageBuffer.push(fnUpdate(Message, {
+                        id, status: "delete"
+                    }, { id })
+                    )
+                }
             }
-            else if (action == 'delete') {
-                message_arr.push({
-                    id, status: "delete"
-                })
-                await fnbulkMessageUpdate(message_arr);
+            if (messageBuffer.length > BUFFER_LIMIT) {
+                await fnbulkMessageUpdate(messageBuffer);
+                messageBuffer = []
             }
+            createonInterval();
         })
 
         socket.on('get_message', async (x) => {
             let { id, email } = x;
-            let { data: messages } = await fnGet(Participate, { user_id: id }, {
-                include: [
-                    {
-                        model: Message,
-                        where: {
-                            conversation_id: Sequelize.col('Participate.conversation_id')
+            if (id && email) {
+                let { data: messages } = await fnGet(Participate, { user_id: id },
+                    [
+                        {
+                            model: Conversation,
+                            include: [
+                                {
+                                    model: Message,
+                                    sourceKey: "conversation_id",
+                                    //   where: {
+                                    //     timestamp: {
+                                    //       [Sequelize.Op.gt]: Sequelize.col('Participate.last_read_timestamp')
+                                    //     }
+                                    //   }
+                                    as: 'messages'
+                                }
+                            ],
+                            sourceKey: "conversation_id",
+                            as: 'conversation'
                         }
-                    }
-                ]
-            })
-            console.log(messages, 'messages');
+                    ]
+                )
+                console.log(messages, 'messages');
+                io.to(email).emit('message_history', messages)
+            }
 
-            io.to(email).emit('message_history', messages)
         })
         socket.on('disconnect', () => {
             console.log('A client disconnected.', socket.id);
         });
+        const createonInterval = () => setInterval(async () => {
+            console.log(messageBuffer.length, 'messageBuffer.length check');
+            if (messageBuffer.length > 0) {
+                await fnbulkMessagePost(messageBuffer)
+                messageBuffer = []
+                console.log('inside fnbulkMessagePost');
+            }
+            console.log('interval hit ');
+        }, POST_INTERVAL)
+
     });
     io.engine.on("connection_error", (err) => {
         console.log(err.code, err.message, 'error in connecting')
@@ -136,12 +186,15 @@ const createSocket = (app) => {
     });
     return { io, server };
 };
+
 const fnbulkMessageUpdate = TryCatch(async (arr) => {
     await fnbulkCreate(Message, arr, ['status'], [], req);
 }
 )
 const fnbulkMessagePost = TryCatch(async (arr) => {
-    await fnbulkCreate(Message, arr, [], [], req);
+    await Promise.all(arr);
+    return [];
+    //  fnbulkCreate(Message, arr, [], [], req);
 }
 )
 // const fnbulkMessageDelete = TryCatch((arr) => {

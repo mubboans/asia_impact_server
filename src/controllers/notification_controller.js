@@ -11,6 +11,7 @@ const TryCatch = require("../utils/TryCatchHelper");
 const { fnGet, fnUpdate, fnDelete, fnPost } = require("../utils/dbCommonfn");
 const { createRandomCode } = require("../utils/functionalHelper");
 const { ActiveChatRequest } = require("../Models/ActiveChatRequest");
+const { Company } = require("../Models/Company");
 
 const getNotification = TryCatch(async (req, res, next) => {
     let query = req.query;
@@ -31,6 +32,11 @@ const getNotification = TryCatch(async (req, res, next) => {
                 model: ActiveChatRequest,
                 foreignKey: 'activechatrequestid', // This should be the foreign key in ActiveChatRequestHistory
                 as: 'activerequestchat',
+            },
+            {
+                model: Company,
+                foreignKey: 'companyid',
+                attributes: ['id', 'name', 'companylogo', 'country', 'activerequest'],
             }
 
         ]

@@ -150,6 +150,8 @@ const dbConnect = async () => {
         Highlight.hasMany(HighlightInterestNFavourite, { foreignKey: 'highlightid' });
         HighlightInterestNFavourite.belongsTo(Highlight, { foreignKey: 'highlightid' });
 
+        User.hasMany(HighlightInterestNFavourite, { foreignKey: 'userid', as: 'UserDetail' });
+        HighlightInterestNFavourite.belongsTo(User, { foreignKey: 'userid', as: 'UserDetail' });
 
         Company.hasMany(SectionData, { foreignKey: 'companyid', as: 'sectiondata' });
         SectionData.belongsTo(Company, { foreignKey: 'companyid' });
@@ -165,6 +167,8 @@ const dbConnect = async () => {
 
         Notification.hasMany(UserRelation, { foreignKey: 'notification_id' });
         UserRelation.belongsTo(Notification, { foreignKey: 'notification_id' });
+
+
 
         User.hasMany(Setting, { foreignKey: 'advisorId', as: 'advisorUser' });
         Setting.belongsTo(User, { foreignKey: 'advisorId', as: 'advisorUser' });
@@ -193,7 +197,21 @@ const dbConnect = async () => {
         User.hasMany(ActiveRequest, { foreignKey: "useridAdvisor", as: "AdvisorDetail" });
         ActiveRequest.belongsTo(User, { foreignKey: "useridAdvisor", as: "AdvisorDetail" })
         User.hasMany(ActiveRequest, { foreignKey: "useridInvestor", as: "InvestorDetail" });
-        ActiveRequest.belongsTo(User, { foreignKey: "useridInvestor", as: "InvestorDetail" })
+        ActiveRequest.belongsTo(User, { foreignKey: "useridInvestor", as: "InvestorDetail" });
+
+        User.hasMany(ActiveChatRequest, { foreignKey: "sender_id", as: "SenderDetail" });
+        ActiveChatRequest.belongsTo(User, { foreignKey: "sender_id", as: "SenderDetail" });
+        User.hasMany(ActiveChatRequest, { foreignKey: "receiver_id", as: "ReceiverDetail" });
+        ActiveChatRequest.belongsTo(User, { foreignKey: "receiver_id", as: "ReceiverDetail" });
+
+
+        User.hasMany(ActiveChatRequestHistory, { foreignKey: "sender_id", as: "Sender" });
+        ActiveChatRequestHistory.belongsTo(User, { foreignKey: "sender_id", as: "Sender" });
+        User.hasMany(ActiveChatRequestHistory, { foreignKey: "receiver_id", as: "Receiver" });
+        ActiveChatRequestHistory.belongsTo(User, { foreignKey: "receiver_id", as: "Receiver" });
+
+
+
 
         ActiveChatRequest.hasMany(ActiveChatRequestHistory, { foreignKey: 'activechatrequestid', as: 'activerequestchathistory' });
         ActiveChatRequestHistory.belongsTo(ActiveChatRequest, { foreignKey: 'activechatrequestid', as: 'activerequestchathistory' });
@@ -205,8 +223,14 @@ const dbConnect = async () => {
         ActiveRequest.hasMany(ActiveChatRequestHistory, { foreignKey: 'activerequestid', as: 'activerequest_chathistory' });
         ActiveChatRequestHistory.belongsTo(ActiveRequest, { foreignKey: 'activerequestid', as: 'activerequest_chathistory' });
 
-        Company.hasMany(ActiveRequest, { foreignKey: 'companyid' });
-        ActiveChatRequestHistory.belongsTo(ActiveChatRequest, { foreignKey: 'companyid' });
+        Company.hasMany(ActiveChatRequestHistory, { foreignKey: 'companyid' });
+        ActiveChatRequestHistory.belongsTo(Company, { foreignKey: 'companyid' });
+
+        Company.hasMany(Notification, { foreignKey: 'company_id' });
+        Notification.belongsTo(Company, { foreignKey: 'company_id' });
+
+        Company.hasMany(ActiveChatRequest, { foreignKey: 'companyid' });
+        ActiveChatRequest.belongsTo(Company, { foreignKey: 'companyid' });
 
         User.hasMany(ActiveChatRequestHistory, { foreignKey: 'sender_id' });
         ActiveChatRequestHistory.belongsTo(User, { foreignKey: 'sender_id' });
@@ -226,7 +250,7 @@ const dbConnect = async () => {
         City.belongsTo(Region, { foreignKey: "regionid", as: "city" });
 
         Conversation.hasMany(Participate, { foreignKey: "conversation_id", as: 'participate' });
-        Participate.belongsTo(Conversation, { foreignKey: "conversation_id", as: 'participate' });
+        Participate.belongsTo(Conversation, { foreignKey: "conversation_id", as: 'conversation' });
         Conversation.hasMany(Message, { foreignKey: "conversation_id", as: 'messages' });
         Message.belongsTo(Conversation, { foreignKey: "conversation_id", as: 'messages' });
 

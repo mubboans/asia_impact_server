@@ -1,3 +1,4 @@
+const { ActiveRequest } = require("../Models/ActiveRequest");
 const { Company } = require("../Models/Company");
 const { CompanyNSustain } = require("../Models/CompanyNSustain");
 const { HighlightDetail } = require("../Models/HighlightDetail");
@@ -50,7 +51,12 @@ const getCompany = TryCatch(async (req, res, next) => {
                         [SustainGoal, 'id', 'DESC']
                     ]
                 }
+            },
+            {
+                model: ActiveRequest,
+                sourceKey: "companyid",
             }
+
         )
 
 

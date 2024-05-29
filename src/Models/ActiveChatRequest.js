@@ -69,7 +69,7 @@ const createActiveChatRequestModel = (sequelize, DataTypes) => {
                     allowNull: true,
                 },
                 ai_officer_status: {
-                    type: DataTypes.STRING, // pending,approved,declined
+                    type: DataTypes.STRING, // pending,approved,declined,dealclose (Ai Officier)
                     allowNull: true
                 },
                 lang_id: {

@@ -19,7 +19,11 @@ const createHighlightInterestNFavourite = (sequelize, DataTypes) => {
                 },
                 userid: {
                     type: DataTypes.INTEGER,
-                    allowNull: false
+                    allowNull: false,
+                    references: {
+                        model: 'User',
+                        key: 'id',
+                    },
                 },
 
                 type: {

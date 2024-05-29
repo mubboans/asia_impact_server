@@ -19,7 +19,7 @@
 <script src="./socket.io/socket.io.js"></script>
 <script>
     let email = "vogafij204@otemdi.com", id = 22;
-    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIyLCJlbWFpbCI6InZvZ2FmaWoyMDRAb3RlbWRpLmNvbSIsInJvbGUiOiJhZG1pbiIsInR5cGUiOiJhZG1pbiIsImxhbmdfaWQiOm51bGwsInVzZXJkZXRhaWwiOnt9LCJpYXQiOjE3MTY2Mzg5NTcsImV4cCI6MTcxNjY0NjE1N30.oRR0yiD6LrnSP87XRvB3oTBaEv-xH9gTt1egKGUw1s0"
+    let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImVtYWlsIjoidGVzdGFkdmlzb3IwMUBnbWFpbC5jb20iLCJyb2xlIjoiYWR2aXNvciIsInR5cGUiOiJ1c2VyIiwibGFuZ19pZCI6bnVsbCwiYWNjZXNzX2dyb3VwIjoidGVzdGFkdmlzb3IwMUBnbWFpbC5jb20iLCJ1c2VyZGV0YWlsIjp7InVzZXJkZXRhaWxpZCI6MjR9LCJpYXQiOjE3MTY4MDUzOTIsImV4cCI6MTcxNjgxMjU5Mn0.kAe_KupnBDNwPhHyZK3hepfDOdIjj62Ox7U4sQ9h1Hw"
     let room = Math.floor(Math.random() * 90) + 10;
     const socket = io({
         query: { email, id },

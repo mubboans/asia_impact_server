@@ -38,8 +38,8 @@ const postDocument = TryCatch(async (req, res, next) => {
 )
 
 const documentUpload = TryCatch(async (req, res, next) => {
-    console.log(req?.files?.file?.size / (1024 * 1024), 'in controller');
-    if (!req.files) {
+    console.log(req?.files?.file?.size / (1024 * 1024), 'in controller', req?.body);
+    if (!req.files || !req?.body.type) {
         throw new CustomErrorObj('File Required', 400);
     }
     if (req?.files?.file.length > 1) {
@@ -48,7 +48,7 @@ const documentUpload = TryCatch(async (req, res, next) => {
     if (req?.files?.file?.size / (1024 * 1024) >= 5) {
         throw new CustomErrorObj('File should be within 5mb', 400);
     }
-    let obj = await FileUpload(req?.files?.file);
+    let obj = await FileUpload(req?.files?.file, false, `${req?.body.type}/` || 'document/');
     await fnPost(FileStore, { ...obj, userid: req?.user?.userId }, [], req)
     return returnResponse(res, 200, 'Successfully Uploaded File', obj);
 })
