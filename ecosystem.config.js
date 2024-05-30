@@ -16,10 +16,10 @@ module.exports = {
       host: '54.161.183.125',
       ref: 'origin/main',
       repo: 'git@github.com:digitalsalt-tech/asiaimpact-api.git', // Ensure SSH URL is used
-      path: '/home/ubuntu/asiaimpact-api',
+      path: '/home/ubuntu',
       'pre-deploy-local': '',
-      'pre-deploy': 'cd /home/ubuntu/asiaimpact-api && git fetch --all && git reset --hard origin/main',
-      'post-deploy': 'cd /home/ubuntu/asiaimpact-api && npm install && pm2 reload ecosystem.config.js --env production',
+      'pre-deploy': 'git fetch --all && git reset --hard origin/main',
+      'post-deploy': 'npm install && pm2 reload ecosystem.config.js --env production',
       'pre-setup': '',
       'ssh_options': 'ForwardAgent=yes'
     }
