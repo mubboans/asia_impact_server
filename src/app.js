@@ -66,7 +66,7 @@ app.use('/asiaimpact/v1', checkToken, auth_route);
 
 
 app.get('/life-check', (req, res) => {
-  res.status(200).send('working fine  api test / | \ 👌👍');
+  res.status(200).send('working fine  api test / | \ 👌👍 abc');
 })
 
 
