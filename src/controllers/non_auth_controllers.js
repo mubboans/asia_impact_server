@@ -344,8 +344,8 @@ const SendOTP = TryCatch(async (req, res, next) => {
     fnGet(Otp, query, [], true).then(async (result) => {
         console.log(result.data[0], 'result check');
         if (result.data.length > 0) {
-            if (result.data[0].status == 'verify') {
-                throw new CustomErrorObj('Number Already verified', 400)
+            if (result.data[0].status == 'verify' && body.type == 'verification') {
+                throw new CustomErrorObj('Detail Already verified', 400)
             }
             // if (result[0].type !== body.type) {
             //     fnPost(Otp, modelobj);
