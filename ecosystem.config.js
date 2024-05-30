@@ -19,7 +19,7 @@ module.exports = {
       path: '/home/ubuntu/asiaimpact-api',
       'pre-deploy-local': '',
       'pre-deploy': 'git fetch --all && git reset --hard origin/main',
-      'post-deploy': 'npm install && pm2 reload ecosystem.config.js --env production',
+      'post-deploy': 'npm install && pm2 reload /home/ubuntu/asiaimpact-api/ecosystem.config.js --env production',
       'pre-setup': '',
       'ssh_options': 'ForwardAgent=yes'
     }
