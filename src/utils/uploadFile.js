@@ -10,7 +10,7 @@ function FileUpload(file, isMultiple, filePath) {
     return new Promise((resolve, reject) => {
         try {
             let options = {
-                Bucket: process.env.BUCKET,
+                Bucket: process.env.BUCKET || 'asia-impact',
                 Key: filePath + file?.name,
                 Body: file.data, //fileStream,
                 ContentType: file.mimetype,

@@ -1,7 +1,13 @@
 module.exports = {
-  apps: [{
-    script: 'npm start',
-  }],
+  apps: [
+    {
+      name: "asiaimpact-api",
+      script: "./server.js",
+      env_production: {
+        NODE_ENV: "production"
+      }
+    }
+  ],
 
   deploy: {
     production: {
@@ -10,8 +16,9 @@ module.exports = {
       host: '54.161.183.125',
       ref: 'origin/main',
       repo: 'git@github.com:digitalsalt-tech/asiaimpact-api.git',
-      path: '/home/ubuntu/asiaimpact-api', // Ensure this path exists
+      path: '/home/ubuntu/asiaimpact-api',
       'pre-deploy-local': '',
+      'pre-deploy': 'git fetch --all && git reset --hard origin/main',
       'post-deploy': 'npm install && pm2 reload ecosystem.config.js --env production',
       'pre-setup': '',
       'ssh_options': 'ForwardAgent=yes'
