@@ -16,10 +16,9 @@ module.exports = {
       host: '54.161.183.125',
       ref: 'origin/main',
       repo: 'git@github.com:digitalsalt-tech/asiaimpact-api.git',
-      path: '/home/ubuntu/asiaimpact-api',
+      path: '/home/ubuntu/asiaimpact-api', // Ensure this path exists
       'pre-deploy-local': '',
-      // 'pre-deploy': 'git fetch --all && git reset --hard origin/main',
-      'post-deploy': 'cd /home/ubuntu/asiaimpact-api && cp -a source/. . && echo "Copy successful" || echo "Copy failed" && npm install && echo "NPM install successful" || echo "NPM install failed" && pm reload ecosystem.config.js --env production && echo "PM2 reload successful" || echo "PM2 reload failed" && rm -rf source && echo "Source removal successful" || echo "Source removal failed"',
+      'post-deploy': 'npm install && pm2 reload ecosystem.config.js --env production',
       'pre-setup': '',
       'ssh_options': 'ForwardAgent=yes'
     }
